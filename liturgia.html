@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liturgia Completa - 27 de Julio de 2025 (Ciclo C)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Harmony (Warm neutrals with gold/blue accents) -->
+    <!-- Application Structure Plan: A single-page, vertically-scrolling app mirroring the liturgical flow. A sticky navigation bar allows jumps to "La Palabra de Dios" and "La Santa Comunión". The core interaction is a set of filter buttons ("Celebrante", "Congregación", etc.) that highlight corresponding parts of the text, aiding user participation. This structure respects the linear nature of the source while making it a dynamic, interactive guide rather than a static document. -->
+    <!-- Visualization & Content Choices: Liturgical Text -> Goal: Guide Participation -> Presentation: Structured HTML -> Interaction: Role-based text highlighting -> Justification: Simplifies following the service for participants -> Library/Method: Vanilla JS toggling CSS classes. Hymns -> Goal: Provide Music -> Presentation: Embedded Lyrics -> Interaction: Reading -> Justification: Fulfills user request for lyrics over links. Structure -> Goal: Navigate Long Content -> Presentation: Sticky Nav & Collapsible Sections -> Interaction: Click to scroll/expand -> Justification: Improves usability on a single long page -> Library/Method: JS/HTML. CONFIRMATION: NO SVG/Mermaid used as no data visualization is required. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Merriweather', serif;
+            background-color: #FDFBF5; 
+            color: #433A3F; 
+        }
+        h1, h2, h3, h4, h5, h6, .nav-item, .filter-button {
+            font-family: 'Roboto', sans-serif;
+        }
+        .liturgy-text {
+            transition: all 0.3s ease-in-out;
+            border-left: 4px solid transparent;
+            padding-left: 1rem;
+            margin-top: 1rem;
+        }
+        .highlight {
+            background-color: #FEF3C7; /* amber-100 */
+            border-left-color: #FBBF24; /* amber-400 */
+        }
+        .dimmed {
+            opacity: 0.5;
+            filter: grayscale(80%);
+        }
+        .filter-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .active-filter {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 14px 0 rgb(0 0 0 / 10%), 0 2px 8px 0 rgb(0 0 0 / 8%);
+            transform: translateY(-1px);
+        }
+        .lyrics {
+            background-color: #FAF7F0;
+            border-left: 4px solid #D1C4A8;
+            padding: 1rem 1rem 1rem 2rem;
+            font-style: italic;
+            white-space: pre-wrap;
+        }
+        #main-header {
+            transition: transform 0.3s ease-in-out;
+        }
+        .header-hidden {
+            transform: translateY(-100%);
+        }
+        /* Styles for notes and modal */
+        .note-trigger {
+            color: #0d9488; /* teal-600 */
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+        .note-trigger:hover {
+            color: #0f766e; /* teal-700 */
+        }
+        #note-modal-backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #note-modal-content {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="main-header" class="bg-stone-100/75 backdrop-blur-sm shadow-md py-2 px-4 sticky top-0 z-20">
+        <div class="container mx-auto">
+            <div class="text-center mb-2">
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">Liturgia del Domingo</h1>
+                <p class="text-base text-gray-600">17º Domingo del Tiempo Ordinario (Ciclo C) | 27 de Julio de 2025</p>
+            </div>
+            <div class="flex flex-wrap justify-center items-center gap-2">
+                <span class="font-bold text-sm mr-2 text-gray-700">Enfocar en:</span>
+                <button class="filter-button text-sm px-4 py-2 rounded-full bg-white/70 border border-stone-300 text-stone-800 font-semibold shadow-sm hover:bg-white hover:shadow-md" data-filter="all">Todos</button>
+                <button class="filter-button text-sm px-4 py-2 rounded-full bg-white/70 border border-stone-300 text-stone-800 font-semibold shadow-sm hover:bg-white hover:shadow-md" data-filter="celebrante">Celebrante</button>
+                <button class="filter-button text-sm px-4 py-2 rounded-full bg-white/70 border border-stone-300 text-stone-800 font-semibold shadow-sm hover:bg-white hover:shadow-md" data-filter="lector">Lector</button>
+                <button class="filter-button text-sm px-4 py-2 rounded-full bg-white/70 border border-stone-300 text-stone-800 font-semibold shadow-sm hover:bg-white hover:shadow-md" data-filter="congregacion">Congregación</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="palabra" class="mb-12">
+            <h2 class="text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Liturgia de la Palabra</h2>
+
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Procesión de Entrada</h3>
+                 <div class="bg-stone-50 p-4 rounded-lg">
+                    <p class="liturgy-text" data-role="congregacion">Mientras el celebrante y los ministros entran, se entona un canto. Se sugiere "Pescador de Hombres":</p>
+                    <div class="lyrics liturgy-text" data-role="congregacion">
+Tú has venido a la orilla,
+no has buscado ni a sabios ni a ricos.
+Tan solo quieres que yo te siga.
+
+Señor, me has mirado a los ojos,
+sonriendo, has dicho mi nombre.
+En la arena he dejado mi barca,
+junto a Ti, buscaré otro mar.
+
+Tú sabes bien lo que tengo,
+en mi barca no hay oro ni espadas,
+tan solo redes y mi trabajo.
+
+Señor, me has mirado a los ojos,
+sonriendo, has dicho mi nombre.
+En la arena he dejado mi barca,
+junto a Ti, buscaré otro mar.
+                    </div>
+                </div>
+            </article>
+            
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Ritos Iniciales</h3>
+                <div class="space-y-1">
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>En el nombre del Padre, y del Hijo, y del Espíritu Santo.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Amén.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo esté con todos ustedes.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Y con tu espíritu.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">Acto Penitencial</em><br>Hermanos, para celebrar dignamente estos sagrados misterios, reconozcamos nuestros pecados.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Todos:</strong><br>Yo confieso ante Dios todopoderoso, y ante ustedes hermanos, que he pecado mucho de pensamiento, palabra, obra y omisión. Por mi culpa, por mi culpa, por mi gran culpa. Por eso ruego a Santa María, siempre Virgen, a los ángeles, a los santos y a ustedes, hermanos, que intercedan por mí ante Dios, nuestro Señor.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Amén.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Señor, ten piedad.</strong><br>Señor, ten piedad.<br><strong class="text-gray-500">Cristo, ten piedad.</strong><br>Cristo, ten piedad.<br><strong class="text-gray-500">Señor, ten piedad.</strong><br>Señor, ten piedad.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo. Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">Oración Colecta</em><br>Oremos.<br>Oh Dios, protector de los que en ti esperan, sin ti nada es fuerte ni santo; multiplica sobre nosotros los signos de tu misericordia, para que, bajo tu guía, de tal modo nos sirvamos de los bienes pasajeros que podamos adherirnos a los eternos. Por nuestro Señor Jesucristo.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Amén.</p>
+                </div>
+            </article>
+
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Las Lecturas Bíblicas</h3>
+                <div class="space-y-1 bg-stone-50 p-4 rounded-lg">
+                    <div class="mb-4">
+                        <h4 class="font-bold">Primera Lectura: Génesis 18, 20-32</h4>
+                        <div class="liturgy-text" data-role="lector">
+                            <p>En aquellos días, el Señor dijo: «El <span class="note-trigger" data-title="Clamor (זעקה - ze'aqah)" data-content="El término hebreo 'ze'aqah' no es solo un ruido, sino un grito de angustia o una queja formal por una injusticia grave. Es un clamor que pide una intervención divina, como el de los israelitas en Egipto (Éxodo 3:7).">clamor [1]</span> contra Sodoma y Gomorra es tan grande, y su pecado tan grave, que he de bajar a ver si realmente sus acciones responden a la queja que ha llegado hasta mí. Y si no, lo sabré».</p>
+                            <p class="mt-2">Los hombres se volvieron de allí y se dirigieron a Sodoma, mientras Abrahán seguía en pie ante el Señor. Abrahán se acercó y dijo: «¿Es que vas a <span class="note-trigger" data-title="Destruir al justo con el culpable" data-content="Esta es una de las preguntas teológicas más profundas de la Biblia. Abrahán apela a la justicia de Dios (mishpat), argumentando que el Juez de toda la tierra debe actuar con rectitud. No está simplemente pidiendo clemencia, sino que está luchando con la naturaleza misma del carácter de Dios.">destruir al justo con el culpable? [2]</span> Supongamos que hay cincuenta justos en la ciudad: ¿acabarás con ellos y no perdonarás al lugar por los cincuenta justos que hay en él? ¡Lejos de ti tal cosa! Matar al justo con el culpable, de modo que la suerte del justo sea como la del culpable, ¡lejos de ti! El juez de toda la tierra, ¿no hará justicia?».</p>
+                            <p class="mt-2">El Señor contestó: «Si encuentro en Sodoma cincuenta justos, perdonaré a toda la ciudad en atención a ellos». Abrahán replicó: «¡Me he atrevido a hablar a mi Señor, yo que soy <span class="note-trigger" data-title="Polvo y ceniza (עפר ואפר - aphar va'epher)" data-content="Esta expresión de humildad reconoce la mortalidad humana y la gran distancia entre la criatura y el Creador. Sin embargo, desde esta posición de humildad, Abrahán habla con una audacia y una intimidad sorprendentes, un modelo para la oración de intercesión.">polvo y ceniza! [3]</span> Supongamos que faltan cinco para los cincuenta justos: ¿destruirás por cinco toda la ciudad?». Respondió: «No la destruiré, si encuentro allí cuarenta y cinco».</p>
+                            <p class="mt-2">Insistió Abrahán: «Quizá no se encuentren más que cuarenta». Dijo el Señor: «En atención a los cuarenta, no lo haré». Abrahán siguió: «Que no se enfade mi Señor, si sigo hablando: ¿Y si se encuentran treinta?». Respondió: «No lo haré, si encuentro allí treinta». Insistió Abrahán: «¡Me he atrevido a hablar a mi Señor! ¿Y si se encuentran veinte?». Respondió: «En atención a los veinte, no la destruiré». Dijo Abrahán: «Que no se enfade mi Señor, si hablo una vez más: ¿Y si se encuentran diez?». Contestó el Señor: «En atención a los diez, no la destruiré».</p>
+                        </div>
+                        <p class="liturgy-text mt-2" data-role="lector"><em class="text-gray-500">El Lector:</em> Palabra de Dios.</p>
+                        <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong> Demos gracias a Dios.</p>
+                    </div>
+                     <div class="mb-4">
+                        <h4 class="font-bold">Salmo Responsorial: Salmo 137</h4>
+                         <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">R. Señor, el día que te invoqué, me escuchaste.</strong></p>
+                         <p class="liturgy-text" data-role="lector"><em class="text-gray-500">Lector:</em> Te doy gracias, Señor, de todo corazón, porque escuchaste las palabras de mi boca; delante de los ángeles tañeré para ti, me postraré hacia tu santuario.</p>
+                         <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">R. Señor, el día que te invoqué, me escuchaste.</strong></p>
+                         <p class="liturgy-text" data-role="lector"><em class="text-gray-500">Lector:</em> Daré gracias a tu nombre por tu misericordia y tu lealtad. Cuando te invoqué, me escuchaste, acreciste el valor en mi alma.</p>
+                         <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">R. Señor, el día que te invoqué, me escuchaste.</strong></p>
+                         <p class="liturgy-text" data-role="lector"><em class="text-gray-500">Lector:</em> El Señor es sublime, se fija en el humilde y de lejos conoce al soberbio. Cuando camino entre peligros, me conservas la vida; extiendes tu izquierda contra la ira de mi enemigo, y tu derecha me salva.</p>
+                         <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">R. Señor, el día que te invoqué, me escuchaste.</strong></p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold">Segunda Lectura: Colosenses 2, 12-14</h4>
+                        <div class="liturgy-text" data-role="lector">
+                            <p>Hermanos: Por el bautismo fueron <span class="note-trigger" data-title="Sepultados con Cristo (συνταφέντες - syntaphentes)" data-content="El griego usa un participio que significa 'habiendo sido sepultados juntamente con'. Pablo utiliza la imagen del bautismo por inmersión para describir una unión mística con la muerte y sepultura de Cristo. No es solo un símbolo, sino una participación real en su muerte al pecado.">sepultados con Cristo [4]</span> y han resucitado con él, por la fe en el poder de Dios que lo resucitó de entre los muertos. Ustedes estaban muertos por sus pecados y por la incircuncisión de su carne; pero Dios los hizo vivir con Cristo, perdonándonos todos los pecados.</p>
+                            <p class="mt-2">Él anuló el <span class="note-trigger" data-title="Documento que nos era contrario (χειρόγραφον - cheirographon)" data-content="Este término griego se refiere a un 'certificado de deuda' o una 'nota de débito' escrita a mano. Pablo lo usa para describir la Ley que, aunque santa, revelaba el pecado y nos hacía deudores ante Dios. Cristo no solo pagó la deuda, sino que 'clavó' el certificado mismo en la cruz, cancelándolo y desarmando a las potencias que nos acusaban a través de él.">documento que nos era contrario, [5]</span> con sus cláusulas, y lo quitó de en medio, clavándolo en la cruz.</p>
+                        </div>
+                        <p class="liturgy-text mt-2" data-role="lector"><em class="text-gray-500">El Lector:</em> Palabra de Dios.</p>
+                        <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong> Demos gracias a Dios.</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">El Santo Evangelio</h3>
+                <div class="space-y-1">
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Aleluya, aleluya.</strong><br>Han recibido un espíritu de hijos adoptivos, que nos hace gritar: ¡Abbá, Padre!<br><strong class="text-gray-500">Aleluya.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>El Señor esté con ustedes.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Y con tu espíritu.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Lectura del santo Evangelio según san Lucas.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Gloria a ti, Señor.</p>
+                    <div class="liturgy-text" data-role="celebrante">
+                        <p>Una vez estaba Jesús orando en cierto lugar. Cuando terminó, uno de sus discípulos le dijo: «Señor, enséñanos a orar, como Juan enseñó a sus discípulos».</p>
+                        <p class="mt-2">Él les dijo: «Cuando oren, digan: “<span class="note-trigger" data-title="Padre (Πάτερ - Pater / אבא - Abba)" data-content="Aunque Lucas usa el término griego 'Pater', este evoca la palabra aramea 'Abba' que Jesús usaba. 'Abba' era un término íntimo y familiar, similar a 'papá', pero sin perder la reverencia. Era una forma radicalmente nueva de dirigirse a Dios, revelando una relación de cercanía y confianza filial.">Padre, [6]</span> santificado sea tu nombre, venga tu reino, danos cada día nuestro <span class="note-trigger" data-title="Pan del mañana (ἐπιούσιος - epiousios)" data-content="Esta palabra griega es única en toda la literatura griega y solo aparece aquí y en Mateo. Su significado es debatido. Puede significar 'para el día de hoy', 'para el día siguiente' (del mañana), o 'supersustancial', refiriéndose al Pan de Vida, la Eucaristía. La riqueza de la palabra permite todas estas interpretaciones.">pan del mañana, [7]</span> perdónanos nuestros pecados, porque también nosotros perdonamos a todo el que nos debe, y no nos dejes caer en la tentación”».</p>
+                        <p class="mt-2">Y les dijo: «Supongan que alguno de ustedes tiene un amigo, y acude a él a medianoche y le dice: “Amigo, préstame tres panes, pues uno de mis amigos ha venido de viaje y no tengo qué ofrecerle”. Y el de dentro le responde: “No me molestes; la puerta ya está cerrada, y mis niños y yo estamos acostados; no puedo levantarme a dártelos”. Les digo que, si no se levanta a dárselos por ser su amigo, por lo menos por su <span class="note-trigger" data-title="Importunidad (ἀναίδεια - anaideia)" data-content="La palabra griega 'anaideia' a menudo se traduce como 'importunidad' o 'insistencia', pero literalmente significa 'desvergüenza' o 'falta de pudor'. La parábola no sugiere que Dios sea reacio, sino que debemos orar con una audacia y una persistencia 'desvergonzadas', con la confianza de un hijo que sabe que su Padre desea darle buenos dones.">importunidad [8]</span> se levantará y le dará cuanto necesite.</p>
+                        <p class="mt-2">Pues yo les digo a ustedes: Pidan y se les dará, busquen y hallarán, llamen y se les abrirá. Porque todo el que pide, recibe; y el que busca, halla; y al que llama, se le abre. ¿Qué padre entre ustedes, si su hijo le pide un pez, le dará una serpiente en lugar del pez? ¿O si le pide un huevo, le dará un escorpión? Pues si ustedes, que son malos, saben dar cosas buenas a sus hijos, ¿cuánto más el Padre del cielo dará el Espíritu Santo a los que se lo piden?».</p>
+                    </div>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Palabra del Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Gloria a ti, Señor Jesús.</p>
+                </div>
+            </article>
+            
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">La Homilía</h3>
+                <p class="text-gray-600 italic">(Aquí el celebrante ofrece una reflexión sobre las lecturas del día.)</p>
+            </article>
+
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">El Credo</h3>
+                <p class="liturgy-text" data-role="congregacion">Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvación bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato, padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y el Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica y apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.</p>
+            </article>
+
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Oración de los Fieles</h3>
+                <div class="space-y-1">
+                    <p class="liturgy-text" data-role="lector">Hermanos, con la confianza que nos da sabernos hijos de Dios, presentemos nuestras peticiones a nuestro Padre del cielo. A cada petición responderemos: <strong class="text-gray-500">Padre, escúchanos.</strong></p>
+                    <p class="liturgy-text" data-role="lector">Para que la Iglesia nunca se canse de pedir, buscar y llamar a la puerta de la misericordia de Dios para toda la humanidad. Roguemos al Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Padre, escúchanos.</strong></p>
+                    <p class="liturgy-text" data-role="lector">Para que los líderes de las naciones, inspirados por la justicia y la compasión, trabajen incansablemente por el bien de todos, especialmente de los más vulnerables. Roguemos al Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Padre, escúchanos.</strong></p>
+                    <p class="liturgy-text" data-role="lector">Para que aquellos que se sienten perdidos o cuyos pecados les pesan, puedan experimentar la alegría del perdón de Dios, que anula toda deuda. Roguemos al Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Padre, escúchanos.</strong></p>
+                    <p class="liturgy-text" data-role="lector">Para que nuestra comunidad aprenda a orar con la insistencia de Abrahán y la confianza del Evangelio, pidiendo siempre el don del Espíritu Santo. Roguemos al Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Padre, escúchanos.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante concluye:</em> Padre bueno, que siempre nos das lo que más necesitamos, escucha estas oraciones que te presentamos con fe. Por Jesucristo, nuestro Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Amén.</strong></p>
+                </div>
+            </article>
+        </section>
+        
+        <section id="comunion" class="mb-12">
+            <h2 class="text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Liturgia Eucarística</h2>
+            
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Presentación de las Ofrendas</h3>
+                 <div class="bg-stone-50 p-4 rounded-lg">
+                    <p class="liturgy-text mt-4" data-role="congregacion">Durante la presentación de los dones, se puede entonar un canto. Se sugiere "Te Presentamos el Vino y el Pan":</p>
+                    <div class="lyrics liturgy-text" data-role="congregacion">
+Te presentamos el vino y el pan,
+Bendito seas por siempre, Señor.
+
+Bendito seas, Señor,
+por este pan que nos diste,
+fruto de la tierra y del trabajo de los hombres.
+
+Te presentamos el vino y el pan,
+Bendito seas por siempre, Señor.
+
+Bendito seas, Señor,
+el vino Tú nos lo diste,
+fruto de la tierra y del trabajo de los hombres.
+
+Te presentamos el vino y el pan,
+Bendito seas por siempre, Señor.
+                    </div>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Bendito seas, Señor, Dios del universo, por este pan, fruto de la tierra y del trabajo del hombre, que recibimos de tu generosidad y ahora te presentamos; él será para nosotros pan de vida.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Bendito seas por siempre, Señor.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Oren, hermanos, para que este sacrificio, mío y de ustedes, sea agradable a Dios, Padre todopoderoso.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>El Señor reciba de tus manos este sacrificio, para alabanza y gloria de su nombre, para nuestro bien y el de toda su santa Iglesia.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">Oración sobre las Ofrendas</em><br>Acepta, Señor, los dones que tu misma generosidad ha puesto en nuestras manos, y haz que estos sagrados misterios, por la fuerza de tu gracia, nos santifiquen en la vida presente y nos lleven a las alegrías eternas. Por Jesucristo, nuestro Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Amén.</p>
+                </div>
+            </article>
+            
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Plegaria Eucarística II</h3>
+                <div class="space-y-1">
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>El Señor esté con ustedes.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Y con tu espíritu.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Levantemos el corazón.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Lo tenemos levantado hacia el Señor.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Demos gracias al Señor, nuestro Dios.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">La Congregación:</strong><br>Es justo y necesario.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">Prefacio VI del Tiempo Ordinario: El misterio de Cristo, prenda de la salvación eterna</em><br>En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno, por Cristo, Señor nuestro. Quien, por su misterio pascual, realizó la obra maravillosa de llamarnos de la esclavitud del pecado y de la muerte al honor de ser estirpe elegida, sacerdocio real, gente santa, pueblo de su propiedad, para que, trasladados de las tinieblas a tu luz admirable, proclamemos tus proezas. Por eso, con los ángeles y arcángeles, con los tronos y dominaciones y con todos los coros celestiales, cantamos sin cesar el himno de tu gloria:</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Santo, Santo, Santo es el Señor, Dios del Universo. Llenos están el cielo y la tierra de tu gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante continúa:</em><br>Santo eres en verdad, Señor, fuente de toda santidad; por eso te pedimos que santifiques estos dones con la efusión de tu Espíritu, de manera que se conviertan para nosotros en el Cuerpo y la Sangre de Jesucristo, nuestro Señor.</p>
+                    <p class="liturgy-text" data-role="celebrante">El cual, cuando iba a ser entregado a su Pasión, voluntariamente aceptada, tomó pan, dándote gracias, lo partió y lo dio a sus discípulos, diciendo:<br><strong class="font-serif text-lg">«TOMEN Y COMAN TODOS DE ÉL, PORQUE ESTO ES MI CUERPO, QUE SERÁ ENTREGADO POR USTEDES».</strong></p>
+                    <p class="liturgy-text" data-role="celebrante">Del mismo modo, acabada la cena, tomó el cáliz, y, dándote gracias de nuevo, lo pasó a sus discípulos, diciendo:<br><strong class="font-serif text-lg">«TOMEN Y BEBAN TODOS DE ÉL, PORQUE ESTE ES EL CÁLIZ DE MI SANGRE, SANGRE DE LA ALIANZA NUEVA Y ETERNA, QUE SERÁ DERRAMADA POR USTEDES Y POR MUCHOS PARA EL PERDÓN DE LOS PECADOS. HAGAN ESTO EN CONMEMORACIÓN MÍA».</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Este es el Misterio de la fe.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante continúa:</em><br>Así, pues, Padre, al celebrar ahora el memorial de la muerte y resurrección de tu Hijo, te ofrecemos el pan de vida y el cáliz de salvación, y te damos gracias porque nos haces dignos de servirte en tu presencia. Te pedimos humildemente que el Espíritu Santo congregue en la unidad a cuantos participamos del Cuerpo y Sangre de Cristo.</p>
+                    <p class="liturgy-text" data-role="celebrante">Acuérdate, Señor, de tu Iglesia extendida por toda la tierra; y con el Papa Francisco, con nuestro Arzobispo Jorge Carlos y todos los pastores que cuidan de tu pueblo, llévala a su perfección por la caridad. Acuérdate también de nuestros hermanos que se durmieron en la esperanza de la resurrección, y de todos los que han muerto en tu misericordia; admítelos a contemplar la luz de tu rostro. Ten misericordia de todos nosotros, y así, con María, la Virgen Madre de Dios, su esposo san José, los apóstoles y cuantos vivieron en tu amistad a través de los tiempos, merezcamos, por tu Hijo Jesucristo, compartir la vida eterna y cantar tus alabanzas.</p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante eleva el pan y el cáliz:</em><br>Por Cristo, con él y en él, a ti, Dios Padre omnipotente, en la unidad del Espíritu Santo, todo honor y toda gloria por los siglos de los siglos.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Amén.</strong></p>
+                </div>
+            </article>
+
+             <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Rito de la Comunión</h3>
+                <div class="space-y-1">
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Fieles a la recomendación del Salvador y siguiendo su divina enseñanza, nos atrevemos a decir:</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Líbranos de todos los males, Señor, y concédenos la paz en nuestros días, para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Señor Jesucristo, que dijiste a tus apóstoles: «La paz les dejo, mi paz les doy», no tengas en cuenta nuestros pecados, sino la fe de tu Iglesia y, conforme a tu palabra, concédele la paz y la unidad. Tú que vives y reinas por los siglos de los siglos.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Amén.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>La paz del Señor esté siempre con ustedes.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Y con tu espíritu.</strong></p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong class="text-gray-500">Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong class="text-gray-500">Cordero de Dios, que quitas el pecado del mundo, danos la paz.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>Este es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.</strong></p>
+                </div>
+            </article>
+
+             <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Distribución de la Comunión</h3>
+                <div class="bg-stone-50 p-4 rounded-lg">
+                    <p class="liturgy-text" data-role="congregacion">(La congregación recibe la Comunión. Durante este tiempo se canta "Pan de Vida")</p>
+                     <div class="lyrics liturgy-text" data-role="congregacion">
+Pan de vida, cuerpo del Señor,
+Copa de alianza, sangre del Redentor.
+Hemos sido salvados,
+con su vida y su amor.
+Este es el pan que ha bajado del cielo
+para la vida del mundo.
+
+Quien coma de este pan, vivirá.
+Quien beba de esta copa, tendrá
+la vida eterna, la vida en Dios.
+Este es el pan que ha bajado del cielo
+para la vida del mundo.
+                     </div>
+                </div>
+            </article>
+
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Ritos de Conclusión</h3>
+                <div class="space-y-1">
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">Oración después de la Comunión</em><br>Oremos.<br>Hemos recibido, Señor, este sacramento, memorial perpetuo de la pasión de tu Hijo; concédenos que este don de su amor inefable nos aproveche para la salvación. Por Jesucristo, nuestro Señor.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Amén.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante da la bendición:</em><br>El Señor esté con ustedes.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Y con tu espíritu.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Celebrante:</em><br>La bendición de Dios todopoderoso, Padre, Hijo, y Espíritu Santo, descienda sobre ustedes.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Amén.</strong></p>
+                    <p class="liturgy-text" data-role="celebrante"><em class="text-gray-500">El Diácono o Celebrante:</em><br>Pueden ir en paz.</p>
+                    <p class="liturgy-text" data-role="congregacion"><strong class="text-gray-500">Demos gracias a Dios.</strong></p>
+                </div>
+            </article>
+
+            <article class="mb-8">
+                <h3 class="text-xl font-bold mb-2 text-gray-700">Procesión de Salida</h3>
+                <div class="bg-stone-50 p-4 rounded-lg">
+                    <p class="liturgy-text" data-role="congregacion">(Mientras el celebrante y los ministros salen, se puede entonar un canto final. Se sugiere "Pueblo de Reyes".)</p>
+                    <div class="lyrics liturgy-text" data-role="congregacion">
+Pueblo de reyes, asamblea santa,
+pueblo sacerdotal, pueblo de Dios,
+¡bendice a tu Señor!
+
+Te cantamos, oh Hijo amado del Padre,
+te alabamos, eterna Palabra salida de Dios.
+Te cantamos, oh Hijo de la Virgen María,
+te alabamos, oh Cristo nuestro hermano, nuestro Salvador.
+
+Pueblo de reyes, asamblea santa,
+pueblo sacerdotal, pueblo de Dios,
+¡bendice a tu Señor!
+                    </div>
+                </div>
+            </article>
+
+        </section>
+        
+    </main>
+
+    <section id="recursos" class="container mx-auto p-4 md:p-8 text-center border-t border-stone-200 mt-8">
+        <h2 class="text-3xl font-bold pb-2 mb-6 text-gray-800">Recursos Adicionales</h2>
+        <p class="mb-6 text-gray-600 max-w-2xl mx-auto">Haga clic en el botón de abajo para abrir una nueva ventana con recursos adicionales, incluyendo reflexiones sobre las lecturas, información sobre los santos del día y música recomendada.</p>
+        <button onclick="abrirVentanaRecursos()" class="inline-block bg-teal-600 text-white font-bold py-3 px-6 rounded-full hover:bg-teal-700 transition-colors duration-300 shadow-lg transform hover:scale-105">
+            Abrir Ventana de Recursos
+        </button>
+    </section>
+    
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 Aplicación Litúrgica Interactiva. Todos los derechos reservados.</p>
+            <p class="text-sm text-gray-400 mt-2">Textos litúrgicos del Misal Romano. Textos bíblicos de la Conferencia Episcopal Española.</p>
+            <p class="text-sm text-gray-400 mt-2">Iglesia Católica | Xalapa, Ver.</p>
+        </div>
+    </footer>
+
+    <!-- Modal for Notes -->
+    <div id="note-modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden opacity-0"></div>
+    <div id="note-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div id="note-modal-content" class="bg-white rounded-lg shadow-2xl w-full max-w-md p-6 transform scale-95 opacity-0">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="note-modal-title" class="text-xl font-bold text-gray-800"></h3>
+                <button id="note-modal-close" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="note-modal-body" class="text-gray-600">
+                <p>Content goes here.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function abrirVentanaRecursos() {
+            const resourceWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+            
+            const content = `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Recursos Adicionales</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap');
+                        body { font-family: 'Merriweather', serif; background-color: #FDFBF5; color: #433A3F; }
+                        h1, h2, h3 { font-family: 'Roboto', sans-serif; }
+                    </style>
+                </head>
+                <body class="antialiased p-8">
+                    <div class="container mx-auto">
+                        <h1 class="text-3xl font-bold text-gray-800 border-b-2 border-amber-400 pb-2 mb-6">Recursos para el 17º Domingo del Tiempo Ordinario</h1>
+                        
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-700 mb-3">Reflexión sobre el Evangelio (Lucas 11, 1-13)</h2>
+                            <p class="mb-4">El Evangelio de hoy nos presenta a Jesús como maestro de oración. Los discípulos, al verlo orar, sienten el deseo de aprender. La respuesta de Jesús es doble: les enseña el "Padre Nuestro", la oración cristiana por excelencia, y les anima a orar con confianza y perseverancia.</p>
+                            <p>La parábola del amigo inoportuno no nos muestra a un Dios reacio al que hay que convencer, sino que, por contraste, revela a un Padre que está deseando darnos lo mejor: el Espíritu Santo. La oración no es una fórmula mágica, sino un diálogo de confianza con un Padre que nos ama y sabe lo que necesitamos antes de que se lo pidamos. La insistencia en la oración no cambia a Dios, nos cambia a nosotros: abre nuestro corazón para recibir sus dones y alinea nuestra voluntad con la suya.</p>
+                        </div>
+
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-700 mb-3">La Intercesión de Abrahán (Génesis 18, 20-32)</h2>
+                            <p class="mb-4">La primera lectura nos ofrece un modelo de oración de intercesión. Abrahán, con audacia y humildad, "regatea" con Dios para salvar a los justos de Sodoma. Este diálogo revela un Dios misericordioso, dispuesto a perdonar a toda una ciudad por amor a unos pocos justos. Nos enseña a orar por los demás, a no dar por perdido a nadie y a confiar en la infinita misericordia de Dios, que siempre busca salvar y no destruir.</p>
+                        </div>
+
+                        <div class="bg-stone-100 p-6 rounded-lg">
+                            <h2 class="text-2xl font-bold text-gray-700 mb-3">Música para la Semana</h2>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>"Alma Misionera"</strong> - Un canto que nos recuerda la llamada a llevar el mensaje de Dios a todos.</li>
+                                <li><strong>"Pescador de Hombres"</strong> - Clásico canto sobre seguir a Jesús y confiar en su llamada.</li>
+                                <li><strong>"Ven, Espíritu Divino"</strong> - Una hermosa invocación al Espíritu Santo, el don que el Padre anhela darnos.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            resourceWindow.document.open();
+            resourceWindow.document.write(content);
+            resourceWindow.document.close();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Main liturgy filter logic
+            const filterButtons = document.querySelectorAll('.filter-button');
+            const liturgyTexts = document.querySelectorAll('.liturgy-text');
+            const header = document.getElementById('main-header');
+            
+            let currentFilter = 'all';
+            let lastScrollY = window.scrollY;
+
+            function applyFilter() {
+                liturgyTexts.forEach(text => {
+                    const role = text.getAttribute('data-role');
+                    if (currentFilter === 'all') {
+                        text.classList.remove('dimmed', 'highlight');
+                    } else {
+                        if (role === currentFilter) {
+                            text.classList.remove('dimmed');
+                            text.classList.add('highlight');
+                        } else {
+                            text.classList.add('dimmed');
+                            text.classList.remove('highlight');
+                        }
+                    }
+                });
+            }
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    currentFilter = button.getAttribute('data-filter');
+                    filterButtons.forEach(btn => btn.classList.remove('active-filter'));
+                    button.classList.add('active-filter');
+                    applyFilter();
+                });
+            });
+
+            function handleHeaderVisibility() {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > lastScrollY && currentScrollY > header.offsetHeight) {
+                    header.classList.add('header-hidden');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                lastScrollY = currentScrollY;
+            }
+
+            window.addEventListener('scroll', handleHeaderVisibility);
+
+            const allButton = document.querySelector('.filter-button[data-filter="all"]');
+            if(allButton) {
+                allButton.classList.add('active-filter');
+            }
+            applyFilter();
+
+            // Modal logic for notes
+            const modal = document.getElementById('note-modal');
+            const modalBackdrop = document.getElementById('note-modal-backdrop');
+            const modalContent = document.getElementById('note-modal-content');
+            const modalTitle = document.getElementById('note-modal-title');
+            const modalBody = document.getElementById('note-modal-body');
+            const closeModalBtn = document.getElementById('note-modal-close');
+            const noteTriggers = document.querySelectorAll('.note-trigger');
+
+            function openModal(title, content) {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = content; // Use innerHTML to allow for simple formatting if needed
+                modal.classList.remove('hidden');
+                modalBackdrop.classList.remove('hidden');
+                setTimeout(() => {
+                    modalBackdrop.classList.remove('opacity-0');
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            }
+
+            function closeModal() {
+                modalBackdrop.classList.add('opacity-0');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modalBackdrop.classList.add('hidden');
+                }, 300); // Match transition duration
+            }
+
+            noteTriggers.forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const title = trigger.getAttribute('data-title');
+                    const content = trigger.getAttribute('data-content');
+                    openModal(title, content);
+                });
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+
+        });
+    </script>
+</body>
+</html>
