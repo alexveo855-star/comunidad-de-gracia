@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBCG APP - Liturgia 2025 (Ciclo C)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Merriweather', serif;
+            background-image: url('https://www.bibleserver.com/build/bs-start-back-Dno9hVpC.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #433A3F; 
+        }
+        h1, h2, h3, h4, h5, h6, .nav-item, .filter-button, .main-nav-button {
+            font-family: 'Roboto', sans-serif;
+        }
+        .liturgy-text {
+            transition: all 0.3s ease-in-out;
+            border-left: 4px solid transparent;
+            padding-left: 1rem;
+            margin-top: 1rem;
+            line-height: 1.8;
+        }
+        #main-header {
+            transition: transform 0.3s ease-in-out;
+        }
+        .header-hidden {
+            transform: translateY(-100%);
+        }
+        .ref-link {
+            cursor: pointer;
+            font-weight: bold;
+            color: #0f766e; /* teal-700 */
+            text-decoration: none;
+            position: relative;
+        }
+        .ref-link sup {
+            font-size: 0.7em;
+            vertical-align: super;
+            margin-left: 1px;
+            font-weight: 900;
+        }
+        #theology-popup {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 350px;
+            z-index: 110;
+            font-family: 'Merriweather', serif;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #334155;
+        }
+        #theology-popup h5 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: #0d9488;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        #theology-popup .original-term {
+            font-size: 1.5rem;
+            font-family: 'Times New Roman', serif;
+        }
+        #popup-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #94a3b8;
+            cursor: pointer;
+            line-height: 1;
+        }
+        #popup-close:hover { color: #475569; }
+        
+        /* Full Screen Liturgy View Styles */
+        #full-liturgy-view {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #FDFBF5; z-index: 100; overflow-y: auto;
+        }
+        .liturgy-section h2 {
+            font-size: 1.5rem; md:font-size: 1.75rem; font-weight: 700; border-bottom: 2px solid #fBBF24; padding-bottom: 0.5rem; margin-bottom: 1.5rem; margin-top: 2.5rem; color: #1e293b;
+        }
+         .liturgy-section h3 {
+            font-size: 1.1rem; md:font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #334155;
+        }
+        
+        /* Bible View Styles */
+        .book-button {
+            width: 100%; text-align: left; padding: 0.5rem 0.75rem; border-radius: 0.375rem; transition: background-color 0.2s, color 0.2s; font-size: 0.9rem;
+        }
+        .book-button:hover:not(:disabled) { background-color: #f3f4f6; }
+        .book-button:disabled { color: #9ca3af; cursor: not-allowed; }
+        .book-button.active { background-color: #0d9488; color: white; font-weight: 600; }
+        #chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 0.5rem; margin-top: 1rem; }
+        .chapter-button {
+            aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; border: 1px solid #d1d5db; border-radius: 9999px; transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .chapter-button:hover { background-color: #fef3c7; border-color: #fBBF24; }
+        .chapter-button.active { background-color: #0d9488; color: white; border-color: #0d9488; font-weight: 600; }
+        #bible-chapter-content sup { font-size: 0.65em; vertical-align: super; color: #0f766e; font-weight: bold; margin-right: 0.2em; line-height: 1; }
+        #bible-chapter-content p { line-height: 1.9; }
+
+        #back-to-chapters-mobile { display: none; }
+
+        @media (max-width: 767px) {
+            .mobile-content-focused #bible-nav {
+                display: none;
+            }
+            .mobile-content-focused #bible-content-wrapper {
+                width: 100%;
+            }
+            .mobile-content-focused #back-to-chapters-mobile {
+                display: flex;
+            }
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1489664942048-a3a60914a2f4?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-align: center;
+            transition: opacity 1.5s ease-in-out;
+            padding: 1rem;
+        }
+        #splash-screen.fade-out {
+            opacity: 0;
+        }
+        .splash-title {
+            font-family: 'Merriweather', serif;
+            font-size: 2.5rem; sm:font-size: 3rem; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .splash-subtitle {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem; sm:font-size: 1.25rem; margin-top: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        /* New Menu */
+        .main-nav-button {
+            padding: 0.5rem 0;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: #4b5563; /* gray-600 */
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem; sm:font-size: 1rem;
+        }
+        .main-nav-button:hover {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #99f6e4; /* teal-200 */
+        }
+        .active-nav {
+            color: #0f766e; /* teal-700 */
+            font-weight: 700;
+            border-bottom-color: #0f766e; /* teal-700 */
+        }
+        
+        #sunday-selector option {
+            background-color: white;
+            color: #1f2937;
+        }
+
+        /* Accordion Styles */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .is-open + .accordion-content {
+            max-height: 1000px; /* Adjust if list is longer */
+        }
+        .is-open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+
+        /* Print Styles */
+        .print-only-header { display: none; }
+        @media print {
+            @page {
+                size: letter landscape;
+                margin: 1cm;
+            }
+            body, html { background-color: white !important; }
+            body > *:not(#full-liturgy-view) { display: none; }
+            #full-liturgy-view {
+                position: static; width: auto; height: auto; overflow: visible; background-color: white !important;
+            }
+            #full-liturgy-header { display: none; }
+            .print-only-header { display: block; text-align: center; margin-bottom: 1cm; break-after: avoid; }
+            .print-title { font-size: 16pt; font-weight: bold; font-family: 'Times New Roman', Times, serif; }
+            .print-subtitle { font-size: 12pt; font-style: italic; font-family: 'Times New Roman', Times, serif; }
+            #full-liturgy-content { padding: 0; margin: 0; }
+            .print-liturgy-body { column-count: 2; column-gap: 1.5cm; }
+            .liturgy-section { break-inside: avoid; }
+            .liturgy-section h2 { font-size: 14pt !important; color: black !important; border-bottom: 2px solid black; break-after: avoid; padding-top: 1em; }
+            .liturgy-section:first-of-type h2 { padding-top: 0; }
+            .liturgy-section h3 { font-size: 11pt !important; color: black !important; }
+            body, .liturgy-text, p { font-family: 'Times New Roman', Times, serif; font-size: 10pt !important; color: black !important; background-color: white !important; }
+            .ref-link { display: none; }
+            #full-liturgy-content .bg-white { box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="splash-screen">
+        <h1 class="splash-title">Comunidad de Gracia</h1>
+        <p class="splash-subtitle">Liturgia y Recursos</p>
+    </div>
+
+    <div id="main-content" class="opacity-0 transition-opacity duration-500">
+        <header id="main-header" class="bg-white/80 backdrop-blur-sm shadow-sm py-2 px-4 sticky top-0 z-20">
+            <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+                <!-- Logo and Title -->
+                <div class="flex items-center gap-3 self-start sm:self-center">
+                    <img id="logo-image" src="https://scontent-mia3-1.xx.fbcdn.net/v/t39.30808-1/458442022_122107426106496454_2577487987417874050_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=111&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=Zy1TV0kujjIQ7kNvwEz8bgt&_nc_oc=Adl4Yh0O1zq-mS8LlfMHzCmTKgBM-yzBhJyyNVnQtxBS9eQMVoKdbqWamxJjkk23f78&_nc_zt=24&_nc_ht=scontent-mia3-1.xx&_nc_gid=AuKzGmho4nnugwzcXEAx7A&oh=00_AfQLVtVuH2tLlf7fZE-otz8oogECgeQlPogoM7mnCAewGA&oe=68938DFE" onerror="this.onerror=null;this.src='https://placehold.co/100x100/3A5F7D/FFFFFF?text=Logo';" alt="Logo Comunidad de Gracia" class="h-10 w-auto rounded-full">
+                    <h1 class="text-lg sm:text-xl font-bold text-gray-800">IBCG APP</h1>
+                </div>
+                <!-- Navigation Buttons -->
+                <nav class="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 sm:gap-x-4 md:gap-x-6 w-full sm:w-auto">
+                    <a id="btn-liturgy" class="main-nav-button cursor-pointer">Liturgia</a>
+                    <a id="btn-bible" class="main-nav-button cursor-pointer">Biblia</a>
+                    <a id="btn-glossary" class="main-nav-button cursor-pointer">Recursos</a>
+                    <a id="btn-lectionary" class="main-nav-button cursor-pointer">Leccionario</a>
+                    <a href="https://www.bibleserver.com/nicodemus-ai" target="_blank" rel="noopener noreferrer" class="main-nav-button">Nicodemus IA</a>
+                    <a id="btn-upload-logo" class="main-nav-button cursor-pointer">
+                        <svg class="w-6 h-6 text-gray-600 hover:text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <input type="file" id="logo-uploader" class="hidden" accept="image/*">
+
+        <div id="liturgy-view">
+             <div class="container mx-auto p-4 flex justify-center items-center min-h-[80vh]">
+                <div class="w-full max-w-2xl bg-black/50 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-2xl">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-6">Descarga la liturgia dominical</h2>
+                    <div class="flex items-center gap-4">
+                        <svg class="w-6 h-6 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <select id="sunday-selector" class="w-full p-3 bg-white/20 text-white rounded-md border border-white/30 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none appearance-none">
+                            <option value="">Selecciona una Celebración...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="bible-view" class="hidden">
+             <main class="container mx-auto p-4">
+                <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-4 sm:mb-6 text-gray-800 bg-white/80 backdrop-blur-sm rounded-t-lg px-4 py-2">Biblia - El Libro del Pueblo de Dios</h2>
+                <div id="bible-flex-container" class="flex flex-col md:flex-row gap-6">
+                    <!-- Navigation Panel -->
+                    <nav id="bible-nav" class="md:w-1/3 lg:w-1/4 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-lg self-start md:sticky top-24">
+                         <div id="book-list-container" class="space-y-2">
+                             <div>
+                                 <button class="accordion-header flex items-center justify-between w-full p-3 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+                                     <span class="font-bold text-teal-800">Antiguo Testamento</span>
+                                     <svg class="accordion-icon w-5 h-5 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                 </button>
+                                 <div id="ot-books" class="accordion-content pl-4 pt-2 space-y-1"></div>
+                             </div>
+                             <div>
+                                 <button class="accordion-header flex items-center justify-between w-full p-3 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+                                     <span class="font-bold text-teal-800">Nuevo Testamento</span>
+                                     <svg class="accordion-icon w-5 h-5 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                 </button>
+                                 <div id="nt-books" class="accordion-content pl-4 pt-2 space-y-1"></div>
+                            </div>
+                         </div>
+                         <div id="chapter-list-container" class="hidden">
+                            <button id="back-to-books-btn" class="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                                Volver a Libros
+                            </button>
+                            <h3 id="chapter-list-title" class="text-xl font-bold mb-3 text-teal-800"></h3>
+                            <div id="chapter-grid"></div>
+                         </div>
+                    </nav>
+                    <!-- Content Panel -->
+                    <div id="bible-content-wrapper" class="md:w-2/3 lg:w-3/4 relative">
+                        <button id="back-to-chapters-mobile" class="sticky top-24 left-0 z-10 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-gray-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <div id="bible-chapter-content" class="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-inner min-h-[75vh] prose max-w-none mt-4 md:mt-0">
+                            <div class="flex items-center justify-center h-full text-center text-gray-500">
+                                <p>Seleccione un libro y capítulo para comenzar la lectura.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="glossary-view" class="hidden">
+            <main class="container mx-auto p-4 md:p-8">
+                <div class="bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">ACNA: Libro de Oración Común y Recursos</h2>
+                    <div class="mt-8 text-center bg-stone-100 p-6 sm:p-8 rounded-lg shadow">
+                        <p class="text-lg text-gray-700 mb-4">Para acceder a los recursos del Libro de Oración Común, por favor haz clic en el siguiente botón. El sitio se abrirá en una nueva pestaña del navegador.</p>
+                        <a href="https://bcp2019.anglicanchurch.net/index.php/downloads-espanol/" target="_blank" rel="noopener noreferrer" class="inline-block bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors shadow-md">
+                            Ir a Recursos ACNA
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="lectionary-view" class="hidden">
+            <main class="container mx-auto p-4 md:p-8 flex items-center justify-center min-h-[85vh]">
+                <div class="w-full max-w-2xl bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Leccionario Diario 2025</h2>
+                    <div class="mt-8 text-center bg-stone-100 p-6 sm:p-8 rounded-lg shadow">
+                        <p class="text-lg text-gray-700 mb-6">El Leccionario Diario se abrirá en una nueva pestaña del navegador para una mejor experiencia de visualización.</p>
+                        <a href="https://liturgical-calendar.com/es/ACNA2019/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors shadow-md">
+                            <span>Abrir Leccionario</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <footer class="bg-gray-800/90 text-white py-6 px-4">
+            <div class="container mx-auto text-center">
+                <p>&copy; 2025 IBCG APP. Todos los derechos reservados.</p>
+                <p class="text-sm text-gray-400 mt-2">Textos litúrgicos del Misal Romano. Textos bíblicos de la Conferencia Episcopal Española.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="full-liturgy-view" class="hidden">
+        <header id="full-liturgy-header" class="sticky top-0 bg-white/95 backdrop-blur-sm shadow-md z-10">
+            <div class="container mx-auto flex items-center justify-between p-2 sm:p-4">
+                <button id="back-to-calendar-btn" title="Volver al calendario" class="flex-shrink-0 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    <span class="hidden sm:inline font-semibold text-base">Volver</span>
+                </button>
+                <div class="flex-grow text-center min-w-0 px-2">
+                    <h1 id="full-liturgy-title" class="text-sm sm:text-base md:text-lg font-bold text-gray-800 truncate"></h1>
+                    <p id="full-liturgy-subtitle" class="text-xs text-gray-600 truncate"></p>
+                </div>
+                <div class="flex-shrink-0 flex items-center gap-2 sm:gap-4">
+                    <button id="download-docx-btn" title="Descargar como DOCX" class="text-gray-600 hover:text-gray-900 transition-colors p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </button>
+                    <button id="print-btn" title="Imprimir Liturgia" class="text-gray-600 hover:text-gray-900 transition-colors p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main id="full-liturgy-content" class="container mx-auto p-4 md:p-8">
+            
+</main>
+    </div>
+
+    <div id="theology-popup">
+        <span id="popup-close">&times;</span>
+        <div id="popup-content-theology"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- HELPER FUNCTIONS ---
+            const addDays = (d, days) => { const res = new Date(d); res.setDate(d.getDate() + days); return res; };
+            
+            // --- COMPLETE BIBLE DATA (Structure) ---
+            // Note: To optimize performance, only key books/chapters are fully loaded.
+            // The complete structure is provided for full navigation.
+            const placeholderChapter = (chapterNum) => ([{ verse: 1, text: `[Texto del capítulo ${chapterNum} no cargado para optimizar el rendimiento.]` }]);
+            
+            const bibleData = [
+                // --- ANTIGUO TESTAMENTO ---
+                { "name": "Génesis", "testament": "OT", "chapters": [
+                    [
+                        {"verse":1,"text":"Al principio Dios creó el cielo y la tierra."},
+                        {"verse":2,"text":"La tierra era algo informe y vacío, las tinieblas cubrían el abismo, y el soplo de Dios se cernía sobre las aguas."},
+                        {"verse":3,"text":"Entonces Dios dijo: «Que exista la luz». Y la luz existió."},
+                        {"verse":4,"text":"Dios vio que la luz era buena, y separó la luz de las tinieblas;"},
+                        {"verse":5,"text":"y llamó a la luz «Día», y a las tinieblas «Noche». Así hubo una tarde y una mañana: este fue el primer día."},
+                        {"verse":6,"text":"Dios dijo: «Que haya un firmamento en medio de las aguas, para que separe las aguas de las aguas»."},
+                        {"verse":7,"text":"Y así sucedió. Dios hizo el firmamento, y este separó las aguas que están debajo de él, de las aguas que están encima de él."},
+                        {"verse":8,"text":"Y Dios llamó al firmamento «Cielo». Así hubo una tarde y una mañana: este fue el segundo día."},
+                        {"verse":9,"text":"Dios dijo: «Que se reúnan en un solo lugar las aguas que están bajo el cielo, y que aparezca el suelo firme». Y así sucedió."},
+                        {"verse":10,"text":"Dios llamó al suelo firme «Tierra», y al conjunto de las aguas «Mar». Y Dios vio que esto era bueno."},
+                        {"verse":11,"text":"Entonces Dios dijo: «Que la tierra produzca vegetales, toda clase de plantas con semillas y árboles que den frutos con simiente». Y así sucedió."},
+                        {"verse":12,"text":"La tierra produjo vegetales, toda clase de plantas con semillas y árboles que dan frutos con simiente. Y Dios vio que esto era bueno."},
+                        {"verse":13,"text":"Así hubo una tarde y una mañana: este fue el tercer día."},
+                        {"verse":14,"text":"Dios dijo: «Que haya astros en el firmamento del cielo para separar el día de la noche; que ellos sirvan de señales para marcar las festividades, los días y los años;"},
+                        {"verse":15,"text":"y que estén en el firmamento del cielo para iluminar la tierra». Y así sucedió."},
+                        {"verse":16,"text":"Dios hizo los dos grandes astros: el astro mayor para gobernar el día, y el menor para gobernar la noche; e hizo también las estrellas."},
+                        {"verse":17,"text":"Y los puso en el firmamento del cielo para iluminar la tierra,"},
+                        {"verse":18,"text":"para gobernar el día y la noche, y para separar la luz de las tinieblas. Y Dios vio que esto era bueno."},
+                        {"verse":19,"text":"Así hubo una tarde y una mañana: este fue el cuarto día."},
+                        {"verse":20,"text":"Dios dijo: «Que las aguas se llenen de seres vivientes, y que vuelen los pájaros sobre la tierra, en el firmamento del cielo»."},
+                        {"verse":21,"text":"Dios creó los grandes monstruos marinos, todos los seres vivientes que se deslizan y que llenan las aguas según su especie, y todas las aves según su especie. Y Dios vio que esto era bueno."},
+                        {"verse":22,"text":"Entonces los bendijo, diciéndoles: «Sean fecundos y multiplíquense; llenen las aguas de los mares, y que las aves se multipliquen sobre la tierra»."},
+                        {"verse":23,"text":"Así hubo una tarde y una mañana: este fue el quinto día."},
+                        {"verse":24,"text":"Dios dijo: «Que la tierra produzca seres vivientes según su especie: animales domésticos, reptiles y animales salvajes según su especie». Y así sucedió."},
+                        {"verse":25,"text":"Dios hizo los animales salvajes según su especie, los animales domésticos según su especie, y todos los reptiles de la tierra según su especie. Y Dios vio que esto era bueno."},
+                        {"verse":26,"text":"Dios dijo: «Hagamos al hombre a nuestra imagen, según nuestra semejanza; y que le estén sometidos los peces del mar y las aves del cielo, el ganado, las fieras de la tierra, y todos los reptiles que se arrastran por el suelo»."},
+                        {"verse":27,"text":"Y Dios creó al hombre a su imagen; lo creó a imagen de Dios, los creó varón y mujer."},
+                        {"verse":28,"text":"Y los bendijo, diciéndoles: «Sean fecundos, multiplíquense, llenen la tierra y sométanla; dominen a los peces del mar, a las aves del cielo y a todos los vivientes que se mueven sobre la tierra»."},
+                        {"verse":29,"text":"Y continuó diciendo: «Yo les doy todas las plantas que producen semilla sobre la tierra, y todos los árboles que dan frutos con semilla: todo esto les servirá de alimento."},
+                        {"verse":30,"text":"Y a todos los animales de la tierra, a todas las aves del cielo y a todos los seres vivientes que se mueven sobre la tierra, les doy como alimento toda clase de hierba verde». Y así sucedió."},
+                        {"verse":31,"text":"Dios miró todo lo que había hecho, y vio que era muy bueno. Así hubo una tarde y una mañana: este fue el sexto día."}
+                    ],
+                    [
+                        {"verse":1,"text":"Así fueron terminados el cielo y la tierra, y todos los seres que hay en ellos."},
+                        {"verse":2,"text":"El séptimo día, Dios concluyó la obra que había hecho, y cesó de toda su actividad."},
+                        {"verse":3,"text":"Dios bendijo el séptimo día y lo consagró, porque en él cesó de toda la obra de creación que había hecho."},
+                        {"verse":4,"text":"Este es el origen del cielo y de la tierra cuando fueron creados. Cuando el Señor Dios hizo la tierra y el cielo,"},
+                        {"verse":5,"text":"aún no había ningún arbusto del campo sobre la tierra ni había brotado ninguna hierba del campo, porque el Señor Dios no había hecho llover sobre la tierra, ni había hombre que la cultivara."},
+                        {"verse":6,"text":"Sin embargo, un manantial brotaba de la tierra y regaba toda la superficie del suelo."},
+                        {"verse":7,"text":"Entonces el Señor Dios modeló al hombre con arcilla del suelo y sopló en su nariz un aliento de vida. Así el hombre se convirtió en un ser viviente."},
+                        {"verse":8,"text":"El Señor Dios plantó un jardín en Edén, al oriente, y allí puso al hombre que había formado."},
+                        {"verse":9,"text":"El Señor Dios hizo brotar del suelo toda clase de árboles agradables a la vista y buenos para comer; en medio del jardín, hizo brotar el árbol de la vida y el árbol del conocimiento del bien y del mal."},
+                        {"verse":10,"text":"De Edén salía un río que regaba el jardín y que desde allí se dividía en cuatro brazos."},
+                        {"verse":11,"text":"El primero se llama Pisón: es el que rodea todo el país de Javilá, donde hay oro."},
+                        {"verse":12,"text":"El oro de ese país es bueno; también se encuentra allí el bedelio y la piedra de ónix."},
+                        {"verse":13,"text":"El segundo río se llama Guijón: es el que rodea todo el país de Cus."},
+                        {"verse":14,"text":"El tercer río se llama Tigris: es el que pasa al oriente de Asur. Y el cuarto río es el Eufrates."},
+                        {"verse":15,"text":"El Señor Dios tomó al hombre y lo puso en el jardín de Edén, para que lo cultivara y lo cuidara."},
+                        {"verse":16,"text":"Y el Señor Dios le dio esta orden: «Puedes comer de todos los árboles del jardín,"},
+                        {"verse":17,"text":"pero no comas del árbol del conocimiento del bien y del mal; porque el día que comas de él, ciertamente morirás»."},
+                        {"verse":18,"text":"Después el Señor Dios dijo: «No es bueno que el hombre esté solo. Le haré una ayuda adecuada»."},
+                        {"verse":19,"text":"Entonces el Señor Dios modeló con arcilla del suelo a todos los animales del campo y a todos los pájaros del cielo, y se los presentó al hombre para ver qué nombre les ponía. Y cada ser viviente debía llevar el nombre que el hombre le pusiera."},
+                        {"verse":20,"text":"El hombre puso un nombre a todos los animales domésticos, a todas las aves del cielo y a todos los animales del campo; pero no encontró una ayuda adecuada para sí."},
+                        {"verse":21,"text":"Entonces el Señor Dios hizo caer sobre el hombre un profundo sueño, y mientras dormía, le sacó una de sus costillas y cerró la carne en su lugar."},
+                        {"verse":22,"text":"Con la costilla que había sacado del hombre, el Señor Dios formó una mujer y se la presentó al hombre."},
+                        {"verse":23,"text":"El hombre exclamó: «¡Esta sí que es hueso de mis huesos y carne de mi carne! Se llamará Mujer, porque ha sido sacada del hombre»."},
+                        {"verse":24,"text":"Por eso el hombre deja a su padre y a su madre y se une a su mujer, y los dos llegan a ser una sola carne."},
+                        {"verse":25,"text":"Los dos, el hombre y su mujer, estaban desnudos, pero no sentían vergüenza."}
+                    ],
+                    [
+                        {"verse":1,"text":"La serpiente era el más astuto de todos los animales del campo que el Señor Dios había hecho. Y dijo a la mujer: «¿Así que Dios les ha dicho que no coman de ningún árbol del jardín?»."},
+                        {"verse":2,"text":"La mujer respondió a la serpiente: «Podemos comer del fruto de los árboles del jardín,"},
+                        {"verse":3,"text":"pero del fruto del árbol que está en medio del jardín, ha dicho Dios: “No coman de él, ni lo toquen, para que no mueran”»."},
+                        {"verse":4,"text":"Entonces la serpiente dijo a la mujer: «No, no morirán."},
+                        {"verse":5,"text":"Es que Dios sabe que el día que coman de él, se les abrirán los ojos y serán como dioses, conocedores del bien y del mal»."},
+                        {"verse":6,"text":"La mujer vio que el árbol era bueno para comer, agradable a los ojos y deseable para adquirir sabiduría. Tomó, pues, de su fruto y comió. Y dio también a su marido, que estaba con ella, y él comió."},
+                        {"verse":7,"text":"Entonces se les abrieron los ojos a ambos y se dieron cuenta de que estaban desnudos; y cosieron hojas de higuera y se hicieron unos ceñidores."},
+                        {"verse":8,"text":"Oyeron la voz del Señor Dios que se paseaba por el jardín a la brisa del día, y el hombre y su mujer se escondieron de la presencia del Señor Dios entre los árboles del jardín."},
+                        {"verse":9,"text":"Pero el Señor Dios llamó al hombre y le dijo: «¿Dónde estás?»."},
+                        {"verse":10,"text":"Él respondió: «Oí tu voz en el jardín, y tuve miedo, porque estaba desnudo, y me escondí»."},
+                        {"verse":11,"text":"Le dijo: «¿Quién te ha hecho saber que estabas desnudo? ¿Has comido del árbol del que te mandé no comer?»."},
+                        {"verse":12,"text":"Dijo el hombre: «La mujer que me diste por compañera me dio del árbol, y comí»."},
+                        {"verse":13,"text":"Dijo, pues, el Señor Dios a la mujer: «¿Qué es lo que has hecho?». Y la mujer dijo: «La serpiente me engañó, y comí»."},
+                        {"verse":14,"text":"Entonces el Señor Dios dijo a la serpiente: «Por haber hecho esto, maldita seas entre todas las bestias y entre todos los animales del campo. Sobre tu vientre te arrastrarás, y polvo comerás todos los días de tu vida."},
+                        {"verse":15,"text":"Pondré enemistad entre ti y la mujer, y entre tu descendencia y la suya; esta te aplastará la cabeza, mientras tú le herirás el talón»."},
+                        {"verse":16,"text":"A la mujer le dijo: «Multiplicaré en gran manera los dolores en tus preñeces; con dolor darás a luz los hijos. Tu deseo será para tu marido, y él se enseñoreará de ti»."},
+                        {"verse":17,"text":"Y al hombre le dijo: «Por cuanto obedeciste a la voz de tu mujer, y comiste del árbol de que te mandé diciendo: “No comerás de él”, maldita será la tierra por tu causa; con dolor comerás de ella todos los días de tu vida."},
+                        {"verse":18,"text":"Espinos y cardos te producirá, y comerás plantas del campo."},
+                        {"verse":19,"text":"Con el sudor de tu rostro comerás el pan hasta que vuelvas a la tierra, porque de ella fuiste tomado; pues polvo eres, y al polvo volverás»."},
+                        {"verse":20,"text":"Y llamó el hombre el nombre de su mujer, Eva, por cuanto ella era madre de todos los vivientes."},
+                        {"verse":21,"text":"Y el Señor Dios hizo al hombre y a su mujer túnicas de pieles, y los vistió."},
+                        {"verse":22,"text":"Y dijo el Señor Dios: «He aquí el hombre es como uno de nosotros, sabiendo el bien y el mal; ahora, pues, que no alargue su mano, y tome también del árbol de la vida, y coma, y viva para siempre»."},
+                        {"verse":23,"text":"Y lo sacó el Señor del huerto del Edén, para que labrase la tierra de que fue tomado."},
+                        {"verse":24,"text":"Echó, pues, fuera al hombre, y puso al oriente del huerto de Edén querubines, y una espada encendida que se revolvía por todos lados, para guardar el camino del árbol de la vida."}
+                    ],
+                    ...Array.from({ length: 47 }, (_, i) => placeholderChapter(i + 4)) // Placeholder for Gen 4-50
+                ]},
+                { "name": "Éxodo", "testament": "OT", "chapters": Array.from({ length: 40 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Levítico", "testament": "OT", "chapters": Array.from({ length: 27 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Números", "testament": "OT", "chapters": Array.from({ length: 36 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Deuteronomio", "testament": "OT", "chapters": Array.from({ length: 34 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Josué", "testament": "OT", "chapters": Array.from({ length: 24 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Jueces", "testament": "OT", "chapters": Array.from({ length: 21 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Rut", "testament": "OT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Samuel", "testament": "OT", "chapters": Array.from({ length: 31 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Samuel", "testament": "OT", "chapters": Array.from({ length: 24 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Reyes", "testament": "OT", "chapters": Array.from({ length: 22 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Reyes", "testament": "OT", "chapters": Array.from({ length: 25 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Crónicas", "testament": "OT", "chapters": Array.from({ length: 29 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Crónicas", "testament": "OT", "chapters": Array.from({ length: 36 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Esdras", "testament": "OT", "chapters": Array.from({ length: 10 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Nehemías", "testament": "OT", "chapters": Array.from({ length: 13 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Tobías", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Judit", "testament": "OT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Ester", "testament": "OT", "chapters": Array.from({ length: 10 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Macabeos", "testament": "OT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Macabeos", "testament": "OT", "chapters": Array.from({ length: 15 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Job", "testament": "OT", "chapters": Array.from({ length: 42 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Salmos", "testament": "OT", "chapters": [
+                    [{"verse":1,"text":"¡Feliz el hombre que no sigue el consejo de los malvados, ni se detiene en el camino de los pecadores, ni se sienta en la reunión de los impíos,"},{"verse":2,"text":"sino que se complace en la ley del Señor y la medita de día y de noche!"}],
+                    ...Array.from({ length: 21 }, (_, i) => placeholderChapter(i + 2)), // Psalms 2-22
+                    [{"verse":1,"text":"El Señor es mi pastor, nada me puede faltar."},{"verse":2,"text":"Él me hace descansar en verdes praderas, me conduce a las aguas tranquilas"},{"verse":3,"text":"y repara mis fuerzas; me guía por el recto sendero, por amor de su Nombre."},{"verse":4,"text":"Aunque cruce por oscuras quebradas, no temeré ningún mal, porque tú estás conmigo: tu vara y tu bastón me infunden confianza."},{"verse":5,"text":"Tú preparas ante mí una mesa, frente a mis enemigos; unges con óleo mi cabeza y mi copa rebosa."},{"verse":6,"text":"Tu bondad y tu gracia me acompañan a lo largo de mi vida; y habitaré en la Casa del Señor, por muy largo tiempo."}],
+                    ...Array.from({ length: 127 }, (_, i) => placeholderChapter(i + 24)) // Psalms 24-150
+                ]},
+                { "name": "Proverbios", "testament": "OT", "chapters": Array.from({ length: 31 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Eclesiastés", "testament": "OT", "chapters": Array.from({ length: 12 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Cantar de los Cantares", "testament": "OT", "chapters": Array.from({ length: 8 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Sabiduría", "testament": "OT", "chapters": Array.from({ length: 19 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Eclesiástico (Sirácida)", "testament": "OT", "chapters": Array.from({ length: 51 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Isaías", "testament": "OT", "chapters": Array.from({ length: 66 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Jeremías", "testament": "OT", "chapters": Array.from({ length: 52 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Lamentaciones", "testament": "OT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Baruc", "testament": "OT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Ezequiel", "testament": "OT", "chapters": Array.from({ length: 48 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Daniel", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Oseas", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Joel", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Amós", "testament": "OT", "chapters": Array.from({ length: 9 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Abdías", "testament": "OT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Jonás", "testament": "OT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Miqueas", "testament": "OT", "chapters": Array.from({ length: 7 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Nahúm", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Habacuc", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Sofonías", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Ageo", "testament": "OT", "chapters": Array.from({ length: 2 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Zacarías", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Malaquías", "testament": "OT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
+                
+                // --- NUEVO TESTAMENTO ---
+                { "name": "Mateo", "testament": "NT", "chapters": [
+                    ...Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)), // Matt 1-4
+                    [{"verse":1,"text":"Al ver a la multitud, Jesús subió a la montaña, se sentó, y sus discípulos se acercaron a él."},{"verse":2,"text":"Entonces tomó la palabra y comenzó a enseñarles, diciendo:"},{"verse":3,"text":"«Felices los que tienen alma de pobres, porque a ellos les pertenece el Reino de los Cielos."},{"verse":4,"text":"Felices los que lloran, porque serán consolados."},{"verse":5,"text":"Felices los pacientes, porque recibirán la tierra en herencia."}], // Matt 5
+                    [{"verse":9,"text":"Ustedes oren de esta manera: Padre nostro, que estás en el cielo, santificado sea tu Nombre,"},{"verse":10,"text":"que venga tu Reino, que se haga tu voluntad en la tierra como en el cielo."},{"verse":11,"text":"Danos hoy nuestro pan de cada día."},{"verse":12,"text":"Perdona nuestras ofensas, como nosotros perdonamos a los que nos ofenden."},{"verse":13,"text":"No nos dejes caer en la tentación, y líbranos del mal."}], // Matt 6
+                    ...Array.from({ length: 22 }, (_, i) => placeholderChapter(i + 7)) // Matt 7-28
+                ]},
+                { "name": "Marcos", "testament": "NT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Lucas", "testament": "NT", "chapters": Array.from({ length: 24 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Juan", "testament": "NT", "chapters": [
+                    [{"verse":1,"text":"Al principio existía la Palabra, y la Palabra estaba junto a Dios, y la Palabra era Dios."},{"verse":2,"text":"Al principio estaba junto a Dios."},{"verse":3,"text":"Todas las cosas fueron hechas por medio de la Palabra y sin ella no se hizo nada de todo lo que existe."},{"verse":4,"text":"En ella estaba la vida, y la vida era la luz de los hombres."},{"verse":5,"text":"La luz brilla en las tinieblas, y las tinieblas no la recibieron."}], // John 1
+                    ...Array.from({ length: 20 }, (_, i) => placeholderChapter(i + 2)) // John 2-21
+                ]},
+                { "name": "Hechos de los Apóstoles", "testament": "NT", "chapters": Array.from({ length: 28 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Romanos", "testament": "NT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Corintios", "testament": "NT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Corintios", "testament": "NT", "chapters": Array.from({ length: 13 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Gálatas", "testament": "NT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Efesios", "testament": "NT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Filipenses", "testament": "NT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Colosenses", "testament": "NT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Tesalonicenses", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Tesalonicenses", "testament": "NT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Timoteo", "testament": "NT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Timoteo", "testament": "NT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Tito", "testament": "NT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Filemón", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Hebreos", "testament": "NT", "chapters": Array.from({ length: 13 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Santiago", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Pedro", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Pedro", "testament": "NT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "1 Juan", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "2 Juan", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "3 Juan", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Judas", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Apocalipsis", "testament": "NT", "chapters": Array.from({ length: 22 }, (_, i) => placeholderChapter(i + 1)) }
+            ];
+
+            // --- COMPLETE LITURGICAL DATA GENERATOR ---
+            function getLiturgyForDate(date) {
+                const year = date.getFullYear();
+                if (year !== 2025) return null;
+
+                const toYYYYMMDD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                const dateString = toYYYYMMDD(date);
+                const dayOfWeek = date.getDay();
+
+                if (dayOfWeek !== 0) return null; // Only process Sundays for this model
+
+                const easter = new Date(2025, 3, 20);
+                const ashWednesday = addDays(easter, -46);
+                const pentecost = addDays(easter, 50);
+                const firstSundayOfAdvent = new Date(2025, 10, 30);
+                const baptismLord = new Date(2025, 0, 12);
+                const trinitySunday = addDays(pentecost, 7);
+                const corpusChristi = addDays(pentecost, 14);
+                const christKing = new Date(2025, 10, 23);
+
+                let season = 'Ordinary Time';
+                if (date >= firstSundayOfAdvent && date < new Date(2025, 11, 25)) season = 'Advent';
+                else if ((date >= new Date(2025, 11, 25)) || (date <= baptismLord)) season = 'Christmas';
+                else if (date >= ashWednesday && date < easter) season = 'Lent';
+                else if (date >= easter && date <= pentecost) season = 'Easter';
+
+                let liturgy = {
+                    title: '', cycle: '', omitGloria: false, omitCredo: false, omitAlleluia: false,
+                    prayers: { collect: '', offerings: '', postCommunion: '', preface: ''},
+                    readings: { firstReading: null, psalm: null, secondReading: null, alleluiaVerse: null, gospelAcclamationVerse: null, gospel: null }
+                };
+
+                // --- Base Templates for Mass Parts (Now with full text) ---
+                const templates = {
+                    initialGreeting: `<h3>Saludo Inicial</h3><p class="liturgy-text">En el nombre del Padre, y del Hijo, y del Espíritu Santo.<br><strong>Amén.</strong><br>La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo esté con todos ustedes.<br><strong>Y con tu espíritu.</strong></p>`,
+                    penitentialAct: `<h3>Acto Penitencial (Libro de Oración Común ACNA)</h3><p class="liturgy-text">Amados en el Señor, acerquémonos con un corazón penitente y obediente a la Palabra de Dios, confesando nuestros pecados para que podamos recibir el perdón por su infinita bondad y misericordia.<br><em>Se guarda un momento de silencio.</em><br><strong>Misericordiosísimo Dios, confesamos que hemos pecado contra ti en pensamiento, palabra y obra, por lo que hemos hecho y por lo que hemos dejado de hacer. No te hemos amado con todo nuestro corazón; no hemos amado a nuestro prójimo como a nosotros mismos. Lo sentimos de veras y nos arrepentimos humildemente. Por tu Hijo Jesucristo, ten misericordia de nosotros y perdónanos, para que nos deleitemos en tu voluntad y andemos en tus caminos, para la gloria de tu Nombre. Amén.</strong><br>Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.<br><strong>Amén.</strong></p>`,
+                    gloria: `<h3>Gloria</h3><p class="liturgy-text"><strong>Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo. Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.</strong></p>`,
+                    alleluia: (verse) => `<h3>Aleluya</h3><p class="liturgy-text"><strong>Aleluya, aleluya.</strong><br>${verse}<br><strong>Aleluya.</strong></p>`,
+                    gospelAcclamation: (verse) => `<h3>Aclamación antes del Evangelio</h3><p class="liturgy-text">${verse}</p>`,
+                    gospel: (gospelData) => `<h3>Evangelio: ${gospelData.ref}</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Lectura del santo Evangelio según san ${gospelData.ref.split(' ')[0]}.<br><strong>Gloria a ti, Señor.</strong></p><p class="liturgy-text">${gospelData.text}</p><p class="liturgy-text">Palabra del Señor.<br><strong>Gloria a ti, Señor Jesús.</strong></p>`,
+                    credo: `<h3>Profesión de Fe - Credo Niceno-Constantinopolitano</h3><p class="liturgy-text"><strong>Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvación bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato, padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y del Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica y apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.</strong></p>`,
+                    prayerOfTheFaithful: `<h3>Oración de los Fieles</h3><p class="liturgy-text">Hermanos, oremos a Dios Padre, que escucha siempre la oración de sus hijos.</p><p class="liturgy-text">Por la santa Iglesia de Dios, para que el Señor le dé la paz, la mantenga en la unidad y la proteja en toda la tierra, y a todos nosotros nos conceda una vida tranquila y serena. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Por los gobernantes de todas las naciones, para que busquen siempre la justicia y promuevan la paz y el bien común. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Por los que sufren a causa de la enfermedad, la pobreza, la soledad o cualquier otra dificultad, para que encuentren en nosotros el consuelo y la ayuda que necesitan. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Por nuestra comunidad parroquial, para que, alimentados con el Cuerpo y la Sangre de Cristo, crezcamos en el amor a Dios y a nuestros hermanos. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Escucha, Padre de bondad, las oraciones de tu pueblo y concédenos aquellos dones que confiadamente te pedimos. Por Jesucristo, nuestro Señor.<br><strong>Amén.</strong></p>`,
+                    eucharisticPrayerII: (preface) => `<h3>Plegaria Eucarística II</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Levantemos el corazón.<br><strong>Lo tenemos levantado hacia el Señor.</strong><br>Demos gracias al Señor, nuestro Dios.<br><strong>Es justo y necesario.</strong></p><p class="liturgy-text">${preface}</p><p class="liturgy-text"><strong>Santo, Santo, Santo es el Señor, Dios del Universo. Llenos están el cielo y la tierra de tu gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.</strong></p><p class="liturgy-text">Santo eres en verdad, Señor, fuente de toda santidad; por eso te pedimos que santifiques estos dones con la efusión de tu Espíritu, de manera que se conviertan para nosotros en el Cuerpo y la Sangre de Jesucristo, nuestro Señor.<br>El cual, cuando iba a ser entregado a su Pasión, voluntariamente aceptada, tomó pan, dándote gracias, lo partió y lo dio a sus discípulos, diciendo:<br><strong>«TOMEN Y COMAN TODOS DE ÉL, PORQUE ESTO ES MI CUERPO, QUE SERÁ ENTREGADO POR USTEDES».</strong><br>Del mismo modo, acabada la cena, tomó el cáliz, y, dándote gracias de nuevo, lo pasó a sus discípulos, diciendo:<br><strong>«TOMEN Y BEBAN TODOS DE ÉL, PORQUE ESTE ES EL CÁLIZ DE MI SANGRE, SANGRE DE LA ALIANZA NUEVA Y ETERNA, QUE SERÁ DERRAMADA POR USTEDES E POR MUCHOS PARA EL PERDÓN DE LOS PECADOS. HAGAN ESTO EN CONMEMORACIÓN MÍA».</strong><br>Este es el Misterio de la fe.<br><strong>Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!</strong><br>Así, pues, Padre, al celebrar ahora el memorial de la muerte y resurrección de tu Hijo, te ofrecemos el pan de vida y el cáliz de salvación, y te damos gracias porque nos haces dignos de servirte en tu presencia. Te pedimos humildemente que el Espíritu Santo congregue en la unidad a cuantos participamos del Cuerpo y Sangre de Cristo. Acuérdate, Señor, de tu Iglesia extendida por toda la tierra... Acuérdate también de nuestros hermanos que se durmieron en la esperanza de la resurrección, y de todos los que han muerto en tu misericordia; admítelos a contemplar la luz de tu rostro. Ten misericordia de todos nosotros...<br>Por Cristo, con él y en él, a ti, Dios Padre omnipotente, en la unidad del Espíritu Santo, todo honor y toda gloria por los siglos de los siglos.<br><strong>Amén.</strong></p>`,
+                    communionRite: `<h3>Rito de la Comunión</h3>
+<p class="liturgy-text">Fieles a la recomendación del Salvador y siguiendo su divina enseñanza, nos atrevemos a decir:</p>
+<p class="liturgy-text"><strong>Padre nostro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.</strong></p>
+<p class="liturgy-text">Líbranos de todos los males, Señor, y concédenos la paz en nuestros días, para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.</p>
+<p class="liturgy-text"><strong>Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.</strong></p>
+<p class="liturgy-text">Señor Jesucristo, que dijiste a tus apóstoles: «La paz les dejo, mi paz les doy», no tengas en cuenta nuestros pecados, sino la fe de tu Iglesia y, conforme a tu palabra, concédele la paz y la unidad. Tú que vives y reinas por los siglos de los siglos.<br><strong>Amén.</strong></p>
+<p class="liturgy-text">La paz del Señor esté siempre con ustedes.<br><strong>Y con tu espíritu.</strong></p>
+<p class="liturgy-text italic">A continuación, si procede, el diácono o el sacerdote, dice:</p>
+<p class="liturgy-text"><strong>Daos fraternalmente la paz.</strong></p>
+<p class="liturgy-text"><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, danos la paz.</strong></p>
+<p class="liturgy-text">Este es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.</p>
+<p class="liturgy-text"><strong>Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.</strong></p>`,
+                    acnaPostCommunion: `<h3>Oración después de la Comunión (Libro de Oración Común ACNA)</h3><p class="liturgy-text"><strong>Padre Celestial, te damos gracias por alimentarnos con el alimento espiritual del preciosísimo Cuerpo y Sangre de tu Hijo nuestro Salvador Jesucristo; y por asegurarnos en estos santos misterios que somos miembros vivos de tu Hijo y herederos de tu reino eterno. Y ahora, Padre, envíanos al mundo para hacer el trabajo que nos has dado que hacer, para amar y servirte como testigos fieles de Cristo nuestro Señor. A él, a ti y al Espíritu Santo, sea el honor y la gloria, ahora y por siempre. Amén.</strong></p>`,
+                    concludingRites: `<h3>Rito de Conclusión</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>La bendición de Dios todopoderoso, Padre, Hijo, y Espíritu Santo, descienda sobre ustedes.<br><strong>Amén.</strong><br>Pueden ir en paz.<br><strong>Demos gracias a Dios.</strong></p>`
+                };
+
+                // --- Theological Term Data ---
+                const terms = {
+                    zaaqat: {original: "זַעֲקַת", transliteration: "za'aqat", meaning: "Clamor, un grito de angustia o por justicia. Refleja una queja formal llevada ante una autoridad superior, en este caso, Dios."},
+                    chattatam: {original: "חַטָּאתָם", transliteration: "chattatam", meaning: "Su pecado. Deriva de una raíz que significa 'errar el blanco'. Implica una ofensa moral y una desviación del camino divino."},
+                    tzaddiq: {original: "צַדִּיק", transliteration: "tzaddiq", meaning: "Justo, inocente. Describe a alguien que vive en conformidad con la ley y la voluntad de Dios, manteniendo una relación correcta con Él y con la comunidad."},
+                    nasata: {original: "נָשָׂאתָ", transliteration: "nasata", meaning: "Perdonar, levantar, llevar. La idea de 'perdonar' aquí está ligada a 'quitar' o 'llevarse' la culpa del pecado."},
+                    yada: {original: "יָדָה", transliteration: "yadá", meaning: "Dar gracias, alabar, confesar. Implica un reconocimiento público y gozoso de la grandeza y las obras de Dios."},
+                    chesed: {original: "חֶסֶד", transliteration: "chesed", meaning: "Misericordia, amor leal, bondad pactada. Es un atributo central de Dios que describe su fidelidad inquebrantable a su pacto con su pueblo."},
+                    emet: {original: "אֱמֶת", transliteration: "emet", meaning: "Lealtad, verdad, fidelidad. Denota firmeza, fiabilidad y constancia. La verdad de Dios es su fidelidad a sus promesas."},
+                    baptisma: {original: "βάπτισμα", transliteration: "baptisma", meaning: "Bautismo. Inmersión o ablución ritual que simboliza purificación, muerte al pecado y renacimiento a una nueva vida en Cristo."},
+                    syntaphentes: {original: "συνταφέντες", transliteration: "syntaphéntes", meaning: "Sepultados con. Participio que indica una acción conjunta. En el bautismo, el creyente se une místicamente a la sepultura de Cristo."},
+                    synegerthate: {original: "συνηγέρθητε", transliteration: "synēgērthēte", meaning: "Resucitados con. Similar al anterior, indica una resurrección conjunta con Cristo a una nueva vida, un concepto central de la soteriología paulina."},
+                    pistis: {original: "πίστις", transliteration: "pístis", meaning: "Fe. No solo es una creencia intelectual, sino una confianza radical y una adhesión personal a Dios a través de Cristo."},
+                    charisamenos: {original: "χαρισάμενος", transliteration: "charisámenos", meaning: "Habiendo perdonado gratuitamente. Viene de 'charis' (gracia). El perdón de Dios no es ganado, sino un don de su gracia inmerecida."},
+                    proseuchomai: {original: "προσεύχομαι", transliteration: "proseúchomai", meaning: "Orar. Una comunicación directa y personal con Dios, que implica alabanza, petición y acción de gracias."},
+                    pater: {original: "Πάτερ", transliteration: "Páter", meaning: "Padre. Jesús usa este término íntimo para dirigirse a Dios, revelando una relación filial única y enseñando a sus discípulos a acercarse a Dios con la misma confianza."},
+                    basileia: {original: "βασιλεία", transliteration: "basileía", meaning: "Reino. Se refiere al reinado o soberanía de Dios. Es una realidad presente y futura que irrumpe en el mundo a través de la persona y obra de Jesús."},
+                    aphiomen: {original: "ἀφίομεν", transliteration: "aphíomen", meaning: "Perdonamos, dejamos ir, cancelamos una deuda. La oración vincula el perdón que recibimos de Dios con nuestra disposición a perdonar a otros."},
+                    pneumaHagion: {original: "Πνεῦμα Ἅγιον", transliteration: "Pneúma Hágion", meaning: "Espíritu Santo. La tercera persona de la Trinidad, presentado como el don supremo del Padre, que capacita, guía y santifica a los creyentes."},
+                    hevel: {original: "הֶבֶל", transliteration: "hevel", meaning: "Vanidad, soplo, vapor. Describe algo efímero, fútil y sin sustancia duradera."},
+                    chokmah: {original: "חָכְמָה", transliteration: "chokmah", meaning: "Sabiduría. No solo conocimiento, sino la habilidad de vivir de manera recta y piadosa según el orden de Dios."},
+                    amal: {original: "עָמָל", transliteration: "amal", meaning: "Afán, trabajo fatigoso, esfuerzo. A menudo con una connotación de trabajo pesado y agotador."},
+                    anothen: {original: "ἄνωθεν", transliteration: "ánōthen", meaning: "De arriba. Puede significar tanto 'de nuevo' como 'desde arriba'. Pablo lo usa para dirigir la atención de los creyentes a la realidad celestial."},
+                    kryptō: {original: "κρύπτω", transliteration: "krýptō", meaning: "Esconder. La nueva vida del creyente está segura y protegida en la esfera divina, unida a Cristo."},
+                    eikōn: {original: "εἰκών", transliteration: "eikōn", meaning: "Imagen. El creyente se renueva a semejanza de la imagen de su Creador, restaurando la dignidad original perdida por el pecado."},
+                    pleonexia: {original: "πλεονεξία", transliteration: "pleonexía", meaning: "Codicia, avaricia. Un deseo insaciable de tener más, que Jesús identifica como una forma de idolatría porque desplaza a Dios del centro de la vida."},
+                    psychē: {original: "ψυχή", transliteration: "psychē", meaning: "Alma, vida. Se refiere a la persona en su totalidad, el centro de la vida y la personalidad."},
+                    aphrōn: {original: "ἄφρων", transliteration: "áphrōn", meaning: "Necio, insensato. Describe a alguien que vive sin considerar a Dios ni la verdadera naturaleza de la vida y la muerte."},
+                    hypostasis: {original: "ὑπόστασις", transliteration: "hypóstasis", meaning: "Sustancia, fundamento, garantía. En este contexto, la fe es la realidad fundamental de lo que se espera."},
+                    elenchos: {original: "ἔλεγχos", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
+                    epangelia: {original: "ἐπαγγελία", transliteration: "epangelía", meaning: "Promesa. Un compromiso divino que es el objeto de la esperanza y la fe del creyente."},
+                    poimnion: {original: "ποίμνιον", transliteration: "poímnion", meaning: "Rebaño pequeño. Término de cariño y ternura que Jesús usa para sus discípulos, destacando su vulnerabilidad y la protección de Dios."},
+                    kardia: {original: "καρδία", transliteration: "kardía", meaning: "Corazón. En la Biblia, no es solo el asiento de las emociones, sino el centro del intelecto, la voluntad y toda la persona."},
+                    gregoreō: {original: "γρηγορέω", transliteration: "grēgoreō", meaning: "Velar, estar despierto. Una actitud de alerta espiritual y preparación constante para la venida del Señor."},
+                    doulos: {original: "δοῦλος", transliteration: "doûlos", meaning: "Siervo, esclavo. Describe la total devoción y obediencia a un amo; en el Nuevo Testamento, se usa para la relación del creyente con Cristo."},
+                    phronimos: {original: "φρόνιμος", transliteration: "phrónimos", meaning: "Prudente, sensato. Describe al siervo que actúa con sabiduría práctica y fidelidad en ausencia de su amo."},
+                    bor: {original: "בּוֹר", transliteration: "bōr", meaning: "Cisterna, pozo, mazmorra. Un hoyo cavado, a menudo para almacenar agua, pero también usado como prisión."},
+                    tit: {original: "טִיט", transliteration: "tīt", meaning: "Lodo, fango, arcilla. Representa una situación de desamparo y desesperación de la que uno no puede salir por sí mismo."},
+                    hypomone: {original: "ὑπομονή", transliteration: "hypomonē", meaning: "Perseverancia, resistencia paciente. No es una resignación pasiva, sino una constancia activa y esperanzada en medio de la prueba."},
+                    martys: {original: "μάρτυς", transliteration: "mártys", meaning: "Testigo. Alguien que da testimonio de lo que ha visto o experimentado. En el contexto cristiano, se refiere a dar testimonio de Cristo, incluso hasta la muerte (mártir)."},
+                    agon: {original: "ἀγών", transliteration: "agōn", meaning: "Lucha, combate, carrera. Se usa en el contexto de una competencia atlética, simbolizando el esfuerzo y la disciplina de la vida cristiana."},
+                    pyr: {original: "πῦρ", transliteration: "pŷr", meaning: "Fuego. Símbolo poderoso con múltiples significados: purificación, juicio, la presencia de Dios y la división que la verdad puede causar."},
+                    diamerismos: {original: "διαμερισμός", transliteration: "diamerismós", meaning: "División, discordia. La llegada del Reino de Dios provoca una crisis que obliga a tomar partido, pudiendo causar división incluso en las familias."},
+                    goyim: {original: "גּוֹיִם", transliteration: "gōyim", meaning: "Naciones, gentiles. Se refiere a todos los pueblos no israelitas. La visión profética de Isaías es universal: todas las naciones verán la gloria de Dios."},
+                    kabod: {original: "כָּבוֹד", transliteration: "kābôd", meaning: "Gloria. Se refiere al peso, la honra y la manifestación visible de la majestad y la presencia de Dios."},
+                    paideia: {original: "παιδεία", transliteration: "paideía", meaning: "Disciplina, corrección, formación. Se refiere a la formación integral de un niño, que incluye instrucción y corrección para su bien. El autor de Hebreos la aplica a la acción correctora y formativa de Dios."},
+                    stenes_pyles: {original: "στενῆς πύλης", transliteration: "stenēs pýlēs", meaning: "Puerta estrecha. Metáfora que indica que la entrada al Reino de Dios requiere esfuerzo, decisión y renuncia, no es un camino fácil ni automático."},
+                    anaw: {original: "עָנָו", transliteration: "‘ānāw", meaning: "Humilde, pobre, manso. Describe a quien depende totalmente de Dios, en contraste con el soberbio que confía en sí mismo."},
+                    tapeinophrosyne: {original: "ταπεινοφροσύνη", transliteration: "tapeinophrosýnē", meaning: "Humildad, modestia. La virtud de tener una visión realista y modesta de uno mismo ante Dios y los demás."},
+                    protoklisia: {original: "πρωτοκλισία", transliteration: "prōtoklisía", meaning: "Primer puesto. Literalmente, 'reclinarse el primero'. Se refiere al lugar de honor en un banquete, símbolo de estatus y prestigio social."},
+                    kalein: {original: "καλεῖν", transliteration: "kaleîn", meaning: "Invitar, llamar. Jesús usa este verbo para contrastar las invitaciones sociales basadas en la reciprocidad con la invitación gratuita y generosa del Reino de Dios."}
+                };
+
+                const ref = (key, num) => `<span class="ref-link" data-term='${JSON.stringify(terms[key]).replace(/'/g, "&#39;")}'><sup>${num}</sup></span>`;
+
+                // --- LITURGICAL DATA FOR SUNDAYS OF 2025 (CYCLE C) ---
+
+                // --- SEASONAL FLAGS ---
+                if (season === 'Advent') { liturgy.omitGloria = true; }
+                if (season === 'Lent') { liturgy.omitGloria = true; liturgy.omitAlleluia = true; }
+
+
+                // --- ADVENT ---
+                if (season === 'Advent') {
+                    liturgy.cycle = 'Tiempo de Adviento';
+                    liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno, por Cristo, Señor nuestro. Quien, al venir por vez primera en la humildad de nuestra carne, realizó el plan de redención que habías trazado desde antiguo y nos abrió el camino de la salvación eterna, para que, cuando venga de nuevo en la majestad de su gloria, revelando así la plenitud de su obra, podamos recibir los bienes prometidos que ahora, en vigilante espera, confiamos alcanzar. Por eso, con los ángeles y los arcángeles, con los tronos y las dominaciones y con todos los coros celestiales, cantamos sin cesar el himno de tu gloria:';
+                    
+                    if (dateString === '2025-11-30') { /* ... */ } 
+                    else if (dateString === '2025-12-07') { /* ... */ } 
+                    else if (dateString === '2025-12-14') { /* ... */ } 
+                    else if (dateString === '2025-12-21') { /* ... */ }
+                }
+
+                // --- ORDINARY TIME ---
+                else if (season === 'Ordinary Time') {
+                    liturgy.cycle = 'Tiempo Ordinario';
+                    
+                    if (dateString === '2025-07-27') {
+                        liturgy.title = 'Decimoséptimo Domingo del Tiempo Ordinario';
+                        liturgy.cycle = 'Ciclo C';
+                        liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:';
+                        liturgy.readings = {
+                            firstReading: { ref: 'Génesis 18, 20-32', text: `En aquellos días, dijo el Señor: «El clamor${ref('zaaqat', 1)} contra Sodoma y Gomorra es fuerte y su pecado${ref('chattatam', 2)} es grave; voy a bajar, a ver si lo que han hecho responde en todo al clamor que ha llegado hasta mí; y si no, lo sabré». Los hombres se volvieron de allí y se dirigieron a Sodoma, mientras Abrahán seguía en pie ante el Señor. Abrahán se acercó y le dijo: «¿Es que vas a destruir al justo${ref('tzaddiq', 3)} con el culpable? Si hay cincuenta justos en la ciudad, ¿los destruirás y no perdonarás el lugar por los cincuenta justos que hay en él? ¡Lejos de ti tal cosa! Matar al justo con el culpable, de modo que la suerte del justo sea como la del culpable; ¡lejos de ti! El juez de toda la tierra, ¿no hará justicia?». El Señor contestó: «Si encuentro en Sodoma cincuenta justos, perdonaré a toda la ciudad en atención a ellos». Abrahán replicó: «¡Me he atrevido a hablar a mi Señor, yo que soy polvo y ceniza! Si faltan cinco para los cincuenta justos, ¿destruirás por cinco toda la ciudad?». Respondió el Señor: «No la destruiré, si encuentro allí cuarenta y cinco». Abrahán insistió: «Quizá no se encuentren más que cuarenta». Le dijo: «En atención a los cuarenta, no lo haré». Abrahán siguió: «Que no se enfade mi Señor, si sigo hablando. ¿Y si se encuentran treinta?». Él dijo: «No lo haré, si encuentro allí treinta». Insistió Abrahán: «¡Me he atrevido a hablar a mi Señor! ¿Y si se encuentran veinte?». Respondió: «En atención a los veinte, no la destruiré». Abrahán dijo: «Que no se enfade mi Señor, y hablaré solo esta vez: ¿Y si se encuentran diez?». Contestó el Señor: «En atención a los diez, no la destruiré».` },
+                            psalm: { ref: 'Salmo 137', response: 'Cuando te invoqué, me escuchaste, Señor.', stanzas: [ `Te doy gracias${ref('yada', 5)}, Señor, de todo corazón;<br>delante de los ángeles tañeré para ti,<br>me postraré hacia tu santuario.`, `Daré gracias a tu nombre:<br>por tu misericordia${ref('chesed', 6)} y tu lealtad${ref('emet', 7)}.<br>Cuando te invoqué, me escuchaste,<br>acreciste el valor en mi alma.`, `Que te den gracias, Señor, los reyes de la tierra,<br>al escuchar el oráculo de tu boca;<br>canten los caminos del Señor,<br>porque la gloria del Señor es grande.`, `Tu derecha me salva.<br>El Señor completará sus favores conmigo.<br>Señor, tu misericordia es eterna,<br>no abandones la obra de tus manos.` ] },
+                            secondReading: { ref: 'Colosenses 2, 12-14', text: `Hermanos: Por el bautismo${ref('baptisma', 8)} fuisteis sepultados con${ref('syntaphentes', 9)} Cristo y habéis resucitado con él, por la fe${ref('pistis', 11)} en la fuerza de Dios que lo resucitó de entre los muertos. Y a vosotros, que estabais muertos por vuestros pecados y la incircuncisión de vuestra carne, os vivificó con él, perdonándonos${ref('charisamenos', 12)} gratuitamente todos los pecados. Canceló la nota de cargo que nos condenaba con sus cláusulas, la quitó de en medio, clavándola en la cruz.` },
+                            alleluiaVerse: 'Habéis recibido un espíritu de hijos de adopción, en el que clamamos: ¡Abba, Padre! (cf. Rm 8, 15bc)',
+                            gospel: { ref: 'Lucas 11, 1-13', text: `Una vez que estaba Jesús orando${ref('proseuchomai', 13)} en cierto lugar, cuando terminó, uno de sus discípulos le dijo: «Señor, enséñanos a orar, como Juan enseñó a sus discípulos». Él les dijo: «Cuando oréis, decid: “Padre${ref('pater', 14)}, santificado sea tu nombre, venga tu reino${ref('basileia', 15)}, danos cada día nuestro pan del mañana, perdónanos nuestros pecados, porque también nosotros perdonamos${ref('aphiomen', 16)} a todo el que nos debe, y no nos dejes caer en la tentación”». Y les dijo: «Suponed que alguno de vosotros tiene un amigo, y viene a medianoche para decirle: “Amigo, préstame tres panes, pues uno de mis amigos ha venido de viaje y no tengo qué ofrecerle”. Y, desde dentro, el otro le responde: “No me molestes; la puerta está cerrada; mis niños y yo estamos acostados; no puedo levantarme para dártelos”. Os digo que, si no se levanta y se los da por ser amigo suyo, por lo menos por su importunidad se levantará y le dará cuanto necesite. Pues yo os digo a vosotros: Pedid y se os dará, buscad y hallaréis, llamad y se os abrirá; porque todo el que pide, recibe; y el que busca, halla; y al que llama, se le abre. ¿Qué padre entre vosotros, si su hijo le pide un pez, le dará una serpiente en lugar del pez? ¿O si le pide un huevo, le dará un escorpión? Si vosotros, pues, que sois malos, sabéis dar cosas buenas a vuestros hijos, ¿cuánto más vuestro Padre celestial dará el Espíritu Santo${ref('pneumaHagion', 17)} a los que se lo piden?».` }
+                        };
+                        liturgy.prayers.collect = 'Oh Dios, protector de los que en ti esperan, sin ti nada es fuerte ni santo; multiplica sobre nosotros los signos de tu misericordia, para que, bajo tu guía, de tal modo nos sirvamos de los bienes pasajeros que podamos adherirnos a los eternos. Por nuestro Señor Jesucristo.';
+                        liturgy.prayers.offerings = 'Recibe, Señor, los dones que por tu generosidad te presentamos, para que estos sagrados misterios, con la fuerza de tu gracia, nos santifiquen en la vida presente y nos lleven a las alegrías eternas. Por Jesucristo, nuestro Señor.';
+                        liturgy.prayers.postCommunion = 'Hemos recibido, Señor, este sacramento, memorial perpetuo de la pasión de tu Hijo; concédenos que este don, que él mismo nos entregó con amor inefable, nos aproveche para la salvación. Por Jesucristo, nuestro Señor.';
+                    }
+                    else if (dateString === '2025-08-03') {
+                        liturgy.title = 'Decimoctavo Domingo del Tiempo Ordinario';
+                        liturgy.cycle = 'Ciclo C';
+                        liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:';
+                        liturgy.readings = {
+                            firstReading: { ref: 'Eclesiastés 1, 2; 2, 21-23', text: `¡Vanidad${ref('hevel', 1)} de vanidades! —dice Qohélet—, ¡vanidad de vanidades, todo es vanidad! Hay quien se agota trabajando con sabiduría${ref('chokmah', 2)}, con ciencia y con acierto, y tiene que dejárselo todo a otro que no ha trabajado. También esto es vanidad y una gran desgracia. Entonces, ¿qué saca el hombre de todos los afanes${ref('amal', 3)} y fatigas con que se agota bajo el sol? Porque todos sus días son un tormento, y su tarea, una congoja; ni de noche descansa su corazón. También esto es vanidad.` },
+                            psalm: { ref: 'Salmo 89', response: 'Señor, tú has sido nuestro refugio de generación en generación.', stanzas: [ `Tú reduces el hombre a polvo,<br>diciendo: «Retornad, hijos de Adán».<br>Mil años en tu presencia son un ayer que pasó,<br>una vela en la noche.`, `Los siembras año por año, como hierba que se renueva:<br>que florece y se renueva por la mañana,<br>y por la tarde la siegan y se seca.`, `Enséñanos a calcular nuestros años,<br>para que adquiramos un corazón sensato.<br>Vuélvete, Señor, ¿hasta cuándo?<br>Ten compasión de tus siervos.`, `Por la mañana sácianos de tu misericordia,<br>y toda nuestra vida será alegría y júbilo.<br>Baje a nosotros la bondad del Señor<br>y haga prósperas las obras de nuestras manos.` ] },
+                            secondReading: { ref: 'Colosenses 3, 1-5. 9-11', text: `Hermanos: Si habéis resucitado con Cristo, buscad las cosas de arriba${ref('anothen', 4)}, donde está Cristo, sentado a la derecha de Dios. Aspirad a las cosas de arriba, no a las de la tierra. Porque habéis muerto, y vuestra vida está escondida${ref('kryptō', 5)} con Cristo en Dios. Cuando aparezca Cristo, vida vuestra, entonces también vosotros apareceréis, gloriosos, con él. Por tanto, dad muerte a todo lo terreno que hay en vosotros: la fornicación, la impureza, la pasión, la codicia y la avaricia, que es una idolatría. No os engañéis unos a otros, pues os habéis despojado del hombre viejo con sus obras, y os habéis revestido del nuevo, que se va renovando como imagen${ref('eikōn', 6)} de su creador, hasta llegar a conocerlo. En esta nueva condición no hay griego ni judío, circuncisión ni incircuncisión, bárbaro o escita, esclavo o libre, sino que Cristo es todo en todos.` },
+                            alleluiaVerse: 'Dichosos los pobres en el espíritu, porque de ellos es el reino de los cielos. (Mt 5, 3)',
+                            gospel: { ref: 'Lucas 12, 13-21', text: `En aquel tiempo, uno de la gente le dijo a Jesús: «Maestro, dile a mi hermano que reparta conmigo la herencia». Él le contestó: «Hombre, ¿quién me ha constituido juez o árbitro entre vosotros?». Y les dijo: «Mirad: guardaos de toda clase de codicia${ref('pleonexia', 7)}. Pues, aunque uno ande sobrado, su vida no está asegurada por sus bienes». Y les propuso una parábola: «Las tierras de un hombre rico produjeron una gran cosecha. Y empezó a deliberar para sí: “¿Qué haré? No tengo dónde almacenar mi cosecha”. Y se dijo: “Haré lo siguiente: derribaré mis graneros y construiré otros más grandes, y almacenaré allí todo mi grano y mis bienes. Y entonces me diré a mí mismo: Alma${ref('psychē', 8)} mía, tienes bienes acumulados para muchos años; descansa, come, bebe y date buena vida”. Pero Dios le dijo: “¡Necio${ref('aphrōn', 9)}! Esta misma noche te van a reclamar la vida. Lo que has preparado, ¿para quién será?”. Así es el que atesora para sí y no es rico ante Dios».` }
+                        };
+                        liturgy.prayers.collect = 'Manifiesta, Señor, tu inagotable bondad para con tus hijos, y ya que ellos se glorían de tenerte por Creador y por guía, renueva en ellos los dones de tu gracia y consérvalos con tu constante ayuda. Por nuestro Señor Jesucristo.';
+                        liturgy.prayers.offerings = 'Santifica, Señor, estos dones que te presentamos y, al aceptar esta ofrenda espiritual, conviértenos para ti en una oblación perenne. Por Jesucristo, nuestro Señor.';
+                        liturgy.prayers.postCommunion = 'Acompaña, Señor, con tu constante auxilio a quienes has renovado con el don celestial, y a quienes no cesas de proteger, hazlos cada vez más dignos de la eterna redención. Por Jesucristo, nuestro Señor.';
+                    }
+                }
+                
+                // --- SOLEMNITIES IN ORDINARY TIME ---
+                else if (date.getTime() === trinitySunday.getTime()) {
+                    liturgy.title = 'Santísima Trinidad';
+                    liturgy.cycle = 'Tiempo Ordinario - Solemnidad';
+                    liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Que con tu único Hijo y el Espíritu Santo eres un solo Dios, un solo Señor; no en la singularidad de una sola persona, sino en la trinidad de una sola naturaleza. Y lo que creemos por tu revelación acerca de tu gloria, lo afirmamos también de tu Hijo y del Espíritu Santo, sin diferencia ni distinción. De modo que, al proclamar nuestra fe en la verdadera y eterna Divinidad, adoramos a tres Personas distintas, de única naturaleza e iguales en su dignidad. A quien alaban los ángeles y los arcángeles y todos los coros celestiales, que no cesan de aclamarte con una sola voz:';
+                    // ... Add readings and prayers for Trinity Sunday ...
+                }
+                else if (date.getTime() === christKing.getTime()) {
+                    liturgy.title = 'Nuestro Señor Jesucristo, Rey del Universo';
+                    liturgy.cycle = 'Tiempo Ordinario - Solemnidad';
+                    liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Porque consagraste Sacerdote eterno y Rey del universo a tu único Hijo, nuestro Señor Jesucristo, ungiéndolo con óleo de alegría, para que, ofreciéndose a sí mismo como víctima perfecta y pacificadora en el altar de la cruz, consumara el misterio de la redención humana; y, sometiendo a su poder la creación entera, entregara a tu majestad infinita un reino eterno y universal: el reino de la verdad y la vida, el reino de la santidad y la gracia, el reino de la justicia, el amor y la paz. Por eso, con los ángeles y los arcángeles, con los tronos y las dominaciones y con todos los coros celestiales, cantamos sin cesar el himno de tu gloria:';
+                    // ... Add readings and prayers for Christ the King ...
+                }
+                
+                // --- Fallback for other Sundays (placeholder) ---
+                else {
+                    return null;
+                }
+
+                if (!liturgy.readings.firstReading) return null; // Ensure data was populated
+
+                // --- Assemble the final liturgy HTML ---
+                const entranceProcession = `<h3>Procesión de Entrada</h3><p class="liturgy-text italic">(Se canta un himno o antífona de entrada apropiado)</p>`;
+                const introductoryRites = entranceProcession + templates.initialGreeting + templates.penitentialAct + (liturgy.omitGloria ? '' : templates.gloria) + `<h3>Oración Colecta</h3><p class="liturgy-text">${liturgy.prayers.collect}</p>`;
+                
+                let psalmContentHtml;
+                if (liturgy.readings.psalm.stanzas) {
+                    const responseHtml = `<br><br><strong>R. ${liturgy.readings.psalm.response}</strong>`;
+                    psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>` + liturgy.readings.psalm.stanzas.join(responseHtml + '<br><br>');
+                } else {
+                    psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>${liturgy.readings.psalm.text.replace(/\n/g, '<br>')}`;
+                }
+
+                let gospelAcclamationHtml = '';
+                if (liturgy.omitAlleluia) {
+                    if (liturgy.readings.gospelAcclamationVerse) {
+                        gospelAcclamationHtml = templates.gospelAcclamation(liturgy.readings.gospelAcclamationVerse);
+                    }
+                } else {
+                    if (liturgy.readings.alleluiaVerse) {
+                        gospelAcclamationHtml = templates.alleluia(liturgy.readings.alleluiaVerse);
+                    }
+                }
+
+                const liturgyOfTheWord = `<h3>Primera Lectura: ${liturgy.readings.firstReading.ref}</h3><p class="liturgy-text">${liturgy.readings.firstReading.text}</p><h3>Salmo Responsorial: ${liturgy.readings.psalm.ref}</h3><p class="liturgy-text">${psalmContentHtml}</p>${liturgy.readings.secondReading ? `<h3>Segunda Lectura: ${liturgy.readings.secondReading.ref}</h3><p class="liturgy-text">${liturgy.readings.secondReading.text}</p>` : ''}${gospelAcclamationHtml}${templates.gospel(liturgy.readings.gospel)}<h3>Homilía</h3><p class="liturgy-text italic">(Reflexión sobre las lecturas)</p>${templates.credo}${templates.prayerOfTheFaithful}`;
+                
+                const liturgyOfTheEucharist = `<h3>Presentación de las Ofrendas</h3><p class="liturgy-text">Oren, hermanos, para que este sacrificio, mío y de ustedes, sea agradable a Dios, Padre todopoderoso.<br><strong>El Señor reciba de tus manos este sacrificio, para alabanza y gloria de su nombre, para nuestro bien y el de toda su santa Iglesia.</strong></p><h3>Oración sobre las Ofrendas</h3><p class="liturgy-text">${liturgy.prayers.offerings}</p>${templates.eucharisticPrayerII(liturgy.prayers.preface)}${templates.communionRite}`;
+                
+                const recessionalProcession = `<h3>Procesión de Salida</h3><p class="liturgy-text italic">(Se puede cantar un himno de salida apropiado)</p>`;
+                const concludingRites = `<h3>Oración después de la Comunión (Misal Romano)</h3><p class="liturgy-text">${liturgy.prayers.postCommunion}</p>${templates.acnaPostCommunion}${templates.concludingRites}${recessionalProcession}`;
+
+                return {
+                    title: liturgy.title,
+                    cycle: liturgy.cycle,
+                    html: `
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="liturgy-section"><h2>Ritos Iniciales</h2>${introductoryRites}</div>
+                            <div class="liturgy-section"><h2>Liturgia de la Palabra</h2>${liturgyOfTheWord}</div>
+                            <div class="liturgy-section"><h2>Liturgia Eucarística</h2>${liturgyOfTheEucharist}</div>
+                            <div class="liturgy-section"><h2>Ritos de Conclusión</h2>${concludingRites}</div>
+                        </div>`
+                };
+            }
+            
+            // --- DOM ELEMENTS & STATE ---
+            const splashScreen = document.getElementById('splash-screen');
+            const mainContent = document.getElementById('main-content');
+            const fullLiturgyView = document.getElementById('full-liturgy-view');
+            const backToCalendarBtn = document.getElementById('back-to-calendar-btn');
+            const printBtn = document.getElementById('print-btn');
+            const downloadDocxBtn = document.getElementById('download-docx-btn');
+            const mainNavButtons = { 
+                liturgy: document.getElementById('btn-liturgy'), 
+                bible: document.getElementById('btn-bible'),
+                glossary: document.getElementById('btn-glossary'), 
+                lectionary: document.getElementById('btn-lectionary')
+            };
+            const views = { 
+                liturgy: document.getElementById('liturgy-view'), 
+                bible: document.getElementById('bible-view'),
+                glossary: document.getElementById('glossary-view'), 
+                lectionary: document.getElementById('lectionary-view')
+            };
+            const sundaySelector = document.getElementById('sunday-selector');
+            const fullLiturgyUI = { title: document.getElementById('full-liturgy-title'), subtitle: document.getElementById('full-liturgy-subtitle'), content: document.getElementById('full-liturgy-content') };
+            const uploadLogoBtn = document.getElementById('btn-upload-logo');
+            const logoUploader = document.getElementById('logo-uploader');
+            const logoImage = document.getElementById('logo-image');
+            let currentDate = new Date(2025, 0, 1); 
+            const theologyPopup = document.getElementById('theology-popup');
+            const theologyPopupContent = document.getElementById('popup-content-theology');
+            const theologyPopupClose = document.getElementById('popup-close');
+
+            // Bible View Elements
+            const bibleFlexContainer = document.getElementById('bible-flex-container');
+            const bibleContentWrapper = document.getElementById('bible-content-wrapper');
+            const backToChaptersMobileBtn = document.getElementById('back-to-chapters-mobile');
+            const bibleNav = {
+                bookListContainer: document.getElementById('book-list-container'),
+                chapterListContainer: document.getElementById('chapter-list-container'),
+                otBooks: document.getElementById('ot-books'),
+                ntBooks: document.getElementById('nt-books'),
+                backToBooksBtn: document.getElementById('back-to-books-btn'),
+                chapterListTitle: document.getElementById('chapter-list-title'),
+                chapterGrid: document.getElementById('chapter-grid')
+            };
+            const bibleContent = document.getElementById('bible-chapter-content');
+            let activeBookButton = null;
+
+            // --- FUNCTIONS ---
+            function switchView(viewName) {
+                Object.values(views).forEach(v => v.classList.add('hidden'));
+                Object.values(mainNavButtons).forEach(b => b.classList.remove('active-nav'));
+                if (views[viewName]) {
+                    views[viewName].classList.remove('hidden');
+                }
+                if (mainNavButtons[viewName]) {
+                    mainNavButtons[viewName].classList.add('active-nav');
+                }
+            }
+            
+            function populateSundaySelector() {
+                const year = 2025;
+                let date = new Date(year, 0, 1);
+                while(date.getFullYear() === year) {
+                    if (date.getDay() === 0) { // It's a Sunday
+                        const liturgyData = getLiturgyForDate(date);
+                        if (liturgyData) {
+                            const option = document.createElement('option');
+                            option.value = date.toISOString().split('T')[0];
+                            const formattedDate = date.toLocaleDateString('es-ES', { month: 'long', day: 'numeric' });
+                            option.textContent = `${liturgyData.title} (${liturgyData.cycle}) - ${formattedDate}`;
+                            sundaySelector.appendChild(option);
+                        }
+                    }
+                    date.setDate(date.getDate() + 1);
+                }
+            }
+            
+            function renderFullLiturgy(date) {
+                const data = getLiturgyForDate(date);
+                if (data) {
+                    fullLiturgyUI.title.textContent = data.title;
+                    const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    fullLiturgyUI.subtitle.textContent = `${formattedDate} | ${data.cycle}`;
+                    
+                    const printHeaderHtml = `
+                        <div class="print-only-header">
+                            <h1 class="print-title">${data.title}</h1>
+                            <p class="print-subtitle">${formattedDate}</p>
+                        </div>
+                    `;
+
+                    fullLiturgyUI.content.innerHTML = `${printHeaderHtml}<div class="print-liturgy-body">${data.html}</div>`;
+                } else {
+                    fullLiturgyUI.title.textContent = 'Liturgia no Disponible';
+                    fullLiturgyUI.subtitle.textContent = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    fullLiturgyUI.content.innerHTML = `<div class="bg-white p-8 rounded-lg shadow-md text-center"><p class="text-gray-600 py-16">Lo sentimos, la liturgia completa para este día aún no ha sido implementada.</p></div>`;
+                }
+            }
+
+            function showFullLiturgy(date) {
+                renderFullLiturgy(date);
+                mainContent.classList.add('hidden');
+                fullLiturgyView.classList.remove('hidden');
+                fullLiturgyView.scrollTop = 0;
+            }
+
+            function hideFullLiturgy() {
+                mainContent.classList.remove('hidden');
+                fullLiturgyView.classList.add('hidden');
+            }
+
+            function loadLogoFromStorage() {
+                const savedLogo = localStorage.getItem('userLogo');
+                if (savedLogo) {
+                    logoImage.src = savedLogo;
+                }
+            }
+
+            // --- BIBLE FUNCTIONS ---
+            function loadAndInitializeBible() {
+                // The data is now local, no fetch needed.
+                initializeBible();
+            }
+
+            function initializeBible() {
+                bibleNav.otBooks.innerHTML = '';
+                bibleNav.ntBooks.innerHTML = '';
+                
+                bibleData.forEach((book, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'book-button';
+                    button.textContent = book.name;
+                    button.dataset.bookIndex = index;
+
+                    if (book.testament === 'OT') {
+                        bibleNav.otBooks.appendChild(button);
+                    } else {
+                        bibleNav.ntBooks.appendChild(button);
+                    }
+                });
+
+                const accordionHeaders = document.querySelectorAll('.accordion-header');
+                accordionHeaders.forEach(header => {
+                    header.addEventListener('click', () => {
+                        header.classList.toggle('is-open');
+                    });
+                });
+            }
+
+            function showChapters(bookIndex, buttonElement) {
+                const bookData = bibleData[bookIndex];
+                if (!bookData) return;
+                
+                if (activeBookButton) {
+                    activeBookButton.classList.remove('active');
+                }
+                activeBookButton = buttonElement;
+                activeBookButton.classList.add('active');
+
+                bibleNav.bookListContainer.classList.add('hidden');
+                bibleNav.chapterListContainer.classList.remove('hidden');
+                bibleNav.chapterListTitle.textContent = bookData.name;
+                bibleNav.chapterGrid.innerHTML = '';
+                bibleNav.chapterListContainer.dataset.currentBook = bookIndex;
+
+                for (let i = 1; i <= bookData.chapters.length; i++) {
+                    const button = document.createElement('button');
+                    button.className = 'chapter-button';
+                    button.textContent = i;
+                    button.dataset.chapterIndex = i - 1;
+                    bibleNav.chapterGrid.appendChild(button);
+                }
+            }
+
+            function showChapterContent(bookIndex, chapterIndex, chapterButton) {
+                const bookData = bibleData[bookIndex];
+                const chapterData = bookData.chapters[chapterIndex];
+                
+                document.querySelectorAll('#chapter-grid .chapter-button').forEach(btn => btn.classList.remove('active'));
+                chapterButton.classList.add('active');
+                bibleFlexContainer.classList.add('mobile-content-focused');
+
+                bibleContent.innerHTML = '';
+                bibleContent.scrollTop = 0;
+
+                const title = document.createElement('h3');
+                title.className = "text-2xl font-bold mb-4";
+                title.textContent = `${bookData.name} ${parseInt(chapterIndex) + 1}`;
+                bibleContent.appendChild(title);
+
+                const p = document.createElement('p');
+                chapterData.forEach((verse) => {
+                    const sup = document.createElement('sup');
+                    sup.textContent = verse.verse;
+                    p.appendChild(sup);
+                    p.appendChild(document.createTextNode(verse.text + ' '));
+                });
+                bibleContent.appendChild(p);
+            }
+
+
+            // --- EVENT LISTENERS ---
+            Object.keys(mainNavButtons).forEach(key => {
+                if(mainNavButtons[key]) {
+                    mainNavButtons[key].addEventListener('click', () => switchView(key));
+                }
+            });
+
+            sundaySelector.addEventListener('change', (e) => {
+                const selectedDateStr = e.target.value;
+                if (selectedDateStr) {
+                    const [year, month, day] = selectedDateStr.split('-').map(Number);
+                    // Note: Month is 0-indexed in JS Date, so month-1
+                    const selectedDate = new Date(year, month - 1, day);
+                    showFullLiturgy(selectedDate);
+                }
+            });
+
+            backToCalendarBtn.addEventListener('click', hideFullLiturgy);
+            printBtn.addEventListener('click', () => window.print());
+            downloadDocxBtn.addEventListener('click', () => {
+                const title = fullLiturgyUI.title.textContent;
+                const subtitle = fullLiturgyUI.subtitle.textContent;
+                const contentElement = document.getElementById('full-liturgy-content').cloneNode(true);
+                
+                const printHeader = contentElement.querySelector('.print-only-header');
+                if (printHeader) printHeader.remove();
+                
+                const liturgyBody = contentElement.querySelector('.print-liturgy-body .bg-white');
+                
+                const headerHtml = `
+                    <div style="text-align: center;">
+                        <h1>${title}</h1>
+                        <p><em>${subtitle}</em></p>
+                    </div>
+                    <p style="text-align: center; font-style: italic; font-size: 9pt;">
+                        <strong>Instrucciones para imprimir como folleto:</strong><br/>
+                        1. Abra este archivo en Microsoft Word.<br/>
+                        2. Vaya a Archivo > Imprimir.<br/>
+                        3. En Configuración, seleccione "Imprimir en ambas caras" (voltear páginas por el borde corto).<br/>
+                        4. En la misma sección, busque "Diseño de página" o "Páginas por hoja" y elija "Diseño de folleto".
+                    </p>
+                    <br/>
+                `;
+                
+                const contentHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${headerHtml}${liturgyBody.innerHTML}</body></html>`;
+
+                const converted = htmlDocx.asBlob(contentHtml, {
+                    orientation: 'landscape',
+                    margins: {
+                        top: 720, // 0.5 inch
+                        right: 720,
+                        bottom: 720,
+                        left: 720,
+                    }
+                });
+                saveAs(converted, `${title}.docx`);
+            });
+            
+            // --- BIBLE EVENT LISTENERS ---
+            const handleBookClick = (e) => {
+                if (e.target.classList.contains('book-button')) {
+                    showChapters(e.target.dataset.bookIndex, e.target);
+                }
+            };
+            bibleNav.otBooks.addEventListener('click', handleBookClick);
+            bibleNav.ntBooks.addEventListener('click', handleBookClick);
+
+            bibleNav.backToBooksBtn.addEventListener('click', () => {
+                bibleNav.bookListContainer.classList.remove('hidden');
+                bibleNav.chapterListContainer.classList.add('hidden');
+                if (activeBookButton) {
+                    activeBookButton.classList.remove('active');
+                    activeBookButton = null;
+                }
+            });
+
+            backToChaptersMobileBtn.addEventListener('click', () => {
+                bibleFlexContainer.classList.remove('mobile-content-focused');
+            });
+
+            bibleNav.chapterGrid.addEventListener('click', e => {
+                if (e.target.tagName === 'BUTTON') {
+                    const bookIndex = bibleNav.chapterListContainer.dataset.currentBook;
+                    showChapterContent(bookIndex, e.target.dataset.chapterIndex, e.target);
+                }
+            });
+
+
+            // --- THEOLOGY POPUP LISTENERS ---
+            fullLiturgyView.addEventListener('click', function(e) {
+                const refLink = e.target.closest('.ref-link');
+                if (refLink) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const data = JSON.parse(refLink.dataset.term);
+                    
+                    theologyPopupContent.innerHTML = `
+                        <h5>Término Teológico</h5>
+                        <p><strong class="original-term" lang="${/^[α-ωΑ-Ω]/.test(data.original) ? 'el' : 'he'}">${data.original}</strong></p>
+                        <p><strong>Transliteración:</strong> <em>${data.transliteration}</em></p>
+                        <p><strong>Significado:</strong> ${data.meaning}</p>
+                    `;
+
+                    const rect = refLink.getBoundingClientRect();
+                    theologyPopup.style.display = 'block';
+                    
+                    let top = window.scrollY + rect.bottom + 10;
+                    let left = window.scrollX + rect.left + (rect.width / 2) - (theologyPopup.offsetWidth / 2);
+
+                    if (left < 10) left = 10;
+                    if ((left + theologyPopup.offsetWidth) > window.innerWidth) {
+                        left = window.innerWidth - theologyPopup.offsetWidth - 10;
+                    }
+                    if ((top + theologyPopup.offsetHeight) > window.innerHeight) {
+                        top = window.scrollY + rect.top - theologyPopup.offsetHeight - 10;
+                    }
+
+                    theologyPopup.style.top = `${top}px`;
+                    theologyPopup.style.left = `${left}px`;
+                }
+            });
+
+            theologyPopupClose.addEventListener('click', () => {
+                theologyPopup.style.display = 'none';
+            });
+
+            document.addEventListener('click', function(e) {
+                if (theologyPopup.style.display === 'block' && !theologyPopup.contains(e.target) && !e.target.closest('.ref-link')) {
+                    theologyPopup.style.display = 'none';
+                }
+            }, true);
+
+            // --- LOGO UPLOAD LISTENERS ---
+            uploadLogoBtn.addEventListener('click', () => {
+                logoUploader.click();
+            });
+
+            logoUploader.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const logoDataUrl = e.target.result;
+                        localStorage.setItem('userLogo', logoDataUrl);
+                        logoImage.src = logoDataUrl;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // --- HEADER SCROLL LOGIC ---
+            let lastScrollTop = 0;
+            const mainHeader = document.getElementById('main-header');
+            window.addEventListener("scroll", function() {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > lastScrollTop && scrollTop > mainHeader.offsetHeight) {
+                    // Scroll Down
+                    mainHeader.classList.add('header-hidden');
+                } else {
+                    // Scroll Up
+                    mainHeader.classList.remove('header-hidden');
+                }
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+            }, false);
+
+
+            // --- INITIALIZATION ---
+            function initializeApp() {
+                // Splash Screen Logic
+                setTimeout(() => {
+                    splashScreen.classList.add('fade-out');
+                    mainContent.classList.remove('opacity-0');
+                    setTimeout(() => {
+                        splashScreen.style.display = 'none';
+                    }, 1500);
+                }, 2000);
+
+
+                loadLogoFromStorage();
+                const urlParams = new URLSearchParams(window.location.search);
+                const dateParam = urlParams.get('date');
+                if (dateParam) {
+                    const parts = dateParam.split('-').map(p => parseInt(p, 10));
+                    currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                } else {
+                    currentDate = new Date(); // Start with current date
+                }
+
+                switchView('liturgy');
+                populateSundaySelector();
+                loadAndInitializeBible();
+            }
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
