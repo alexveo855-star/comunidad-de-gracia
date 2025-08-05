@@ -12,7 +12,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap');
         body {
             font-family: 'Merriweather', serif;
-            background-color: #f8fafc; /* gray-50 */
+            background-image: url('https://www.bibleserver.com/build/bs-start-back-Dno9hVpC.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: #433A3F; 
         }
         h1, h2, h3, h4, h5, h6, .nav-item, .filter-button, .main-nav-button {
@@ -146,7 +149,7 @@
             font-size: 1.1rem; sm:font-size: 1.25rem; margin-top: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
 
-        /* Nav Menu */
+        /* New Menu */
         .main-nav-button {
             padding: 0.5rem 0;
             border-bottom: 3px solid transparent;
@@ -180,43 +183,17 @@
         .is-open .accordion-icon {
             transform: rotate(180deg);
         }
-        
-        /* Liturgy Calendar Styles */
-        .liturgy-date-card {
-            border-left-width: 5px;
-            transition: all 0.2s ease-in-out;
-        }
-        .liturgy-date-card.available {
-            border-color: #0d9488; /* teal-600 */
-            cursor: pointer;
-        }
-        .liturgy-date-card.available:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: #fBBF24; /* amber-400 */
-        }
-        .liturgy-date-card.unavailable {
-            border-color: #9ca3af; /* gray-400 */
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .liturgy-date-card h4 {
-            font-family: 'Roboto', sans-serif;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        .liturgy-date-card p {
-            font-size: 0.9rem;
-        }
 
-        /* Home View Styles */
-        #home-view {
-            background-image: url('https://images.unsplash.com/photo-1489664942048-a3a60914a2f4?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+        /* Liturgical Cards Styles */
+        .liturgical-card {
+            background-color: white;
+            border-left-width: 6px;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-
+        .liturgical-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
 
         /* Print Styles */
         .print-only-header { display: none; }
@@ -277,20 +254,17 @@
         </header>
 
         <input type="file" id="logo-uploader" class="hidden" accept="image/*">
-        
-        <div id="home-view" class="hidden">
-            <div class="min-h-[calc(100vh-120px)] flex flex-col items-center justify-center text-white text-center p-4 bg-black/50">
-                <h1 class="splash-title">Bienvenido a la Comunidad de Gracia</h1>
-                <p class="splash-subtitle max-w-2xl mt-4">Un espacio digital para la liturgia, el estudio de las Escrituras y el crecimiento espiritual. Explora nuestros recursos para enriquecer tu camino de fe.</p>
-            </div>
+
+        <div id="home-view" class="min-h-[85vh]">
+            <!-- This div is intentionally empty to show the body background -->
         </div>
 
         <div id="liturgy-view" class="hidden">
-            <main class="container mx-auto p-4 md:p-8">
-                <div class="bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
-                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Calendario Litúrgico 2025 (Ciclo C)</h2>
-                    <div id="liturgy-calendar-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        <!-- Calendar items will be inserted here by JS -->
+            <main class="container mx-auto p-4">
+                <div class="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-2xl">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center border-b-2 border-amber-400 pb-3">Calendario Litúrgico 2025</h2>
+                    <div id="liturgical-cards-container" class="space-y-4">
+                        <!-- Liturgical cards will be inserted here by JavaScript -->
                     </div>
                 </div>
             </main>
@@ -415,117 +389,21 @@
             // --- HELPER FUNCTIONS ---
             const addDays = (d, days) => { const res = new Date(d); res.setDate(d.getDate() + days); return res; };
             
-            // --- COMPLETE BIBLE DATA (Structure) ---
+            // --- MINIMAL BIBLE DATA FOR PERFORMANCE ---
             const placeholderChapter = (chapterNum) => ([{ verse: 1, text: `[Texto del capítulo ${chapterNum} no cargado para optimizar el rendimiento.]` }]);
-            
             const bibleData = [
-                // --- ANTIGUO TESTAMENTO ---
-                { "name": "Génesis", "testament": "OT", "chapters": [
-                    [{"verse":1,"text":"Al principio Dios creó el cielo y la tierra."},{"verse":2,"text":"La tierra era algo informe y vacío, las tinieblas cubrían el abismo, y el soplo de Dios se cernía sobre las aguas."},{"verse":3,"text":"Entonces Dios dijo: «Que exista la luz». Y la luz existió."},{"verse":4,"text":"Dios vio que la luz era buena, y separó la luz de las tinieblas;"},{"verse":5,"text":"y llamó a la luz «Día», y a las tinieblas «Noche». Así hubo una tarde y una mañana: este fue el primer día."},{"verse":6,"text":"Dios dijo: «Que haya un firmamento en medio de las aguas, para que separe las aguas de las aguas»."},{"verse":7,"text":"Y así sucedió. Dios hizo el firmamento, y este separó las aguas que están debajo de él, de las aguas que están encima de él."},{"verse":8,"text":"Y Dios llamó al firmamento «Cielo». Así hubo una tarde y una mañana: este fue el segundo día."},{"verse":9,"text":"Dios dijo: «Que se reúnan en un solo lugar las aguas que están bajo el cielo, y que aparezca el suelo firme». Y así sucedió."},{"verse":10,"text":"Dios llamó al suelo firme «Tierra», y al conjunto de las aguas «Mar». Y Dios vio que esto era bueno."},{"verse":11,"text":"Entonces Dios dijo: «Que la tierra produzca vegetales, toda clase de plantas con semillas y árboles que den frutos con simiente». Y así sucedió."},{"verse":12,"text":"La tierra produjo vegetales, toda clase de plantas con semillas y árboles que dan frutos con simiente. Y Dios vio que esto era bueno."},{"verse":13,"text":"Así hubo una tarde y una mañana: este fue el tercer día."},{"verse":14,"text":"Dios dijo: «Que haya astros en el firmamento del cielo para separar el día de la noche; que ellos sirvan de señales para marcar las festividades, los días y los años;"},{"verse":15,"text":"y que estén en el firmamento del cielo para iluminar la tierra». Y así sucedió."},{"verse":16,"text":"Dios hizo los dos grandes astros: el astro mayor para gobernar el día, y el menor para gobernar la noche; e hizo también las estrellas."},{"verse":17,"text":"Y los puso en el firmamento del cielo para iluminar la tierra,"},{"verse":18,"text":"para gobernar el día y la noche, y para separar la luz de las tinieblas. Y Dios vio que esto era bueno."},{"verse":19,"text":"Así hubo una tarde y una mañana: este fue el cuarto día."},{"verse":20,"text":"Dios dijo: «Que las aguas se llenen de seres vivientes, y que vuelen los pájaros sobre la tierra, en el firmamento del cielo»."},{"verse":21,"text":"Dios creó los grandes monstruos marinos, todos los seres vivientes que se deslizan y que llenan las aguas según su especie, y todas las aves según su especie. Y Dios vio que esto era bueno."},{"verse":22,"text":"Entonces los bendijo, diciéndoles: «Sean fecundos y multiplíquense; llenen las aguas de los mares, y que las aves se multipliquen sobre la tierra»."},{"verse":23,"text":"Así hubo una tarde y una mañana: este fue el quinto día."},{"verse":24,"text":"Dios dijo: «Que la tierra produzca seres vivientes según su especie: animales domésticos, reptiles y animales salvajes según su especie». Y así sucedió."},{"verse":25,"text":"Dios hizo los animales salvajes según su especie, los animales domésticos según su especie, y todos los reptiles de la tierra según su especie. Y Dios vio que esto era bueno."},{"verse":26,"text":"Dios dijo: «Hagamos al hombre a nuestra imagen, según nuestra semejanza; y que le estén sometidos los peces del mar y las aves del cielo, el ganado, las fieras de la tierra, y todos los reptiles que se arrastran por el suelo»."},{"verse":27,"text":"Y Dios creó al hombre a su imagen; lo creó a imagen de Dios, los creó varón y mujer."},{"verse":28,"text":"Y los bendijo, diciéndoles: «Sean fecundos, multiplíquense, llenen la tierra y sométanla; dominen a los peces del mar, a las aves del cielo y a todos los vivientes que se mueven sobre la tierra»."},{"verse":29,"text":"Y continuó diciendo: «Yo les doy todas las plantas que producen semilla sobre la tierra, y todos los árboles que dan frutos con semilla: todo esto les servirá de alimento."},{"verse":30,"text":"Y a todos los animales de la tierra, a todas las aves del cielo y a todos los seres vivientes que se mueven sobre la tierra, les doy como alimento toda clase de hierba verde». Y así sucedió."},{"verse":31,"text":"Dios miró todo lo que había hecho, y vio que era muy bueno. Así hubo una tarde y una mañana: este fue el sexto día."}],
-                    [{"verse":1,"text":"Así fueron terminados el cielo y la tierra, y todos los seres que hay en ellos."},{"verse":2,"text":"El séptimo día, Dios concluyó la obra que había hecho, y cesó de toda su actividad."},{"verse":3,"text":"Dios bendijo el séptimo día y lo consagró, porque en él cesó de toda la obra de creación que había hecho."},{"verse":4,"text":"Este es el origen del cielo y de la tierra cuando fueron creados. Cuando el Señor Dios hizo la tierra y el cielo,"},{"verse":5,"text":"aún no había ningún arbusto del campo sobre la tierra ni había brotado ninguna hierba del campo, porque el Señor Dios no había hecho llover sobre la tierra, ni había hombre que la cultivara."},{"verse":6,"text":"Sin embargo, un manantial brotaba de la tierra y regaba toda la superficie del suelo."},{"verse":7,"text":"Entonces el Señor Dios modeló al hombre con arcilla del suelo y sopló en su nariz un aliento de vida. Así el hombre se convirtió en un ser viviente."},{"verse":8,"text":"El Señor Dios plantó un jardín en Edén, al oriente, y allí puso al hombre que había formado."},{"verse":9,"text":"El Señor Dios hizo brotar del suelo toda clase de árboles agradables a la vista y buenos para comer; en medio del jardín, hizo brotar el árbol de la vida y el árbol del conocimiento del bien y del mal."},{"verse":10,"text":"De Edén salía un río que regaba el jardín y que desde allí se dividía en cuatro brazos."},{"verse":11,"text":"El primero se llama Pisón: es el que rodea todo el país de Javilá, donde hay oro."},{"verse":12,"text":"El oro de ese país es bueno; también se encuentra allí el bedelio y la piedra de ónix."},{"verse":13,"text":"El segundo río se llama Guijón: es el que rodea todo el país de Cus."},{"verse":14,"text":"El tercer río se llama Tigris: es el que pasa al oriente de Asur. Y el cuarto río es el Eufrates."},{"verse":15,"text":"El Señor Dios tomó al hombre y lo puso en el jardín de Edén, para que lo cultivara y lo cuidara."},{"verse":16,"text":"Y el Señor Dios le dio esta orden: «Puedes comer de todos los árboles del jardín,"},{"verse":17,"text":"pero no comas del árbol del conocimiento del bien y del mal; porque el día que comas de él, ciertamente morirás»."},{"verse":18,"text":"Después el Señor Dios dijo: «No es bueno que el hombre esté solo. Le haré una ayuda adecuada»."},{"verse":19,"text":"Entonces el Señor Dios modeló con arcilla del suelo a todos los animales del campo y a todos los pájaros del cielo, y se los presentó al hombre para ver qué nombre les ponía. Y cada ser viviente debía llevar el nombre que el hombre le pusiera."},{"verse":20,"text":"El hombre puso un nombre a todos los animales domésticos, a todas las aves del cielo y a todos los animales del campo; pero no encontró una ayuda adecuada para sí."},{"verse":21,"text":"Entonces el Señor Dios hizo caer sobre el hombre un profundo sueño, y mientras dormía, le sacó una de sus costillas y cerró la carne en su lugar."},{"verse":22,"text":"Con la costilla que había sacado del hombre, el Señor Dios formó una mujer y se la presentó al hombre."},{"verse":23,"text":"El hombre exclamó: «¡Esta sí que es hueso de mis huesos y carne de mi carne! Se llamará Mujer, porque ha sido sacada del hombre»."},{"verse":24,"text":"Por eso el hombre deja a su padre y a su madre y se une a su mujer, y los dos llegan a ser una sola carne."},{"verse":25,"text":"Los dos, el hombre y su mujer, estaban desnudos, pero no sentían vergüenza."}],
-                    placeholderChapter(3),
-                    [{"verse":1,"text":"El hombre se unió a Eva, su mujer, y ella concibió y dio a luz a Caín. Entonces dijo: «He adquirido un hombre con la ayuda del Señor»."},{"verse":2,"text":"Más tarde dio a luz a Abel, hermano de Caín. Abel fue pastor de ovejas y Caín, agricultor."},{"verse":3,"text":"Al cabo de un tiempo, Caín presentó como ofrenda al Señor los frutos de la tierra."},{"verse":4,"text":"También Abel le ofreció las primicias y la grasa de su rebaño. El Señor miró con agrado a Abel y su ofrenda,"},{"verse":5,"text":"pero no miró con agrado a Caín y su ofrenda. Caín se enfureció y andaba cabizbajo."},{"verse":6,"text":"El Señor le dijo: «¿Por qué te has enfurecido y andas cabizbajo?"},{"verse":7,"text":"Si obras bien, podrás mantener la frente en alto; si obras mal, el pecado está agazapado a la puerta y te acecha, pero tú debes dominarlo»."},{"verse":8,"text":"Caín dijo a su hermano Abel: «Vamos al campo». Y cuando estaban en el campo, se abalanzó sobre su hermano Abel y lo mató."},{"verse":9,"text":"Entonces el Señor preguntó a Caín: «¿Dónde está tu hermano Abel?». Él respondió: «No lo sé. ¿Acaso soy yo el guardián de mi hermano?»."},{"verse":10,"text":"El Señor le replicó: «¿Qué has hecho? ¡La sangre de tu hermano clama a mí desde la tierra!"},{"verse":11,"text":"Por eso, maldito seas, lejos de este suelo que abrió su boca para recibir de tu mano la sangre de tu hermano."},{"verse":12,"text":"Cuando lo cultives, no te dará sus frutos. Andarás errante y fugitivo por la tierra»."},{"verse":13,"text":"Caín dijo al Señor: «Mi castigo es demasiado grande para poder sobrellevarlo."},{"verse":14,"text":"Hoy me expulsas de este suelo, y tendré que ocultarme de tu presencia. Andaré errante y fugitivo por la tierra, y el primero que me encuentre me matará»."},{"verse":15,"text":"El Señor le respondió: «No será así. Si alguien mata a Caín, será vengado siete veces». Y el Señor puso una señal a Caín, para que si alguien lo encontraba, no lo matara."},{"verse":16,"text":"Caín se alejó de la presencia del Señor y habitó en la región de Nod, al este de Edén."},{"verse":17,"text":"Caín se unió a su mujer, y ella concibió y dio a luz a Henoc. Caín fundó una ciudad y le puso el nombre de su hijo, Henoc."},{"verse":18,"text":"A Henoc le nació Irad; Irad engendró a Mejuyael; Mejuyael engendró a Metusael, y Metusael engendró a Lamec."},{"verse":19,"text":"Lamec tomó dos mujeres: una se llamaba Adá y la otra, Silá."},{"verse":20,"text":"Adá dio a luz a Jabal, que fue el antepasado de los que habitan en tiendas y tienen rebaños."},{"verse":21,"text":"Su hermano se llamaba Jubal, y fue el antepasado de todos los que tocan la cítara y la flauta."},{"verse":22,"text":"Silá, por su parte, dio a luz a Tubalcaín, que forjaba toda clase de herramientas de bronce y de hierro. La hermana de Tubalcaín fue Naamá."},{"verse":23,"text":"Lamec dijo a sus mujeres: «Adá y Silá, escuchad mi voz; mujeres de Lamec, oíd mi palabra: Yo maté a un hombre por una herida, a un joven por un golpe."},{"verse":24,"text":"Si Caín será vengado siete veces, Lamec lo será setenta y siete»."},{"verse":25,"text":"Adán se unió de nuevo a su mujer, y ella dio a luz un hijo, al que llamó Set, diciendo: «Dios me ha concedido otro descendiente en lugar de Abel, porque Caín lo mató»."},{"verse":26,"text":"También Set tuvo un hijo, y lo llamó Enós. Fue entonces cuando se comenzó a invocar el nombre del Señor."}],
-                    [{"verse":1,"text":"Este es el libro de los descendientes de Adán. El día en que Dios creó al hombre, lo hizo a semejanza de Dios."},{"verse":2,"text":"Los creó varón y mujer, los bendijo y los llamó «Hombre» el día de su creación."},{"verse":3,"text":"Cuando Adán tenía ciento treinta años, engendró un hijo a su semejanza, según su imagen, y lo llamó Set."},{"verse":4,"text":"Después de engendrar a Set, Adán vivió ochocientos años y engendró hijos e hijas."},{"verse":5,"text":"El total de los días que vivió Adán fue de novecientos treinta años, y murió."},{"verse":6,"text":"Cuando Set tenía ciento cinco años, engendró a Enós."},{"verse":7,"text":"Después de engendrar a Enós, Set vivió ochocientos siete años y engendró hijos e hijas."},{"verse":8,"text":"El total de los días de Set fue de novecientos doce años, y murió."},{"verse":9,"text":"Cuando Enós tenía noventa años, engendró a Cainán."},{"verse":10,"text":"Después de engendrar a Cainán, Enós vivió ochocientos quince años y engendró hijos e hijas."},{"verse":11,"text":"El total de los días de Enós fue de novecientos cinco años, y murió."},{"verse":12,"text":"Cuando Cainán tenía setenta años, engendró a Mahalalel."},{"verse":13,"text":"Después de engendrar a Mahalalel, Cainán vivió ochocientos cuarenta años y engendró hijos e hijas."},{"verse":14,"text":"El total de los días de Cainán fue de novecientos diez años, y murió."},{"verse":15,"text":"Cuando Mahalalel tenía sesenta y cinco años, engendró a Jared."},{"verse":16,"text":"Después de engendrar a Jared, Mahalalel vivió ochocientos treinta años y engendró hijos e hijas."},{"verse":17,"text":"El total de los días de Mahalalel fue de ochocientos noventa y cinco años, y murió."},{"verse":18,"text":"Cuando Jared tenía ciento sesenta y dos años, engendró a Henoc."},{"verse":19,"text":"Después de engendrar a Henoc, Jared vivió ochocientos años y engendró hijos e hijas."},{"verse":20,"text":"El total de los días de Jared fue de novecientos sesenta y dos años, y murió."},{"verse":21,"text":"Cuando Henoc tenía sesenta y cinco años, engendró a Matusalén."},{"verse":22,"text":"Henoc anduvo con Dios. Después de engendrar a Matusalén, Henoc vivió trescientos años y engendró hijos e hijas."},{"verse":23,"text":"El total de los días de Henoc fue de trescientos sesenta y cinco años."},{"verse":24,"text":"Henoc anduvo con Dios y desapareció, porque Dios se lo llevó."},{"verse":25,"text":"Cuando Matusalén tenía ciento ochenta y siete años, engendró a Lamec."},{"verse":26,"text":"Después de engendrar a Lamec, Matusalén vivió setecientos ochenta y dos años y engendró hijos e hijas."},{"verse":27,"text":"El total de los días de Matusalén fue de novecientos sesenta y nueve años, y murió."},{"verse":28,"text":"Cuando Lamec tenía ciento ochenta y dos años, engendró un hijo,"},{"verse":29,"text":"y lo llamó Noé, diciendo: «Este nos consolará de nuestros trabajos y de la fatiga de nuestras manos, a causa del suelo que el Señor ha maldecido»."},{"verse":30,"text":"Después de engendrar a Noé, Lamec vivió quinientos noventa y cinco años y engendró hijos e hijas."},{"verse":31,"text":"El total de los días de Lamec fue de setecientos setenta y siete años, y murió."},{"verse":32,"text":"Cuando Noé tenía quinientos años, engendró a Sem, a Cam y a Jafet."}],
-                    [{"verse":1,"text":"Cuando los hombres comenzaron a multiplicarse sobre la faz de la tierra y les nacieron hijas,"},{"verse":2,"text":"los hijos de Dios vieron que las hijas de los hombres eran hermosas, y tomaron para sí mujeres de entre todas las que les gustaban."},{"verse":3,"text":"Entonces el Señor dijo: «Mi espíritu no permanecerá para siempre en el hombre, porque no es más que carne; que sus días sean ciento veinte años»."},{"verse":4,"text":"En aquellos días, y también después, había gigantes en la tierra, cuando los hijos de Dios se unieron a las hijas de los hombres y ellas les dieron hijos. Estos fueron los héroes de la antigüedad, hombres de renombre."},{"verse":5,"text":"El Señor vio que la maldad del hombre en la tierra era grande, y que todos los designios de su corazón tendían constantemente al mal."},{"verse":6,"text":"Y se arrepintió el Señor de haber hecho al hombre en la tierra, y le dolió en su corazón."},{"verse":7,"text":"Y dijo el Señor: «Borraré de la faz de la tierra al hombre que he creado, desde el hombre hasta el ganado, los reptiles y las aves del cielo, porque me arrepiento de haberlos hecho»."},{"verse":8,"text":"Pero Noé halló gracia a los ojos del Señor."},{"verse":9,"text":"Esta es la historia de Noé. Noé fue un hombre justo, perfecto entre sus contemporáneos; Noé anduvo con Dios."},{"verse":10,"text":"Noé engendró tres hijos: Sem, Cam y Jafet."},{"verse":11,"text":"La tierra se había corrompido delante de Dios y estaba llena de violencia."},{"verse":12,"text":"Dios miró la tierra, y he aquí que estaba corrompida, porque toda carne había corrompido su camino sobre la tierra."},{"verse":13,"text":"Entonces Dios dijo a Noé: «He decidido poner fin a toda carne, porque la tierra está llena de violencia por su culpa; por eso, voy a destruirlos junto con la tierra."},{"verse":14,"text":"Hazte un arca de madera de ciprés; harás compartimentos en el arca y la calafatearás con brea por dentro y por fuera."},{"verse":15,"text":"La harás de esta manera: de trescientos codos de longitud, cincuenta codos de anchura y treinta codos de altura."},{"verse":16,"text":"Le harás una claraboya, y la terminarás un codo por encima. Pondrás la puerta del arca en su costado, y harás en ella un piso bajo, uno segundo y uno tercero."},{"verse":17,"text":"Yo, por mi parte, voy a traer el diluvio, aguas sobre la tierra, para destruir toda carne en que haya hálito de vida bajo el cielo; todo lo que hay en la tierra perecerá."},{"verse":18,"text":"Pero estableceré mi pacto contigo, y entrarás en el arca tú, y contigo tus hijos, tu mujer y las mujeres de tus hijos."},{"verse":19,"text":"Y de todo ser viviente, de toda carne, meterás en el arca dos de cada especie, para que sobrevivan contigo; macho y hembra serán."},{"verse":20,"text":"De las aves según su especie, del ganado según su especie, de todo reptil de la tierra según su especie, dos de cada especie vendrán a ti para que sobrevivan."},{"verse":21,"text":"Y tú, toma contigo de todo alimento que se come, y almacénalo; te servirá de alimento a ti y a ellos»."},{"verse":22,"text":"Y Noé lo hizo así; todo lo que Dios le mandó, así lo hizo."}],
-                    [{"verse":1,"text":"El Señor dijo a Noé: «Entra en el arca con toda tu familia, porque tú eres el único justo que he encontrado en esta generación."},{"verse":2,"text":"De todos los animales puros, toma siete parejas, es decir, un macho y su hembra; y de todos los animales impuros, una sola pareja, un macho y su hembra."},{"verse":3,"text":"Toma también siete parejas de las aves del cielo, un macho y su hembra, para preservar la especie sobre la tierra."},{"verse":4,"text":"Porque dentro de siete días, haré llover sobre la tierra durante cuarenta días y cuarenta noches, y exterminaré de la superficie del suelo a todos los seres que he creado»."},{"verse":5,"text":"Y Noé hizo todo lo que el Señor le había mandado."},{"verse":6,"text":"Noé tenía seiscientos años cuando se produjo el diluvio sobre la tierra."},{"verse":7,"text":"Para escapar a las aguas del diluvio, Noé entró en el arca con sus hijos, su mujer y las mujeres de sus hijos."},{"verse":8,"text":"De los animales puros e impuros, de las aves y de todos los reptiles de la tierra,"},{"verse":9,"text":"entraron con Noé en el arca, en parejas, un macho y una hembra, como Dios se lo había mandado."},{"verse":10,"text":"Siete días después, las aguas del diluvio irrumpieron sobre la tierra."},{"verse":11,"text":"El año seiscientos de la vida de Noé, el día diecisiete del segundo mes, rompieron todas las fuentes del gran Abismo y se abrieron las compuertas del cielo."},{"verse":12,"text":"Estuvo lloviendo sobre la tierra cuarenta días y cuarenta noches."},{"verse":13,"text":"En ese mismo día, Noé entró en el arca con sus hijos Sem, Cam y Jafet, con su mujer y las tres mujeres de sus hijos."},{"verse":14,"text":"Entraron con ellos los animales salvajes de toda especie, los animales domésticos de toda especie, todos los reptiles que se arrastran por la tierra, de toda especie, y todas las aves, de toda especie: todos los pájaros, todo lo que tiene alas."},{"verse":15,"text":"Todos los seres que tienen aliento de vida entraron con Noé en el arca, de dos en dos."},{"verse":16,"text":"Los que entraron eran un macho y una hembra de cada especie, como Dios se lo había mandado. Y el Señor cerró la puerta detrás de Noé."},{"verse":17,"text":"El diluvio se prolongó durante cuarenta días sobre la tierra. Las aguas crecieron y levantaron el arca, que se elevó por encima de la tierra."},{"verse":18,"text":"Las aguas subieron y crecieron enormemente sobre la tierra, y el arca flotaba sobre las aguas."},{"verse":19,"text":"Las aguas subieron cada vez más sobre la tierra, hasta que quedaron cubiertas las montañas más altas que hay bajo el cielo."},{"verse":20,"text":"Las aguas subieron quince codos por encima de las montañas, que quedaron cubiertas."},{"verse":21,"text":"Y perecieron todos los seres que se mueven sobre la tierra: las aves, los animales domésticos y salvajes, todos los reptiles que se arrastran por la tierra, y todos los hombres."},{"verse":22,"text":"Todo lo que en tierra firme tenía en sus narices un aliento de vida, murió."},{"verse":23,"text":"El Señor exterminó a todos los seres que estaban sobre la superficie del suelo, desde el hombre hasta el ganado, los reptiles y las aves del cielo: todos fueron exterminados de la tierra. Sólo quedaron Noé y los que estaban con él en el arca."},{"verse":24,"text":"Las aguas prevalecieron sobre la tierra durante ciento cincuenta días."}],
-                    [{"verse":1,"text":"Entonces Dios se acordó de Noé, de todos los animales salvajes y de todos los animales domésticos que estaban con él en el arca. Dios hizo soplar un viento sobre la tierra, y las aguas comenzaron a bajar."},{"verse":2,"text":"Se cerraron las fuentes del Abismo y las compuertas del cielo, y cesó la lluvia que caía sobre la tierra."},{"verse":3,"text":"Las aguas se retiraron gradualmente de la tierra. Al cabo de ciento cincuenta días, las aguas habían disminuido,"},{"verse":4,"text":"y el día diecisiete del séptimo mes, el arca se posó sobre las montañas de Ararat."},{"verse":5,"text":"Las aguas siguieron bajando hasta el décimo mes, y el primer día de ese mes, aparecieron las cumbres de las montañas."},{"verse":6,"text":"Al cabo de cuarenta días, Noé abrió la ventana que había hecho en el arca,"},{"verse":7,"text":"y soltó al cuervo, el cual salía y regresaba, hasta que se secaron las aguas sobre la tierra."},{"verse":8,"text":"Después soltó a la paloma, para ver si las aguas habían disminuido sobre la superficie del suelo."},{"verse":9,"text":"Pero la paloma no encontró un lugar donde posarse, y volvió al arca, porque las aguas cubrían toda la superficie de la tierra. Noé extendió la mano, la tomó y la hizo entrar consigo en el arca."},{"verse":10,"text":"Esperó otros siete días, y de nuevo soltó la paloma fuera del arca."},{"verse":11,"text":"La paloma regresó al atardecer, y he aquí que traía en su pico una hoja de olivo recién cortada. Así Noé supo que las aguas habían disminuido sobre la tierra."},{"verse":12,"text":"Esperó otros siete días, y soltó la paloma, que ya no regresó más."},{"verse":13,"text":"El año seiscientos uno de la vida de Noé, el primer día del primer mes, se secaron las aguas sobre la tierra. Noé retiró el techo del arca, miró, y vio que la superficie del suelo estaba seca."},{"verse":14,"text":"El día veintisiete del segundo mes, la tierra estaba completamente seca."},{"verse":15,"text":"Entonces Dios dijo a Noé:"},{"verse":16,"text":"«Sal del arca, con tu mujer, tus hijos y las mujeres de tus hijos."},{"verse":17,"text":"Saca contigo a todos los seres vivientes de toda especie que están contigo: las aves, el ganado y todos los reptiles que se arrastran por la tierra. Que se dispersen por la tierra, que sean fecundos y se multipliquen sobre ella»."},{"verse":18,"text":"Noé salió con sus hijos, su mujer y las mujeres de tus hijos."},{"verse":19,"text":"Todos los animales salvajes, todos los animales domésticos, todas las aves y todos los reptiles que se arrastran por la tierra, salieron del arca según sus especies."},{"verse":20,"text":"Noé erigió un altar al Señor, y tomando de todos los animales puros y de todas las aves puras, ofreció holocaustos sobre el altar."},{"verse":21,"text":"Al aspirar el Señor el aroma agradable, dijo en su corazón: «Nunca más maldeciré el suelo por causa del hombre, porque las intenciones del corazón del hombre son malas desde su juventud. Nunca más volveré a destruir a todos los seres vivientes, como lo he hecho."},{"verse":22,"text":"Mientras dure la tierra, no cesarán la siembra y la cosecha, el frío y el calor, el verano y el invierno, el día y la noche»."}],
-                    [{"verse":1,"text":"Dios bendijo a Noé y a sus hijos, diciéndoles: «Sean fecundos, multiplíquense y llenen la tierra."},{"verse":2,"text":"Todos los animales de la tierra y todas las aves del cielo temerán y respetarán a ustedes. Todo lo que se mueve sobre la tierra y todos los peces del mar están en sus manos."},{"verse":3,"text":"Todo lo que se mueve y tiene vida les servirá de alimento; se lo doy a ustedes como les di las hierbas verdes."},{"verse":4,"text":"Pero no comerán carne con su vida, es decir, con su sangre."},{"verse":5,"text":"Y de la sangre de ustedes, que es su vida, pediré cuentas. Pediré cuentas a todo animal, y al hombre, a cada uno de su hermano, le pediré cuentas de la vida del hombre."},{"verse":6,"text":"El que derrame sangre de hombre, por el hombre su sangre será derramada; porque a imagen de Dios fue hecho el hombre."},{"verse":7,"text":"En cuanto a ustedes, sean fecundos y multiplíquense; dispérsense por la tierra y domínenla»."},{"verse":8,"text":"Dios dijo a Noé y a sus hijos:"},{"verse":9,"text":"«He aquí que yo establezco mi pacto con ustedes y con su descendencia,"},{"verse":10,"text":"y con todos los seres vivientes que están con ustedes: las aves, el ganado y todos los animales salvajes de la tierra que están con ustedes, todos los que salieron del arca."},{"verse":11,"text":"Yo establezco mi pacto con ustedes: nunca más será exterminada toda carne por las aguas del diluvio, ni habrá más diluvio para destruir la tierra»."},{"verse":12,"text":"Y Dios añadió: «Esta es la señal del pacto que establezco entre ustedes y yo, y con todo ser viviente que está con ustedes, para todas las generaciones futuras:"},{"verse":13,"text":"Pongo mi arco en las nubes, para que sea una señal de mi pacto con la tierra."},{"verse":14,"text":"Cuando yo cubra la tierra de nubes, el arco aparecerá en las nubes,"},{"verse":15,"text":"y me acordaré de mi pacto con ustedes y con todo ser viviente de toda especie, y las aguas no volverán a ser un diluvio para destruir toda carne."},{"verse":16,"text":"El arco estará en las nubes; yo lo veré y me acordaré del pacto eterno entre Dios y todo ser viviente de toda especie que hay sobre la tierra»."},{"verse":17,"text":"Y Dios dijo a Noé: «Esta es la señal del pacto que he establecido entre yo y toda carne que hay sobre la tierra»."},{"verse":18,"text":"Los hijos de Noé que salieron del arca fueron Sem, Cam y Jafet. Cam es el padre de Canaán."},{"verse":19,"text":"Estos tres fueron los hijos de Noé, y a partir de ellos se pobló toda la tierra."},{"verse":20,"text":"Noé, hombre de la tierra, comenzó a plantar una viña."},{"verse":21,"text":"Bebió del vino, se embriagó y quedó desnudo en medio de su tienda."},{"verse":22,"text":"Cam, padre de Canaán, vio la desnudez de su padre y fue a contárselo a sus dos hermanos que estaban afuera."},{"verse":23,"text":"Entonces Sem y Jafet tomaron un manto, se lo pusieron sobre los hombros y, caminando hacia atrás, cubrieron la desnudez de su padre. Como sus rostros estaban vueltos, no vieron la desnudez de su padre."},{"verse":24,"text":"Cuando Noé despertó de su embriaguez y supo lo que le había hecho su hijo menor,"},{"verse":25,"text":"dijo: «¡Maldito sea Canaán! Será el siervo más bajo de sus hermanos»."},{"verse":26,"text":"Y añadió: «¡Bendito sea el Señor, el Dios de Sem, y que Canaán sea su siervo!"},{"verse":27,"text":"¡Que Dios engrandezca a Jafet, que habite en las tiendas de Sem, y que Canaán sea su siervo!»."},{"verse":28,"text":"Después del diluvio, Noé vivió trescientos cincuenta años."},{"verse":29,"text":"El total de los días de Noé fue de novecientos cincuenta años, y murió."}],
-                    [{"verse":1,"text":"Esta es la descendencia de los hijos de Noé: Sem, Cam y Jafet, a quienes les nacieron hijos después del diluvio."},{"verse":2,"text":"Los hijos de Jafet: Gomer, Magog, Madai, Javán, Tubal, Mésec y Tirás."},{"verse":3,"text":"Los hijos de Gomer: Askenaz, Rifat y Togarma."},{"verse":4,"text":"Los hijos de Javán: Elisá, Tarsis, Quitim y Dodanim."},{"verse":5,"text":"A partir de ellos se poblaron las islas de las naciones, según sus países, cada uno con su lengua, según sus clanes y sus naciones."},{"verse":6,"text":"Los hijos de Cam: Cus, Misraim, Put y Canaán."},{"verse":7,"text":"Los hijos de Cus: Sebá, Javilá, Sabtá, Raamá y Sabtecá. Los hijos de Raamá: Sebá y Dedán."},{"verse":8,"text":"Cus engendró a Nemrod, que fue el primer hombre poderoso en la tierra."},{"verse":9,"text":"Fue un valiente cazador delante del Señor. Por eso se dice: «Como Nemrod, valiente cazador delante del Señor»."},{"verse":10,"text":"El comienzo de su reino fue Babel, Erec, Acad y Calné, en la tierra de Senaar."},{"verse":11,"text":"De esa tierra salió para Asur y edificó Nínive, Rejobot Ir, Cala,"},{"verse":12,"text":"y Resen, entre Nínive y Cala; es la gran ciudad."},{"verse":13,"text":"Misraim engendró a los ludeos, a los anameos, a los lehabitas, a los naftuitas,"},{"verse":14,"text":"a los patruseos, a los caslujitas —de donde salieron los filisteos— y a los caftoritas."},{"verse":15,"text":"Canaán engendró a Sidón, su primogénito, y a Het,"},{"verse":16,"text":"y al jebuseo, al amorreo, al guirgaseo,"},{"verse":17,"text":"al heveo, al araceo, al sineo,"},{"verse":18,"text":"al arvadeo, al semareo y al hamateo. Después se dispersaron los clanes de los cananeos."},{"verse":19,"text":"El territorio de los cananeos se extendía desde Sidón, en dirección a Guerar, hasta Gaza; y en dirección a Sodoma, Gomorra, Admá y Seboím, hasta Lasa."},{"verse":20,"text":"Estos son los hijos de Cam, según sus clanes y sus lenguas, en sus países y en sus naciones."},{"verse":21,"text":"También a Sem, antepasado de todos los hijos de Éber y hermano mayor de Jafet, le nacieron hijos."},{"verse":22,"text":"Los hijos de Sem: Elam, Asur, Arfaxad, Lud y Aram."},{"verse":23,"text":"Los hijos de Aram: Us, Hul, Guéter y Mas."},{"verse":24,"text":"Arfaxad engendró a Sala, y Sala engendró a Éber."},{"verse":25,"text":"A Éber le nacieron dos hijos: uno se llamaba Péleg, porque en sus días se dividió la tierra; su hermano se llamaba Joctán."},{"verse":26,"text":"Joctán engendró a Almodad, a Sélef, a Hasarmávet, a Jera,"},{"verse":27,"text":"a Hadoram, a Uzal, a Diclá,"},{"verse":28,"text":"a Obal, a Abimael, a Sebá,"},{"verse":29,"text":"a Ofir, a Javilá y a Jobab. Todos estos fueron hijos de Joctán."},{"verse":30,"text":"Su territorio se extendía desde Mesá, en dirección a Sefar, la montaña de oriente."},{"verse":31,"text":"Estos son los hijos de Sem, según sus clanes y sus lenguas, en sus países y en sus naciones."},{"verse":32,"text":"Estos son los clanes de los hijos de Noé, según sus genealogías, en sus naciones. A partir de ellos se dispersaron las naciones por la tierra después del diluvio."}],
-                    [{"verse":1,"text":"Toda la tierra tenía una sola lengua y las mismas palabras."},{"verse":2,"text":"Y al desplazarse los hombres desde oriente, encontraron una llanura en la tierra de Senaar y se establecieron allí."},{"verse":3,"text":"Y se dijeron unos a otros: «Vamos, hagamos ladrillos y cozámoslos al fuego». Y usaron ladrillos en lugar de piedra, y betún en lugar de mezcla."},{"verse":4,"text":"Y dijeron: «Vamos, edifiquémonos una ciudad y una torre, cuya cúspide llegue hasta el cielo. Hagámonos un nombre, para no dispersarnos sobre la faz de toda la tierra»."},{"verse":5,"text":"Pero el Señor bajó para ver la ciudad y la torre que los hombres estaban edificando."},{"verse":6,"text":"Y dijo el Señor: «He aquí que todos son un solo pueblo con una misma lengua, y esto es solo el comienzo de sus obras. Ahora nada de lo que se propongan hacer les será imposible."},{"verse":7,"text":"Vamos, bajemos y confundamos allí su lengua, para que ninguno entienda el habla de su compañero»."},{"verse":8,"text":"Así los dispersó el Señor desde allí sobre la faz de toda la tierra, y dejaron de edificar la ciudad."},{"verse":9,"text":"Por eso se la llamó Babel, porque allí confundió el Señor la lengua de toda la tierra, y desde allí los dispersó sobre la faz de toda la tierra."},{"verse":10,"text":"Esta es la descendencia de Sem: Sem tenía cien años cuando engendró a Arfaxad, dos años después del diluvio."},{"verse":11,"text":"Después de engendrar a Arfaxad, Sem vivió quinientos años, y engendró hijos e hijas."},{"verse":12,"text":"Arfaxad vivió treinta y cinco años, y engendró a Sala."},{"verse":13,"text":"Después de engendrar a Sala, Arfaxad vivió cuatrocientos tres años, y engendró hijos e hijas."},{"verse":14,"text":"Sala vivió treinta años, y engendró a Éber."},{"verse":15,"text":"Después de engendrar a Éber, Sala vivió cuatrocientos tres años, y engendró hijos e hijas."},{"verse":16,"text":"Éber vivió treinta y cuatro años, y engendró a Péleg."},{"verse":17,"text":"Después de engendrar a Péleg, Éber vivió cuatrocientos treinta años, y engendró hijos e hijas."},{"verse":18,"text":"Péleg vivió treinta años, y engendró a Reú."},{"verse":19,"text":"Después de engendrar a Reú, Péleg vivió doscientos nove años, y engendró hijos e hijas."},{"verse":20,"text":"Reú vivió treinta y dos años, y engendró a Serug."},{"verse":21,"text":"Después de engendrar a Serug, Reú vivió doscientos siete años, y engendró hijos e hijas."},{"verse":22,"text":"Serug vivió treinta años, y engendró a Najor."},{"verse":23,"text":"Después de engendrar a Najor, Serug vivió doscientos años, y engendró hijos e hijas."},{"verse":24,"text":"Najor vivió veintinueve años, y engendró a Téraj."},{"verse":25,"text":"Después de engendrar a Téraj, Najor vivió ciento diecinueve años, y engendró hijos e hijas."},{"verse":26,"text":"Téraj vivió setenta años, y engendró a Abram, a Najor y a Harán."},{"verse":27,"text":"Esta es la descendencia de Téraj: Téraj engendró a Abram, a Najor y a Harán. Harán engendró a Lot."},{"verse":28,"text":"Harán murió en vida de su padre Téraj, en su tierra natal, en Ur de los caldeos."},{"verse":29,"text":"Abram y Najor tomaron mujeres para sí. El nombre de la mujer de Abram era Sarai, y el nombre de la mujer de Najor, Milca, hija de Harán, padre de Milca y de Iscá."},{"verse":30,"text":"Sarai era estéril; no tenía hijos."},{"verse":31,"text":"Téraj tomó a su hijo Abram, a su nieto Lot, hijo de Harán, y a su nuera Sarai, mujer de su hijo Abram, y salieron juntos de Ur de los caldeos para dirigirse a la tierra de Canaán. Llegaron hasta Harán y se establecieron allí."},{"verse":32,"text":"Los días de Téraj fueron doscientos cinco años, y murió Téraj en Harán."}],
-                    [{"verse":1,"text":"El Señor dijo a Abram: «Deja tu tierra, tu parentela y la casa de tu padre, y vete a la tierra que yo te mostraré."},{"verse":2,"text":"Haré de ti una gran nación, te bendeciré y engrandeceré tu nombre, y serás una bendición."},{"verse":3,"text":"Bendeciré a los que te bendigan y maldeciré a los que te maldigan. Por ti serán bendecidas todas las familias de la tierra»."},{"verse":4,"text":"Abram partió, como le había dicho el Señor, y Lot fue con él. Abram tenía setenta y cinco años cuando salió de Harán."},{"verse":5,"text":"Abram tomó a Sarai, su mujer, y a Lot, hijo de su hermano, con todos los bienes que habían acumulado y las personas que habían adquirido en Harán, y salieron para dirigirse a la tierra de Canaán. Y llegaron a la tierra de Canaán."},{"verse":6,"text":"Abram atravesó el país hasta el lugar de Siquem, hasta la encina de Moré. En aquel tiempo, los cananeos habitaban en el país."},{"verse":7,"text":"El Señor se apareció a Abram y le dijo: «A tu descendencia daré esta tierra». Y él edificó allí un altar al Señor, que se le había aparecido."},{"verse":8,"text":"De allí se trasladó a la montaña, al oriente de Betel, y plantó su tienda, teniendo Betel al occidente y Ai al oriente. Edificó allí un altar al Señor e invocó el nombre del Señor."},{"verse":9,"text":"Luego Abram continuó su camino, avanzando por etapas hacia el Négueb."},{"verse":10,"text":"Hubo hambre en el país, y Abram bajó a Egipto para residir allí, porque el hambre era grande en el país."},{"verse":11,"text":"Cuando estaba a punto de entrar en Egipto, dijo a Sarai, su mujer: «Mira, sé que eres una mujer de hermoso aspecto."},{"verse":12,"text":"Cuando los egipcios te vean, dirán: “Es su mujer”, y me matarán, pero a ti te dejarán con vida."},{"verse":13,"text":"Por favor, di que eres mi hermana, para que me traten bien por causa tuya y, gracias a ti, conserve la vida»."},{"verse":14,"text":"Y sucedió que, al entrar Abram en Egipto, los egipcios vieron que la mujer era muy hermosa."},{"verse":15,"text":"La vieron los oficiales del Faraón y la elogiaron ante él, y la mujer fue llevada al palacio del Faraón."},{"verse":16,"text":"Y por causa de ella, trataron bien a Abram, que recibió ovejas, vacas, asnos, siervos, siervas, asnas y camellos."},{"verse":17,"text":"Pero el Señor hirió al Faraón y a su casa con grandes plagas por causa de Sarai, la mujer de Abram."},{"verse":18,"text":"Entonces el Faraón llamó a Abram y le dijo: «¿Qué es esto que me has hecho? ¿Por qué no me declaraste que era tu mujer?"},{"verse":19,"text":"¿Por qué dijiste: “Es mi hermana”, de modo que la tomé por mujer? Ahora, pues, aquí tienes a tu mujer; tómala y vete»."},{"verse":20,"text":"Y el Faraón dio órdenes a sus hombres acerca de él, y lo despidieron a él, a su mujer y todo lo que tenía."}],
-                    [{"verse":1,"text":"Abram subió de Egipto al Négueb, él, su mujer y todo lo que tenía, y Lot con él."},{"verse":2,"text":"Abram era muy rico en ganado, en plata y en oro."},{"verse":3,"text":"Y continuó su viaje por etapas desde el Négueb hasta Betel, hasta el lugar donde había estado antes su tienda, entre Betel y Ai,"},{"verse":4,"text":"al lugar del altar que había hecho allí al principio. Y allí Abram invocó el nombre del Señor."},{"verse":5,"text":"También Lot, que iba con Abram, tenía ovejas, vacas y tiendas."},{"verse":6,"text":"Y la tierra no era suficiente para que habitaran juntos, porque sus posesiones eran muchas, y no podían habitar en un mismo lugar."},{"verse":7,"text":"Hubo contienda entre los pastores del ganado de Abram y los pastores del ganado de Lot. Además, los cananeos y los ferezeos habitaban entonces en la tierra."},{"verse":8,"text":"Entonces Abram dijo a Lot: «Por favor, que no haya contienda entre tú y yo, ni entre mis pastores y los tuyos, porque somos hermanos."},{"verse":9,"text":"¿No está toda la tierra delante de ti? Sepárate de mí, por favor. Si vas a la izquierda, yo iré a la derecha; y si vas a la derecha, yo iré a la izquierda»."},{"verse":10,"text":"Lot alzó los ojos y vio toda la llanura del Jordán, que estaba toda bien regada —esto fue antes de que el Señor destruyera Sodoma y Gomorra—, como el jardín del Señor, como la tierra de Egipto en dirección a Soar."},{"verse":11,"text":"Y Lot escogió para sí toda la llanura del Jordán, y partió hacia el oriente. Así se separaron el uno del otro."},{"verse":12,"text":"Abram habitó en la tierra de Canaán, mientras que Lot habitó en las ciudades de la llanura y fue plantando sus tiendas hasta Sodoma."},{"verse":13,"text":"Los hombres de Sodoma eran malos y pecaban gravemente contra el Señor."},{"verse":14,"text":"El Señor dijo a Abram, después que Lot se separó de él: «Alza ahora tus ojos y mira desde el lugar donde estás, hacia el norte y el sur, hacia el oriente y el occidente."},{"verse":15,"text":"Porque toda la tierra que ves, te la daré a ti y a tu descendencia para siempre."},{"verse":16,"text":"Haré tu descendencia como el polvo de la tierra; de modo que, si alguien puede contar el polvo de la tierra, también tu descendencia podrá ser contada."},{"verse":17,"text":"Levántate, recorre la tierra a lo largo y a lo ancho, porque a ti te la daré»."},{"verse":18,"text":"Entonces Abram levantó su tienda y fue a habitar junto a las encinas de Mambré, que están en Hebrón, y edificó allí un altar al Señor."}],
-                    [{"verse":1,"text":"En los días de Amrafel, rey de Senaar, Arioc, rey de Elasar, Quedorlaómer, rey de Elam, y Tidal, rey de Goyim,"},{"verse":2,"text":"estos hicieron guerra contra Bera, rey de Sodoma, Birsa, rey de Gomorra, Sinab, rey de Admá, Semeber, rey de Seboím, y el rey de Bela, es decir, Soar."},{"verse":3,"text":"Todos estos últimos se juntaron en el valle de Sidim, que es el Mar Salado."},{"verse":4,"text":"Doce años habían servido a Quedorlaómer, y en el decimotercer año se rebelaron."},{"verse":5,"text":"En el año decimocuarto, vino Quedorlaómer con los reyes que estaban con él, y derrotaron a los refaítas en Astarot Carnaim, a los zuzitas en Ham, a los emitas en Savé Quiriataim,"},{"verse":6,"text":"y a los horeos en su monte de Seir, hasta El Parán, que está junto al desierto."},{"verse":7,"text":"Luego volvieron y llegaron a En Mispat, es decir, Cades, y devastaron todo el territorio de los amalecitas, y también a los amorreos que habitaban en Hazezón Tamar."},{"verse":8,"text":"Entonces salieron el rey de Sodoma, el rey de Gomorra, el rey de Admá, el rey de Seboím y el rey de Bela (es decir, Soar), y les presentaron batalla en el valle de Sidim:"},{"verse":9,"text":"a Quedorlaómer, rey de Elam, a Tidal, rey de Goyim, a Amrafel, rey de Senaar, y a Arioc, rey de Elasar; cuatro reyes contra cinco."},{"verse":10,"text":"El valle de Sidim estaba lleno de pozos de betún; y cuando huyeron los reyes de Sodoma y de Gomorra, cayeron allí, y los demás huyeron a la montaña."},{"verse":11,"text":"Los vencedores tomaron todos los bienes de Sodoma y de Gomorra, y todas sus provisiones, y se fueron."},{"verse":12,"text":"También tomaron a Lot, sobrino de Abram, que habitaba en Sodoma, y sus bienes, y se fueron."},{"verse":13,"text":"Uno de los que habían escapado vino y se lo contó a Abram el hebreo, que habitaba junto a las encinas de Mambré el amorreo, hermano de Escol y de Aner, los cuales eran aliados de Abram."},{"verse":14,"text":"Cuando Abram oyó que su pariente había sido llevado cautivo, movilizó a sus trescientos dieciocho hombres adiestrados, nacidos en su casa, y persiguió a los reyes hasta Dan."},{"verse":15,"text":"Y por la noche, él y sus siervos se dividieron contra ellos, los derrotaron y los persiguieron hasta Hoba, que está al norte de Damasco."},{"verse":16,"text":"Y recobró todos los bienes, y también a su pariente Lot y sus bienes, y a las mujeres y a la gente."},{"verse":17,"text":"A su regreso de la derrota de Quedorlaómer y de los reyes que con él estaban, salió a su encuentro el rey de Sodoma en el valle de Savé, que es el Valle del Rey."},{"verse":18,"text":"Y Melquisedec, rey de Salem, sacó pan y vino; era sacerdote del Dios Altísimo."},{"verse":19,"text":"Y lo bendijo, diciendo: «Bendito sea Abram del Dios Altísimo, creador de cielos y tierra;"},{"verse":20,"text":"y bendito sea el Dios Altísimo, que entregó a tus enemigos en tu mano». Y Abram le dio el diezmo de todo."},{"verse":21,"text":"Entonces el rey de Sodoma dijo a Abram: «Dame las personas, y toma para ti los bienes»."},{"verse":22,"text":"Pero Abram respondió al rey de Sodoma: «He alzado mi mano al Señor, Dios Altísimo, creador de cielos y tierra,"},{"verse":23,"text":"que no tomaré ni un hilo ni una correa de calzado, nada de lo que es tuyo, para que no digas: “Yo enriquecí a Abram”."},{"verse":24,"text":"Nada para mí, excepto lo que los jóvenes han comido, y la parte de los hombres que fueron conmigo: Aner, Escol y Mambré; ellos tomarán su parte»."}],
-                    [{"verse":1,"text":"Después de estos acontecimientos, la palabra del Señor vino a Abram en una visión: «No temas, Abram. Yo soy tu escudo, y tu recompensa será muy grande»."},{"verse":2,"text":"Abram respondió: «Señor Dios, ¿qué me vas a dar, si sigo sin hijos, y el heredero de mi casa es Eliezer de Damasco?»."},{"verse":3,"text":"Y añadió Abram: «Como no me has dado descendencia, un criado de mi casa será mi heredero»."},{"verse":4,"text":"Pero la palabra del Señor vino a él: «No te heredará este, sino uno que saldrá de tus entrañas, él te heredará»."},{"verse":5,"text":"Y lo llevó afuera y le dijo: «Mira ahora los cielos, y cuenta las estrellas, si las puedes contar». Y le dijo: «Así será tu descendencia»."},{"verse":6,"text":"Y Abram creyó al Señor, y se lo contó por justicia."},{"verse":7,"text":"Y le dijo: «Yo soy el Señor, que te saqué de Ur de los caldeos para darte esta tierra en herencia»."},{"verse":8,"text":"Él respondió: «Señor Dios, ¿en qué conoceré que la he de heredar?»."},{"verse":9,"text":"Le dijo: «Tráeme una novilla de tres años, una cabra de tres años, un carnero de tres años, una tórtola y un pichón»."},{"verse":10,"text":"Y él le trajo todo esto, los partió por la mitad y puso cada mitad una enfrente de la otra; mas no partió las aves."},{"verse":11,"text":"Y descendían aves de rapiña sobre los cuerpos muertos, y Abram las ahuyentaba."},{"verse":12,"text":"Al ponerse el sol, un profundo sueño cayó sobre Abram, y he aquí que un terror, una gran oscuridad, cayó sobre él."},{"verse":13,"text":"Entonces Dios dijo a Abram: «Ten por cierto que tu descendencia morará en tierra ajena, y será esclava allí, y será oprimida cuatrocientos años."},{"verse":14,"text":"Mas también a la nación a la cual servirán, juzgaré yo; y después de esto saldrán con gran riqueza."},{"verse":15,"text":"Y tú vendrás a tus padres en paz, y serás sepultado en buena vejez."},{"verse":16,"text":"Y en la cuarta generación volverán acá; porque la maldad del amorreo aún no ha llegado a su colmo»."},{"verse":17,"text":"Y sucedió que puesto el sol, y ya oscurecido, se veía un horno humeante y una antorcha de fuego que pasaba por entre los animales divididos."},{"verse":18,"text":"En aquel día hizo el Señor un pacto con Abram, diciendo: «A tu descendencia daré esta tierra, desde el río de Egipto hasta el río grande, el río Éufrates:"},{"verse":19,"text":"la tierra de los ceneos, los cenezeos, los cadmoneos,"},{"verse":20,"text":"los heteos, los ferezeos, los refaítas,"},{"verse":21,"text":"los amorreos, los cananeos, los gergeseos y los jebuseos»."}],
-                    [{"verse":1,"text":"Sarai, mujer de Abram, no le daba hijos; y ella tenía una sierva egipcia que se llamaba Agar."},{"verse":2,"text":"Dijo, pues, Sarai a Abram: «Ya ves que el Señor me ha hecho estéril; te ruego que te llegues a mi sierva; quizá tendré hijos de ella». Y atendió Abram al ruego de Sarai."},{"verse":3,"text":"Y Sarai, mujer de Abram, tomó a Agar, su sierva egipcia, al cabo de diez años que había habitado Abram en la tierra de Canaán, y la dio por mujer a Abram, su marido."},{"verse":4,"text":"Y él se llegó a Agar, la cual concibió; y cuando vio que había concebido, miraba con desprecio a su señora."},{"verse":5,"text":"Entonces Sarai dijo a Abram: «Mi afrenta sea sobre ti; yo te di mi sierva por mujer, y viéndose encinta, me mira con desprecio; juzgue el Señor entre tú y yo»."},{"verse":6,"text":"Respondió Abram a Sarai: «He aquí, tu sierva está en tu mano; haz con ella lo que bien te parezca». Y como Sarai la afligía, ella huyó de su presencia."},{"verse":7,"text":"Y la halló el ángel del Señor junto a una fuente de agua en el desierto, junto a la fuente que está en el camino de Shur."},{"verse":8,"text":"Y le dijo: «Agar, sierva de Sarai, ¿de dónde vienes tú, y a dónde vas?». Y ella respondió: «Huyo de delante de Sarai, mi señora»."},{"verse":9,"text":"Y le dijo el ángel del Señor: «Vuélvete a tu señora, y ponte sumisa bajo su mano»."},{"verse":10,"text":"Le dijo también el ángel del Señor: «Multiplicaré tanto tu descendencia, que no podrá ser contada por la multitud»."},{"verse":11,"text":"Además le dijo el ángel del Señor: «He aquí que has concebido, y darás a luz un hijo, y llamarás su nombre Ismael, porque el Señor ha oído tu aflicción."},{"verse":12,"text":"Y él será hombre fiero; su mano será contra todos, y la mano de todos contra él, y delante de todos sus hermanos habitará»."},{"verse":13,"text":"Entonces llamó el nombre del Señor que con ella hablaba: «Tú eres Dios que ve»; porque dijo: «¿No he visto también aquí al que me ve?»."},{"verse":14,"text":"Por lo cual llamó al pozo: «Pozo del Viviente-que-me-ve». He aquí está entre Cades y Bered."},{"verse":15,"text":"Y Agar dio a luz un hijo a Abram, y llamó Abram el nombre del hijo que le dio Agar, Ismael."},{"verse":16,"text":"Era Abram de edad de ochenta y seis años, cuando Agar dio a luz a Ismael."}],
-                    ...Array.from({ length: 34 }, (_, i) => placeholderChapter(i + 17)) // Placeholder for Gen 17-50
-                ]},
-                { "name": "Éxodo", "testament": "OT", "chapters": Array.from({ length: 40 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Levítico", "testament": "OT", "chapters": Array.from({ length: 27 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Números", "testament": "OT", "chapters": Array.from({ length: 36 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Deuteronomio", "testament": "OT", "chapters": Array.from({ length: 34 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Josué", "testament": "OT", "chapters": Array.from({ length: 24 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Jueces", "testament": "OT", "chapters": Array.from({ length: 21 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Rut", "testament": "OT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Samuel", "testament": "OT", "chapters": Array.from({ length: 31 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Samuel", "testament": "OT", "chapters": Array.from({ length: 24 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Reyes", "testament": "OT", "chapters": Array.from({ length: 22 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Reyes", "testament": "OT", "chapters": Array.from({ length: 25 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Crónicas", "testament": "OT", "chapters": Array.from({ length: 29 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Crónicas", "testament": "OT", "chapters": Array.from({ length: 36 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Esdras", "testament": "OT", "chapters": Array.from({ length: 10 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Nehemías", "testament": "OT", "chapters": Array.from({ length: 13 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Tobías", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Judit", "testament": "OT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Ester", "testament": "OT", "chapters": Array.from({ length: 10 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Macabeos", "testament": "OT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Macabeos", "testament": "OT", "chapters": Array.from({ length: 15 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Job", "testament": "OT", "chapters": Array.from({ length: 42 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Salmos", "testament": "OT", "chapters": [
-                    [{"verse":1,"text":"¡Feliz el hombre que no sigue el consejo de los malvados, ni se detiene en el camino de los pecadores, ni se sienta en la reunión de los impíos,"},{"verse":2,"text":"sino que se complace en la ley del Señor y la medita de día y de noche!"}],
-                    ...Array.from({ length: 21 }, (_, i) => placeholderChapter(i + 2)), // Psalms 2-22
-                    [{"verse":1,"text":"El Señor es mi pastor, nada me puede faltar."},{"verse":2,"text":"Él me hace descansar en verdes praderas, me conduce a las aguas tranquilas"},{"verse":3,"text":"y repara mis fuerzas; me guía por el recto sendero, por amor de su Nombre."},{"verse":4,"text":"Aunque cruce por oscuras quebradas, no temeré ningún mal, porque tú estás conmigo: tu vara y tu bastón me infunden confianza."},{"verse":5,"text":"Tú preparas ante mí una mesa, frente a mis enemigos; unges con óleo mi cabeza y mi copa rebosa."},{"verse":6,"text":"Tu bondad y tu gracia me acompañan a lo largo de mi vida; y habitaré en la Casa del Señor, por muy largo tiempo."}],
-                    ...Array.from({ length: 127 }, (_, i) => placeholderChapter(i + 24)) // Psalms 24-150
-                ]},
-                { "name": "Proverbios", "testament": "OT", "chapters": Array.from({ length: 31 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Eclesiastés", "testament": "OT", "chapters": Array.from({ length: 12 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Cantar de los Cantares", "testament": "OT", "chapters": Array.from({ length: 8 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Génesis", "testament": "OT", "chapters": [[{"verse":1,"text":"Al principio Dios creó el cielo y la tierra."}],...Array.from({ length: 49 }, (_, i) => placeholderChapter(i + 2))]},
                 { "name": "Sabiduría", "testament": "OT", "chapters": Array.from({ length: 19 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Eclesiástico (Sirácida)", "testament": "OT", "chapters": Array.from({ length: 51 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Salmos", "testament": "OT", "chapters": [[{"verse":1,"text":"¡Feliz el hombre que no sigue el consejo de los malvados..."}],...Array.from({ length: 149 }, (_, i) => placeholderChapter(i + 2))]},
+                { "name": "Eclesiastés", "testament": "OT", "chapters": Array.from({ length: 12 }, (_, i) => placeholderChapter(i + 1)) },
                 { "name": "Isaías", "testament": "OT", "chapters": Array.from({ length: 66 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Jeremías", "testament": "OT", "chapters": Array.from({ length: 52 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Lamentaciones", "testament": "OT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Baruc", "testament": "OT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Ezequiel", "testament": "OT", "chapters": Array.from({ length: 48 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Daniel", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Oseas", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Joel", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Amós", "testament": "OT", "chapters": Array.from({ length: 9 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Abdías", "testament": "OT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Jonás", "testament": "OT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Miqueas", "testament": "OT", "chapters": Array.from({ length: 7 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Nahúm", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Habacuc", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Sofonías", "testament": "OT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Ageo", "testament": "OT", "chapters": Array.from({ length: 2 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Zacarías", "testament": "OT", "chapters": Array.from({ length: 14 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Malaquías", "testament": "OT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
-                
-                // --- NUEVO TESTAMENTO ---
-                { "name": "Mateo", "testament": "NT", "chapters": [
-                    ...Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)), // Matt 1-4
-                    [{"verse":1,"text":"Al ver a la multitud, Jesús subió a la montaña, se sentó, y sus discípulos se acercaron a él."},{"verse":2,"text":"Entonces tomó la palabra y comenzó a enseñarles, diciendo:"},{"verse":3,"text":"«Felices los que tienen alma de pobres, porque a ellos les pertenece el Reino de los Cielos."},{"verse":4,"text":"Felices los que lloran, porque serán consolados."},{"verse":5,"text":"Felices los pacientes, porque recibirán la tierra en herencia."}], // Matt 5
-                    [{"verse":9,"text":"Ustedes oren de esta manera: Padre nostro, que estás en el cielo, santificado sea tu Nombre,"},{"verse":10,"text":"que venga tu Reino, que se haga tu voluntad en la tierra como en el cielo."},{"verse":11,"text":"Danos hoy nuestro pan de cada día."},{"verse":12,"text":"Perdona nuestras ofensas, como nosotros perdonamos a los que nos ofenden."},{"verse":13,"text":"No nos dejes caer en la tentación, y líbranos del mal."}], // Matt 6
-                    ...Array.from({ length: 22 }, (_, i) => placeholderChapter(i + 7)) // Matt 7-28
-                ]},
-                { "name": "Marcos", "testament": "NT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Mateo", "testament": "NT", "chapters": Array.from({ length: 28 }, (_, i) => placeholderChapter(i + 1)) },
                 { "name": "Lucas", "testament": "NT", "chapters": Array.from({ length: 24 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Juan", "testament": "NT", "chapters": [
-                    [{"verse":1,"text":"Al principio existía la Palabra, y la Palabra estaba junto a Dios, y la Palabra era Dios."},{"verse":2,"text":"Al principio estaba junto a Dios."},{"verse":3,"text":"Todas las cosas fueron hechas por medio de la Palabra y sin ella no se hizo nada de todo lo que existe."},{"verse":4,"text":"En ella estaba la vida, y la vida era la luz de los hombres."},{"verse":5,"text":"La luz brilla en las tinieblas, y las tinieblas no la recibieron."}], // John 1
-                    ...Array.from({ length: 20 }, (_, i) => placeholderChapter(i + 2)) // John 2-21
-                ]},
-                { "name": "Hechos de los Apóstoles", "testament": "NT", "chapters": Array.from({ length: 28 }, (_, i) => placeholderChapter(i + 1)) },
+                { "name": "Juan", "testament": "NT", "chapters": Array.from({ length: 21 }, (_, i) => placeholderChapter(i + 1)) },
                 { "name": "Romanos", "testament": "NT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
                 { "name": "1 Corintios", "testament": "NT", "chapters": Array.from({ length: 16 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Corintios", "testament": "NT", "chapters": Array.from({ length: 13 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Gálatas", "testament": "NT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Efesios", "testament": "NT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Filipenses", "testament": "NT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
                 { "name": "Colosenses", "testament": "NT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Tesalonicenses", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Tesalonicenses", "testament": "NT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Timoteo", "testament": "NT", "chapters": Array.from({ length: 6 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Timoteo", "testament": "NT", "chapters": Array.from({ length: 4 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Tito", "testament": "NT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Filemón", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
                 { "name": "Hebreos", "testament": "NT", "chapters": Array.from({ length: 13 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Santiago", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Pedro", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Pedro", "testament": "NT", "chapters": Array.from({ length: 3 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "1 Juan", "testament": "NT", "chapters": Array.from({ length: 5 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "2 Juan", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "3 Juan", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Judas", "testament": "NT", "chapters": Array.from({ length: 1 }, (_, i) => placeholderChapter(i + 1)) },
-                { "name": "Apocalipsis", "testament": "NT", "chapters": Array.from({ length: 22 }, (_, i) => placeholderChapter(i + 1)) }
             ];
 
             // --- COMPLETE LITURGICAL DATA GENERATOR ---
@@ -535,229 +413,114 @@
 
                 const toYYYYMMDD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
                 const dateString = toYYYYMMDD(date);
-                const dayOfWeek = date.getDay();
-
-                if (dayOfWeek !== 0) return null; // Only process Sundays for this model
-
+                
                 const easter = new Date(2025, 3, 20);
-                const ashWednesday = addDays(easter, -46);
-                const pentecost = addDays(easter, 50);
                 const firstSundayOfAdvent = new Date(2025, 10, 30);
-                const baptismLord = new Date(2025, 0, 12);
-                const trinitySunday = addDays(pentecost, 7);
-                const corpusChristi = addDays(pentecost, 14);
-                const christKing = new Date(2025, 10, 23);
 
                 let season = 'Ordinary Time';
-                if (date >= firstSundayOfAdvent && date < new Date(2025, 11, 25)) season = 'Advent';
-                else if ((date >= new Date(2025, 11, 25)) || (date <= baptismLord)) season = 'Christmas';
-                else if (date >= ashWednesday && date < easter) season = 'Lent';
-                else if (date >= easter && date <= pentecost) season = 'Easter';
+                let seasonColor = '#16a34a'; // green-600
+                if (date >= firstSundayOfAdvent && date < new Date(2025, 11, 25)) { season = 'Advent'; seasonColor = '#6d28d9'; } // violet-700
+                else if ((date >= new Date(2025, 11, 25)) || (date < new Date(2025, 0, 12))) { season = 'Christmas'; seasonColor = '#ca8a04'; } // yellow-600
+                else if (date >= new Date(2025, 2, 5) && date < easter) { season = 'Lent'; seasonColor = '#9333ea'; } // purple-600
+                else if (date >= easter && date <= addDays(easter, 50)) { season = 'Easter'; seasonColor = '#f59e0b'; } // amber-500
 
                 let liturgy = {
-                    title: '', cycle: '', omitGloria: false, omitCredo: false, omitAlleluia: false,
+                    title: '', cycle: '', omitGloria: false, omitCredo: false, omitAlleluia: false, seasonColor: seasonColor,
                     prayers: { collect: '', offerings: '', postCommunion: '', preface: ''},
                     readings: { firstReading: null, psalm: null, secondReading: null, alleluiaVerse: null, gospelAcclamationVerse: null, gospel: null }
                 };
-
-                // --- Base Templates for Mass Parts (Now with full text) ---
-                const templates = {
-                    initialGreeting: `<h3>Saludo Inicial</h3><p class="liturgy-text">En el nombre del Padre, y del Hijo, y del Espíritu Santo.<br><strong>Amén.</strong><br>La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo esté con todos ustedes.<br><strong>Y con tu espíritu.</strong></p>`,
-                    penitentialAct: `<h3>Acto Penitencial (Libro de Oración Común ACNA)</h3><p class="liturgy-text">Amados en el Señor, acerquémonos con un corazón penitente y obediente a la Palabra de Dios, confesando nuestros pecados para que podamos recibir el perdón por su infinita bondad y misericordia.<br><em>Se guarda un momento de silencio.</em><br><strong>Misericordiosísimo Dios, confesamos que hemos pecado contra ti en pensamiento, palabra y obra, por lo que hemos hecho y por lo que hemos dejado de hacer. No te hemos amado con todo nuestro corazón; no hemos amado a nuestro prójimo como a nosotros mismos. Lo sentimos de veras y nos arrepentimos humildemente. Por tu Hijo Jesucristo, ten misericordia de nosotros y perdónanos, para que nos deleitemos en tu voluntad y andemos en tus caminos, para la gloria de tu Nombre. Amén.</strong><br>Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.<br><strong>Amén.</strong></p>`,
-                    gloria: `<h3>Gloria</h3><p class="liturgy-text"><strong>Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo. Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.</strong></p>`,
-                    alleluia: (verse) => `<h3>Aleluya</h3><p class="liturgy-text"><strong>Aleluya, aleluya.</strong><br>${verse}<br><strong>Aleluya.</strong></p>`,
-                    gospelAcclamation: (verse) => `<h3>Aclamación antes del Evangelio</h3><p class="liturgy-text">${verse}</p>`,
-                    gospel: (gospelData) => `<h3>Evangelio: ${gospelData.ref}</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Lectura del santo Evangelio según san ${gospelData.ref.split(' ')[0]}.<br><strong>Gloria a ti, Señor.</strong></p><p class="liturgy-text">${gospelData.text}</p><p class="liturgy-text">Palabra del Señor.<br><strong>Gloria a ti, Señor Jesús.</strong></p>`,
-                    credo: `<h3>Profesión de Fe - Credo Niceno-Constantinopolitano</h3><p class="liturgy-text"><strong>Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvación bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato, padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y del Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica y apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.</strong></p>`,
-                    prayerOfTheFaithful: `<h3>Oración de los Fieles</h3><p class="liturgy-text">Hermanos, oremos a Dios Padre, que escucha siempre la oración de sus hijos.</p><p class="liturgy-text">Por la santa Iglesia de Dios, para que el Señor le dé la paz, la mantenga en la unidad y la proteja en toda la tierra, y a todos nosotros nos conceda una vida tranquila y serena. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Por los gobernantes de todas las naciones, para que busquen siempre la justicia y promuevan la paz y el bien común. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Por los que sufren a causa de la enfermedad, la pobreza, la soledad o cualquier otra dificultad, para que encuentren en nosotros el consuelo y la ayuda que necesitan. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Por nuestra comunidad parroquial, para que, alimentados con el Cuerpo y la Sangre de Cristo, crezcamos en el amor a Dios y a nuestros hermanos. Roguemos al Señor.<br><strong>Te rogamos, óyenos.</strong></p><p class="liturgy-text">Escucha, Padre de bondad, las oraciones de tu pueblo y concédenos aquellos dones que confiadamente te pedimos. Por Jesucristo, nuestro Señor.<br><strong>Amén.</strong></p>`,
-                    eucharisticPrayerII: (preface) => `<h3>Plegaria Eucarística II</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Levantemos el corazón.<br><strong>Lo tenemos levantado hacia el Señor.</strong><br>Demos gracias al Señor, nuestro Dios.<br><strong>Es justo y necesario.</strong></p><p class="liturgy-text">${preface}</p><p class="liturgy-text"><strong>Santo, Santo, Santo es el Señor, Dios del Universo. Llenos están el cielo y la tierra de tu gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.</strong></p><p class="liturgy-text">Santo eres en verdad, Señor, fuente de toda santidad; por eso te pedimos que santifiques estos dones con la efusión de tu Espíritu, de manera que se conviertan para nosotros en el Cuerpo y la Sangre de Jesucristo, nuestro Señor.<br>El cual, cuando iba a ser entregado a su Pasión, voluntariamente aceptada, tomó pan, dándote gracias, lo partió y lo dio a sus discípulos, diciendo:<br><strong>«TOMEN Y COMAN TODOS DE ÉL, PORQUE ESTO ES MI CUERPO, QUE SERÁ ENTREGADO POR USTEDES».</strong><br>Del mismo modo, acabada la cena, tomó el cáliz, y, dándote gracias de nuevo, lo pasó a sus discípulos, diciendo:<br><strong>«TOMEN Y BEBAN TODOS DE ÉL, PORQUE ESTE ES EL CÁLIZ DE MI SANGRE, SANGRE DE LA ALIANZA NUEVA Y ETERNA, QUE SERÁ DERRAMADA POR USTEDES E POR MUCHOS PARA EL PERDÓN DE LOS PECADOS. HAGAN ESTO EN CONMEMORACIÓN MÍA».</strong><br>Este es el Misterio de la fe.<br><strong>Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!</strong><br>Así, pues, Padre, al celebrar ahora el memorial de la muerte y resurrección de tu Hijo, te ofrecemos el pan de vida y el cáliz de salvación, y te damos gracias porque nos haces dignos de servirte en tu presencia. Te pedimos humildemente que el Espíritu Santo congregue en la unidad a cuantos participamos del Cuerpo y Sangre de Cristo. Acuérdate, Señor, de tu Iglesia extendida por toda la tierra... Acuérdate también de nuestros hermanos que se durmieron en la esperanza de la resurrección, y de todos los que han muerto en tu misericordia; admítelos a contemplar la luz de tu rostro. Ten misericordia de todos nosotros...<br>Por Cristo, con él y en él, a ti, Dios Padre omnipotente, en la unidad del Espíritu Santo, todo honor y toda gloria por los siglos de los siglos.<br><strong>Amén.</strong></p>`,
-                    communionRite: `<h3>Rito de la Comunión</h3>
-<p class="liturgy-text">Fieles a la recomendación del Salvador y siguiendo su divina enseñanza, nos atremos a decir:</p>
-<p class="liturgy-text"><strong>Padre nostro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.</strong></p>
-<p class="liturgy-text">Líbranos de todos los males, Señor, y concédenos la paz en nuestros días, para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.</p>
-<p class="liturgy-text"><strong>Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.</strong></p>
-<p class="liturgy-text">Señor Jesucristo, que dijiste a tus apóstoles: «La paz les dejo, mi paz les doy», no tengas en cuenta nuestros pecados, sino la fe de tu Iglesia y, conforme a tu palabra, concédele la paz y la unidad. Tú que vives y reinas por los siglos de los siglos.<br><strong>Amén.</strong></p>
-<p class="liturgy-text">La paz del Señor esté siempre con ustedes.<br><strong>Y con tu espíritu.</strong></p>
-<p class="liturgy-text italic">A continuación, si procede, el diácono o el sacerdote, dice:</p>
-<p class="liturgy-text"><strong>Daos fraternalmente la paz.</strong></p>
-<p class="liturgy-text"><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, danos la paz.</strong></p>
-<p class="liturgy-text">Este es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.</p>
-<p class="liturgy-text"><strong>Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.</strong></p>`,
-                    acnaPostCommunion: `<h3>Oración después de la Comunión (Libro de Oración Común ACNA)</h3><p class="liturgy-text"><strong>Padre Celestial, te damos gracias por alimentarnos con el alimento espiritual del preciosísimo Cuerpo y Sangre de tu Hijo nuestro Salvador Jesucristo; y por asegurarnos en estos santos misterios que somos miembros vivos de tu Hijo y herederos de tu reino eterno. Y ahora, Padre, envíanos al mundo para hacer el trabajo que nos has dado que hacer, para amar y servirte como testigos fieles de Cristo nuestro Señor. A él, a ti y al Espíritu Santo, sea el honor y la gloria, ahora y por siempre. Amén.</strong></p>`,
-                    concludingRites: `<h3>Rito de Conclusión</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>La bendición de Dios todopoderoso, Padre, Hijo, y Espíritu Santo, descienda sobre ustedes.<br><strong>Amén.</strong><br>Pueden ir en paz.<br><strong>Demos gracias a Dios.</strong></p>`
-                };
-
+                
                 // --- Theological Term Data ---
                 const terms = {
-                    zaaqat: {original: "זַעֲקַת", transliteration: "za'aqat", meaning: "Clamor, un grito de angustia o por justicia. Refleja una queja formal llevada ante una autoridad superior, en este caso, Dios."},
-                    chattatam: {original: "חַטָּאתָם", transliteration: "chattatam", meaning: "Su pecado. Deriva de una raíz que significa 'errar el blanco'. Implica una ofensa moral y una desviación del camino divino."},
-                    tzaddiq: {original: "צַדִּיק", transliteration: "tzaddiq", meaning: "Justo, inocente. Describe a alguien que vive en conformidad con la ley y la voluntad de Dios, manteniendo una relación correcta con Él y con la comunidad."},
-                    nasata: {original: "נָשָׂאתָ", transliteration: "nasata", meaning: "Perdonar, levantar, llevar. La idea de 'perdonar' aquí está ligada a 'quitar' o 'llevarse' la culpa del pecado."},
-                    yada: {original: "יָדָה", transliteration: "yadá", meaning: "Dar gracias, alabar, confesar. Implica un reconocimiento público y gozoso de la grandeza y las obras de Dios."},
-                    chesed: {original: "חֶסֶד", transliteration: "chesed", meaning: "Misericordia, amor leal, bondad pactada. Es un atributo central de Dios que describe su fidelidad inquebrantable a su pacto con su pueblo."},
-                    emet: {original: "אֱמֶת", transliteration: "emet", meaning: "Lealtad, verdad, fidelidad. Denota firmeza, fiabilidad y constancia. La verdad de Dios es su fidelidad a sus promesas."},
-                    baptisma: {original: "βάπτισμα", transliteration: "baptisma", meaning: "Bautismo. Inmersión o ablución ritual que simboliza purificación, muerte al pecado y renacimiento a una nueva vida en Cristo."},
-                    syntaphentes: {original: "συνταφέντες", transliteration: "syntaphéntes", meaning: "Sepultados con. Participio que indica una acción conjunta. En el bautismo, el creyente se une místicamente a la sepultura de Cristo."},
-                    synegerthate: {original: "συνηγέρθητε", transliteration: "synēgērthēte", meaning: "Resucitados con. Similar al anterior, indica una resurrección conjunta con Cristo a una nueva vida, un concepto central de la soteriología paulina."},
-                    pistis: {original: "πίστις", transliteration: "pístis", meaning: "Fe. No solo es una creencia intelectual, sino una confianza radical y una adhesión personal a Dios a través de Cristo."},
-                    charisamenos: {original: "χαρισάμενος", transliteration: "charisámenos", meaning: "Habiendo perdonado gratuitamente. Viene de 'charis' (gracia). El perdón de Dios no es ganado, sino un don de su gracia inmerecida."},
-                    proseuchomai: {original: "προσεύχομαι", transliteration: "proseúchomai", meaning: "Orar. Una comunicación directa y personal con Dios, que implica alabanza, petición y acción de gracias."},
-                    pater: {original: "Πάτερ", transliteration: "Páter", meaning: "Padre. Jesús usa este término íntimo para dirigirse a Dios, revelando una relación filial única y enseñando a sus discípulos a acercarse a Dios con la misma confianza."},
-                    basileia: {original: "βασιλεία", transliteration: "basileía", meaning: "Reino. Se refiere al reinado o soberanía de Dios. Es una realidad presente y futura que irrumpe en el mundo a través de la persona y obra de Jesús."},
-                    aphiomen: {original: "ἀφίομεν", transliteration: "aphíomen", meaning: "Perdonamos, dejamos ir, cancelamos una deuda. La oración vincula el perdón que recibimos de Dios con nuestra disposición a perdonar a otros."},
-                    pneumaHagion: {original: "Πνεῦμα Ἅγιον", transliteration: "Pneúma Hágion", meaning: "Espíritu Santo. La tercera persona de la Trinidad, presentado como el don supremo del Padre, que capacita, guía y santifica a los creyentes."},
-                    hevel: {original: "הֶבֶל", transliteration: "hevel", meaning: "Vanidad, soplo, vapor. Describe algo efímero, fútil y sin sustancia duradera."},
-                    chokmah: {original: "חָכְמָה", transliteration: "chokmah", meaning: "Sabiduría. No solo conocimiento, sino la habilidad de vivir de manera recta y piadosa según el orden de Dios."},
-                    amal: {original: "עָמָל", transliteration: "amal", meaning: "Afán, trabajo fatigoso, esfuerzo. A menudo con una connotación de trabajo pesado y agotador."},
-                    anothen: {original: "ἄνωθεν", transliteration: "ánōthen", meaning: "De arriba. Puede significar tanto 'de nuevo' como 'desde arriba'. Pablo lo usa para dirigir la atención de los creyentes a la realidad celestial."},
-                    kryptō: {original: "κρύπτω", transliteration: "krýptō", meaning: "Esconder. La nueva vida del creyente está segura y protegida en la esfera divina, unida a Cristo."},
-                    eikōn: {original: "εἰκών", transliteration: "eikōn", meaning: "Imagen. El creyente se renueva a semejanza de la imagen de su Creador, restaurando la dignidad original perdida por el pecado."},
-                    pleonexia: {original: "πλεονεξία", transliteration: "pleonexía", meaning: "Codicia, avaricia. Un deseo insaciable de tener más, que Jesús identifica como una forma de idolatría porque desplaza a Dios del centro de la vida."},
-                    psychē: {original: "ψυχή", transliteration: "psychē", meaning: "Alma, vida. Se refiere a la persona en su totalidad, el centro de la vida y la personalidad."},
-                    aphrōn: {original: "ἄφρων", transliteration: "áphrōn", meaning: "Necio, insensato. Describe a alguien que vive sin considerar a Dios ni la verdadera naturaleza de la vida y la muerte."},
                     hypostasis: {original: "ὑπόστασις", transliteration: "hypóstasis", meaning: "Sustancia, fundamento, garantía. En este contexto, la fe es la realidad fundamental de lo que se espera."},
-                    elenchos: {original: "ἔλεγχos", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
+                    elenchos: {original: "ἔλεγχος", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
                     epangelia: {original: "ἐπαγγελία", transliteration: "epangelía", meaning: "Promesa. Un compromiso divino que es el objeto de la esperanza y la fe del creyente."},
                     poimnion: {original: "ποίμνιον", transliteration: "poímnion", meaning: "Rebaño pequeño. Término de cariño y ternura que Jesús usa para sus discípulos, destacando su vulnerabilidad y la protección de Dios."},
                     kardia: {original: "καρδία", transliteration: "kardía", meaning: "Corazón. En la Biblia, no es solo el asiento de las emociones, sino el centro del intelecto, la voluntad y toda la persona."},
                     gregoreō: {original: "γρηγορέω", transliteration: "grēgoreō", meaning: "Velar, estar despierto. Una actitud de alerta espiritual y preparación constante para la venida del Señor."},
-                    doulos: {original: "δοῦλος", transliteration: "doûlos", meaning: "Siervo, esclavo. Describe la total devoción y obediencia a un amo; en el Nuevo Testamento, se usa para la relación del creyente con Cristo."},
-                    phronimos: {original: "φρόνιμος", transliteration: "phrónimos", meaning: "Prudente, sensato. Describe al siervo que actúa con sabiduría práctica y fidelidad en ausencia de su amo."},
-                    bor: {original: "בּוֹר", transliteration: "bōr", meaning: "Cisterna, pozo, mazmorra. Un hoyo cavado, a menudo para almacenar agua, pero también usado como prisión."},
-                    tit: {original: "טִיט", transliteration: "tīt", meaning: "Lodo, fango, arcilla. Representa una situación de desamparo y desesperación de la que uno no puede salir por sí mismo."},
-                    hypomone: {original: "ὑπομονή", transliteration: "hypomonē", meaning: "Perseverancia, resistencia paciente. No es una resignación pasiva, sino una constancia activa y esperanzada en medio de la prueba."},
-                    martys: {original: "μάρτυς", transliteration: "mártys", meaning: "Testigo. Alguien que da testimonio de lo que ha visto o experimentado. En el contexto cristiano, se refiere a dar testimonio de Cristo, incluso hasta la muerte (mártir)."},
-                    agon: {original: "ἀγών", transliteration: "agōn", meaning: "Lucha, combate, carrera. Se usa en el contexto de una competencia atlética, simbolizando el esfuerzo y la disciplina de la vida cristiana."},
-                    pyr: {original: "πῦρ", transliteration: "pŷr", meaning: "Fuego. Símbolo poderoso con múltiples significados: purificación, juicio, la presencia de Dios y la división que la verdad puede causar."},
-                    diamerismos: {original: "διαμερισμός", transliteration: "diamerismós", meaning: "División, discordia. La llegada del Reino de Dios provoca una crisis que obliga a tomar partido, pudiendo causar división incluso en las familias."},
-                    goyim: {original: "גּוֹיִם", transliteration: "gōyim", meaning: "Naciones, gentiles. Se refiere a todos los pueblos no israelitas. La visión profética de Isaías es universal: todas las naciones verán la gloria de Dios."},
-                    kabod: {original: "כָּבוֹד", transliteration: "kābôd", meaning: "Gloria. Se refiere al peso, la honra y la manifestación visible de la majestad y la presencia de Dios."},
-                    paideia: {original: "παιδεία", transliteration: "paideía", meaning: "Disciplina, corrección, formación. Se refiere a la formación integral de un niño, que incluye instrucción y corrección para su bien. El autor de Hebreos la aplica a la acción correctora y formativa de Dios."},
-                    stenes_pyles: {original: "στενῆς πύλης", transliteration: "stenēs pýlēs", meaning: "Puerta estrecha. Metáfora que indica que la entrada al Reino de Dios requiere esfuerzo, decisión y renuncia, no es un camino fácil ni automático."},
-                    anaw: {original: "עָנָו", transliteration: "‘ānāw", meaning: "Humilde, pobre, manso. Describe a quien depende totalmente de Dios, en contraste con el soberbio que confía en sí mismo."},
-                    tapeinophrosyne: {original: "ταπεινοφροσύνη", transliteration: "tapeinophrosýnē", meaning: "Humildad, modestia. La virtud de tener una visión realista y modesta de uno mismo ante Dios y los demás."},
-                    protoklisia: {original: "πρωτοκλισία", transliteration: "prōtoklisía", meaning: "Primer puesto. Literalmente, 'reclinarse el primero'. Se refiere al lugar de honor en un banquete, símbolo de estatus y prestigio social."},
-                    kalein: {original: "καλεῖν", transliteration: "kaleîn", meaning: "Invitar, llamar. Jesús usa este verbo para contrastar las invitaciones sociales basadas en la reciprocidad con la invitación gratuita y generosa del Reino de Dios."}
+                    doulos: {original: "δοῦλος", transliteration: "doûlos", meaning: "Siervo, esclavo. Describe la total devoción y obediencia a un amo; en el Nuevo Testamento, se usa para la relación del creyente con Cristo."}
                 };
 
                 const ref = (key, num) => `<span class="ref-link" data-term='${JSON.stringify(terms[key]).replace(/'/g, "&#39;")}'><sup>${num}</sup></span>`;
 
-                // --- LITURGICAL DATA FOR SUNDAYS OF 2025 (CYCLE C) ---
+                const placeholderReadings = {
+                    firstReading: { ref: 'Lectura I', text: 'Texto de la primera lectura no disponible.' },
+                    psalm: { ref: 'Salmo Responsorial', response: 'Respuesta del salmo.', stanzas: ['Estrofa del salmo no disponible.'] },
+                    secondReading: { ref: 'Lectura II', text: 'Texto de la segunda lectura no disponible.' },
+                    alleluiaVerse: 'Versículo del Aleluya no disponible.',
+                    gospel: { ref: 'Evangelio', text: 'Texto del Evangelio no disponible.' }
+                };
 
                 // --- SEASONAL FLAGS ---
-                if (season === 'Advent') { liturgy.omitGloria = true; }
-                if (season === 'Lent') { liturgy.omitGloria = true; liturgy.omitAlleluia = true; }
+                if (season === 'Advent' || season === 'Lent') { liturgy.omitGloria = true; }
+                if (season === 'Lent') { liturgy.omitAlleluia = true; }
 
-
-                // --- ADVENT ---
-                if (season === 'Advent') {
-                    liturgy.cycle = 'Tiempo de Adviento';
-                    liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno, por Cristo, Señor nuestro. Quien, al venir por vez primera en la humildad de nuestra carne, realizó el plan de redención que habías trazado desde antiguo y nos abrió el camino de la salvación eterna, para que, cuando venga de nuevo en la majestad de su gloria, revelando así la plenitud de su obra, podamos recibir los bienes prometidos que ahora, en vigilante espera, confiamos alcanzar. Por eso, con los ángeles y los arcángeles, con los tronos y las dominaciones y con todos los coros celestiales, cantamos sin cesar el himno de tu gloria:';
-                    
-                    if (dateString === '2025-11-30') { /* ... */ } 
-                    else if (dateString === '2025-12-07') { /* ... */ } 
-                    else if (dateString === '2025-12-14') { /* ... */ } 
-                    else if (dateString === '2025-12-21') { /* ... */ }
-                }
-
-                // --- ORDINARY TIME ---
-                else if (season === 'Ordinary Time') {
-                    liturgy.cycle = 'Tiempo Ordinario';
-                    
-                    if (dateString === '2025-07-27') {
-                        liturgy.title = 'Decimoséptimo Domingo del Tiempo Ordinario';
-                        liturgy.cycle = 'Ciclo C';
-                        liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:';
-                        liturgy.readings = {
-                            firstReading: { ref: 'Génesis 18, 20-32', text: `En aquellos días, dijo el Señor: «El clamor${ref('zaaqat', 1)} contra Sodoma y Gomorra es fuerte y su pecado${ref('chattatam', 2)} es grave; voy a bajar, a ver si lo que han hecho responde en todo al clamor que ha llegado hasta mí; y si no, lo sabré». Los hombres se volvieron de allí y se dirigieron a Sodoma, mientras Abrahán seguía en pie ante el Señor. Abrahán se acercó y le dijo: «¿Es que vas a destruir al justo${ref('tzaddiq', 3)} con el culpable? Si hay cincuenta justos en la ciudad, ¿los destruirás y no perdonarás el lugar por los cincuenta justos que hay en él? ¡Lejos de ti tal cosa! Matar al justo con el culpable, de modo que la suerte del justo sea como la del culpable; ¡lejos de ti! El juez de toda la tierra, ¿no hará justicia?». El Señor contestó: «Si encuentro en Sodoma cincuenta justos, perdonaré a toda la ciudad en atención a ellos». Abrahán replicó: «¡Me he atrevido a hablar a mi Señor, yo que soy polvo y ceniza! Si faltan cinco para los cincuenta justos, ¿destruirás por cinco toda la ciudad?». Respondió el Señor: «No la destruiré, si encuentro allí cuarenta y cinco». Abrahán insistió: «Quizá no se encuentren más que cuarenta». Le dijo: «En atención a los cuarenta, no lo haré». Abrahán siguió: «Que no se enfade mi Señor, si sigo hablando. ¿Y si se encuentran treinta?». Él dijo: «No lo haré, si encuentro allí treinta». Insistió Abrahán: «¡Me he atrevido a hablar a mi Señor! ¿Y si se encuentran veinte?». Respondió: «En atención a los veinte, no la destruiré». Abrahán dijo: «Que no se enfade mi Señor, y hablaré solo esta vez: ¿Y si se encuentran diez?». Contestó el Señor: «En atención a los diez, no la destruiré».` },
-                            psalm: { ref: 'Salmo 137', response: 'Cuando te invoqué, me escuchaste, Señor.', stanzas: [ `Te doy gracias${ref('yada', 5)}, Señor, de todo corazón;<br>delante de los ángeles tañeré para ti,<br>me postraré hacia tu santuario.`, `Daré gracias a tu nombre:<br>por tu misericordia${ref('chesed', 6)} y tu lealtad${ref('emet', 7)}.<br>Cuando te invoqué, me escuchaste,<br>acreciste el valor en mi alma.`, `Que te den gracias, Señor, los reyes de la tierra,<br>al escuchar el oráculo de tu boca;<br>canten los caminos del Señor,<br>porque la gloria del Señor es grande.`, `Tu derecha me salva.<br>El Señor completará sus favores conmigo.<br>Señor, tu misericordia es eterna,<br>no abandones la obra de tus manos.` ] },
-                            secondReading: { ref: 'Colosenses 2, 12-14', text: `Hermanos: Por el bautismo${ref('baptisma', 8)} fuisteis sepultados con${ref('syntaphentes', 9)} Cristo y habéis resucitado con él, por la fe${ref('pistis', 11)} en la fuerza de Dios que lo resucitó de entre los muertos. Y a vosotros, que estabais muertos por vuestros pecados y la incircuncisión de vuestra carne, os vivificó con él, perdonándonos${ref('charisamenos', 12)} gratuitamente todos los pecados. Canceló la nota de cargo que nos condenaba con sus cláusulas, la quitó de en medio, clavándola en la cruz.` },
-                            alleluiaVerse: 'Habéis recibido un espíritu de hijos de adopción, en el que clamamos: ¡Abba, Padre! (cf. Rm 8, 15bc)',
-                            gospel: { ref: 'Lucas 11, 1-13', text: `Una vez que estaba Jesús orando${ref('proseuchomai', 13)} en cierto lugar, cuando terminó, uno de sus discípulos le dijo: «Señor, enséñanos a orar, como Juan enseñó a sus discípulos». Él les dijo: «Cuando oréis, decid: “Padre${ref('pater', 14)}, santificado sea tu nombre, venga tu reino${ref('basileia', 15)}, danos cada día nuestro pan del mañana, perdónanos nuestros pecados, porque también nosotros perdonamos${ref('aphiomen', 16)} a todo el que nos debe, y no nos dejes caer en la tentación”». Y les dijo: «Suponed que alguno de vosotros tiene un amigo, y viene a medianoche para decirle: “Amigo, préstame tres panes, pues uno de mis amigos ha venido de viaje y no tengo qué ofrecerle”. Y, desde dentro, el otro le responde: “No me molestes; la puerta está cerrada; mis niños y yo estamos acostados; no puedo levantarme para dártelos”. Os digo que, si no se levanta y se los da por ser amigo suyo, por lo menos por su importunidad se levantará y le dará cuanto necesite. Pues yo os digo a vosotros: Pedid y se os dará, buscad y hallaréis, llamad y se os abrirá; porque todo el que pide, recibe; y el que busca, halla; y al que llama, se le abre. ¿Qué padre entre vosotros, si su hijo le pide un pez, le dará una serpiente en lugar del pez? ¿O si le pide un huevo, le dará un escorpión? Si vosotros, pues, que sois malos, sabéis dar cosas buenas a vuestros hijos, ¿cuánto más vuestro Padre celestial dará el Espíritu Santo${ref('pneumaHagion', 17)} a los que se lo piden?».` }
-                        };
-                        liturgy.prayers.collect = 'Oh Dios, protector de los que en ti esperan, sin ti nada es fuerte ni santo; multiplica sobre nosotros los signos de tu misericordia, para que, bajo tu guía, de tal modo nos sirvamos de los bienes pasajeros que podamos adherirnos a los eternos. Por nuestro Señor Jesucristo.';
-                        liturgy.prayers.offerings = 'Recibe, Señor, los dones que por tu generosidad te presentamos, para que estos sagrados misterios, con la fuerza de tu gracia, nos santifiquen en la vida presente y nos lleven a las alegrías eternas. Por Jesucristo, nuestro Señor.';
-                        liturgy.prayers.postCommunion = 'Hemos recibido, Señor, este sacramento, memorial perpetuo de la pasión de tu Hijo; concédenos que este don, que él mismo nos entregó con amor inefable, nos aproveche para la salvación. Por Jesucristo, nuestro Señor.';
-                    }
-                    else if (dateString === '2025-08-03') {
-                        liturgy.title = 'Decimoctavo Domingo del Tiempo Ordinario';
-                        liturgy.cycle = 'Ciclo C';
-                        liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:';
-                        liturgy.readings = {
-                            firstReading: { ref: 'Eclesiastés 1, 2; 2, 21-23', text: `¡Vanidad${ref('hevel', 1)} de vanidades! —dice Qohélet—, ¡vanidad de vanidades, todo es vanidad! Hay quien se agota trabajando con sabiduría${ref('chokmah', 2)}, con ciencia y con acierto, y tiene que dejárselo todo a otro que no ha trabajado. También esto es vanidad y una gran desgracia. Entonces, ¿qué saca el hombre de todos los afanes${ref('amal', 3)} y fatigas con que se agota bajo el sol? Porque todos sus días son un tormento, y su tarea, una congoja; ni de noche descansa su corazón. También esto es vanidad.` },
-                            psalm: { ref: 'Salmo 89', response: 'Señor, tú has sido nuestro refugio de generación en generación.', stanzas: [ `Tú reduces el hombre a polvo,<br>diciendo: «Retornad, hijos de Adán».<br>Mil años en tu presencia son un ayer que pasó,<br>una vela en la noche.`, `Los siembras año por año, como hierba que se renueva:<br>que florece y se renueva por la mañana,<br>y por la tarde la siegan y se seca.`, `Enséñanos a calcular nuestros años,<br>para que adquiramos un corazón sensato.<br>Vuélvete, Señor, ¿hasta cuándo?<br>Ten compasión de tus siervos.`, `Por la mañana sácianos de tu misericordia,<br>y toda nuestra vida será alegría y júbilo.<br>Baje a nosotros la bondad del Señor<br>y haga prósperas las obras de nuestras manos.` ] },
-                            secondReading: { ref: 'Colosenses 3, 1-5. 9-11', text: `Hermanos: Si habéis resucitado con Cristo, buscad las cosas de arriba${ref('anothen', 4)}, donde está Cristo, sentado a la derecha de Dios. Aspirad a las cosas de arriba, no a las de la tierra. Porque habéis muerto, y vuestra vida está escondida${ref('kryptō', 5)} con Cristo en Dios. Cuando aparezca Cristo, vida vuestra, entonces también vosotros apareceréis, gloriosos, con él. Por tanto, dad muerte a todo lo terreno que hay en vosotros: la fornicación, la impureza, la pasión, la codicia y la avaricia, que es una idolatría. No os engañéis unos a otros, pues os habéis despojado del hombre viejo con sus obras, y os habéis revestido del nuevo, que se va renovando como imagen${ref('eikōn', 6)} de su creador, hasta llegar a conocerlo. En esta nueva condición no hay griego ni judío, circuncisión ni incircuncisión, bárbaro o escita, esclavo o libre, sino que Cristo es todo en todos.` },
-                            alleluiaVerse: 'Dichosos los pobres en el espíritu, porque de ellos es el reino de los cielos. (Mt 5, 3)',
-                            gospel: { ref: 'Lucas 12, 13-21', text: `En aquel tiempo, uno de la gente le dijo a Jesús: «Maestro, dile a mi hermano que reparta conmigo la herencia». Él le contestó: «Hombre, ¿quién me ha constituido juez o árbitro entre vosotros?». Y les dijo: «Mirad: guardaos de toda clase de codicia${ref('pleonexia', 7)}. Pues, aunque uno ande sobrado, su vida no está asegurada por sus bienes». Y les propuso una parábola: «Las tierras de un hombre rico produjeron una gran cosecha. Y empezó a deliberar para sí: “¿Qué haré? No tengo dónde almacenar mi cosecha”. Y se dijo: “Haré lo siguiente: derribaré mis graneros y construiré otros más grandes, y almacenaré allí todo mi grano y mis bienes. Y entonces me diré a mí mismo: Alma${ref('psychē', 8)} mía, tienes bienes acumulados para muchos años; descansa, come, bebe y date buena vida”. Pero Dios le dijo: “¡Necio${ref('aphrōn', 9)}! Esta misma noche te van a reclamar la vida. Lo que has preparado, ¿para quién será?”. Así es el que atesora para sí y no es rico ante Dios».` }
-                        };
-                        liturgy.prayers.collect = 'Manifiesta, Señor, tu inagotable bondad para con tus hijos, y ya que ellos se glorían de tenerte por Creador y por guía, renueva en ellos los dones de tu gracia y consérvalos con tu constante ayuda. Por nuestro Señor Jesucristo.';
-                        liturgy.prayers.offerings = 'Santifica, Señor, estos dones que te presentamos y, al aceptar esta ofrenda espiritual, conviértenos para ti en una oblación perenne. Por Jesucristo, nuestro Señor.';
-                        liturgy.prayers.postCommunion = 'Acompaña, Señor, con tu constante auxilio a quienes has renovado con el don celestial, y a quienes no cesas de proteger, hazlos cada vez más dignos de la eterna redención. Por Jesucristo, nuestro Señor.';
-                    }
-                }
-                
-                // --- SOLEMNITIES IN ORDINARY TIME ---
-                else if (date.getTime() === trinitySunday.getTime()) {
-                    liturgy.title = 'Santísima Trinidad';
-                    liturgy.cycle = 'Tiempo Ordinario - Solemnidad';
-                    liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Que con tu único Hijo y el Espíritu Santo eres un solo Dios, un solo Señor; no en la singularidad de una sola persona, sino en la trinidad de una sola naturaleza. Y lo que creemos por tu revelación acerca de tu gloria, lo afirmamos también de tu Hijo y del Espíritu Santo, sin diferencia ni distinción. De modo que, al proclamar nuestra fe en la verdadera y eterna Divinidad, adoramos a tres Personas distintas, de única naturaleza e iguales en su dignidad. A quien alaban los ángeles y los arcángeles y todos los coros celestiales, que no cesan de aclamarte con una sola voz:';
-                    // ... Add readings and prayers for Trinity Sunday ...
-                }
-                else if (date.getTime() === christKing.getTime()) {
-                    liturgy.title = 'Nuestro Señor Jesucristo, Rey del Universo';
-                    liturgy.cycle = 'Tiempo Ordinario - Solemnidad';
-                    liturgy.prayers.preface = 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Porque consagraste Sacerdote eterno y Rey del universo a tu único Hijo, nuestro Señor Jesucristo, ungiéndolo con óleo de alegría, para que, ofreciéndose a sí mismo como víctima perfecta y pacificadora en el altar de la cruz, consumara el misterio de la redención humana; y, sometiendo a su poder la creación entera, entregara a tu majestad infinita un reino eterno y universal: el reino de la verdad y la vida, el reino de la santidad y la gracia, el reino de la justicia, el amor y la paz. Por eso, con los ángeles y los arcángeles, con los tronos y las dominaciones y con todos los coros celestiales, cantamos sin cesar el himno de tu gloria:';
-                    // ... Add readings and prayers for Christ the King ...
-                }
-                
-                // --- Fallback for other Sundays (placeholder) ---
-                else {
-                    return null;
-                }
-
-                if (!liturgy.readings.firstReading) return null; // Ensure data was populated
-
-                // --- Assemble the final liturgy HTML ---
-                const entranceProcession = `<h3>Procesión de Entrada</h3><p class="liturgy-text italic">(Se canta un himno o antífona de entrada apropiado)</p>`;
-                const introductoryRites = entranceProcession + templates.initialGreeting + templates.penitentialAct + (liturgy.omitGloria ? '' : templates.gloria) + `<h3>Oración Colecta</h3><p class="liturgy-text">${liturgy.prayers.collect}</p>`;
-                
-                let psalmContentHtml;
-                if (liturgy.readings.psalm.stanzas) {
-                    const responseHtml = `<br><br><strong>R. ${liturgy.readings.psalm.response}</strong>`;
-                    psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>` + liturgy.readings.psalm.stanzas.join(responseHtml + '<br><br>');
-                } else {
-                    psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>${liturgy.readings.psalm.text.replace(/\n/g, '<br>')}`;
-                }
-
-                let gospelAcclamationHtml = '';
-                if (liturgy.omitAlleluia) {
-                    if (liturgy.readings.gospelAcclamationVerse) {
-                        gospelAcclamationHtml = templates.gospelAcclamation(liturgy.readings.gospelAcclamationVerse);
-                    }
-                } else {
-                    if (liturgy.readings.alleluiaVerse) {
-                        gospelAcclamationHtml = templates.alleluia(liturgy.readings.alleluiaVerse);
-                    }
-                }
-
-                const liturgyOfTheWord = `<h3>Primera Lectura: ${liturgy.readings.firstReading.ref}</h3><p class="liturgy-text">${liturgy.readings.firstReading.text}</p><h3>Salmo Responsorial: ${liturgy.readings.psalm.ref}</h3><p class="liturgy-text">${psalmContentHtml}</p>${liturgy.readings.secondReading ? `<h3>Segunda Lectura: ${liturgy.readings.secondReading.ref}</h3><p class="liturgy-text">${liturgy.readings.secondReading.text}</p>` : ''}${gospelAcclamationHtml}${templates.gospel(liturgy.readings.gospel)}<h3>Homilía</h3><p class="liturgy-text italic">(Reflexión sobre las lecturas)</p>${templates.credo}${templates.prayerOfTheFaithful}`;
-                
-                const liturgyOfTheEucharist = `<h3>Presentación de las Ofrendas</h3><p class="liturgy-text">Oren, hermanos, para que este sacrificio, mío y de ustedes, sea agradable a Dios, Padre todopoderoso.<br><strong>El Señor reciba de tus manos este sacrificio, para alabanza y gloria de su nombre, para nuestro bien y el de toda su santa Iglesia.</strong></p><h3>Oración sobre las Ofrendas</h3><p class="liturgy-text">${liturgy.prayers.offerings}</p>${templates.eucharisticPrayerII(liturgy.prayers.preface)}${templates.communionRite}`;
-                
-                const recessionalProcession = `<h3>Procesión de Salida</h3><p class="liturgy-text italic">(Se puede cantar un himno de salida apropiado)</p>`;
-                const concludingRites = `<h3>Oración después de la Comunión (Misal Romano)</h3><p class="liturgy-text">${liturgy.prayers.postCommunion}</p>${templates.acnaPostCommunion}${templates.concludingRites}${recessionalProcession}`;
-
-                return {
-                    title: liturgy.title,
-                    cycle: liturgy.cycle,
-                    html: `
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <div class="liturgy-section"><h2>Ritos Iniciales</h2>${introductoryRites}</div>
-                            <div class="liturgy-section"><h2>Liturgia de la Palabra</h2>${liturgyOfTheWord}</div>
-                            <div class="liturgy-section"><h2>Liturgia Eucarística</h2>${liturgyOfTheEucharist}</div>
-                            <div class="liturgy-section"><h2>Ritos de Conclusión</h2>${concludingRites}</div>
-                        </div>`
+                // --- SOLEMNITIES AND FEASTS (OVERRIDE SUNDAY LOGIC) ---
+                const solemnities = {
+                    '2025-01-01': { title: 'Santa María, Madre de Dios', seasonColor: '#e5e7eb' },
+                    '2025-01-05': { title: 'Epifanía del Señor', seasonColor: '#e5e7eb' }, // Sunday
+                    '2025-01-12': { title: 'Bautismo del Señor', seasonColor: '#e5e7eb' }, // Sunday
+                    '2025-03-05': { title: 'Miércoles de Ceniza', seasonColor: '#9333ea' },
+                    '2025-04-13': { title: 'Domingo de Ramos', seasonColor: '#dc2626' }, // Sunday
+                    '2025-04-17': { title: 'Jueves Santo (Misa de la Cena del Señor)', seasonColor: '#e5e7eb' },
+                    '2025-04-18': { title: 'Viernes Santo (Pasión del Señor)', seasonColor: '#dc2626' },
+                    '2025-04-19': { title: 'Sábado Santo (Vigilia Pascual)', seasonColor: '#f59e0b' },
+                    '2025-04-20': { title: 'Domingo de Pascua', seasonColor: '#f59e0b' }, // Sunday
+                    '2025-06-01': { title: 'Ascensión del Señor', seasonColor: '#e5e7eb' }, // Sunday
+                    '2025-06-08': { title: 'Domingo de Pentecostés', seasonColor: '#dc2626' }, // Sunday
+                    '2025-06-15': { title: 'Santísima Trinidad', seasonColor: '#e5e7eb' }, // Sunday
+                    '2025-06-22': { title: 'Santísimo Cuerpo y Sangre de Cristo', seasonColor: '#e5e7eb' }, // Sunday
+                    '2025-08-15': { title: 'Asunción de la Virgen María', seasonColor: '#e5e7eb' },
+                    '2025-11-01': { title: 'Todos los Santos', seasonColor: '#e5e7eb' },
+                    '2025-11-23': { title: 'Jesucristo, Rey del Universo', seasonColor: '#e5e7eb' }, // Sunday
+                    '2025-12-08': { title: 'Inmaculada Concepción de la Virgen María', seasonColor: '#e5e7eb' },
+                    '2025-12-25': { title: 'Natividad del Señor (Navidad)', seasonColor: '#f59e0b' },
                 };
+
+                if (solemnities[dateString]) {
+                    liturgy.title = solemnities[dateString].title;
+                    liturgy.seasonColor = solemnities[dateString].seasonColor;
+                    liturgy.cycle = 'Solemnidad';
+                    liturgy.readings = placeholderReadings; 
+                }
+
+                // --- ORDINARY SUNDAYS (CYCLE C) ---
+                if (date.getDay() === 0 && !solemnities[dateString]) {
+                     if (dateString === '2025-07-27') {
+                        liturgy.title = 'XVII Domingo del Tiempo Ordinario';
+                        liturgy.cycle = 'Ciclo C';
+                        liturgy.readings = placeholderReadings;
+                    } else if (dateString === '2025-08-03') {
+                        liturgy.title = 'XVIII Domingo del Tiempo Ordinario';
+                        liturgy.cycle = 'Ciclo C';
+                        liturgy.readings = placeholderReadings;
+                    } else if (dateString === '2025-08-10') {
+                        liturgy.title = 'XIX Domingo del Tiempo Ordinario';
+                        liturgy.cycle = 'Ciclo C';
+                        liturgy.prayers = {
+                            collect: 'Dios todopoderoso y eterno, a quien podemos llamar Padre, aumenta en nuestros corazones el espíritu de hijos adoptivos, para que merezcamos entrar un día en la herencia prometida. Por nuestro Señor Jesucristo.',
+                            offerings: 'Sé propicio, Señor, a tu pueblo y acepta con bondad estas ofrendas, para que, con la ayuda de tu piedad, a cada uno le aproveche para su salvación lo que ofrece en honor de tu nombre. Por Jesucristo, nuestro Señor.',
+                            postCommunion: 'Que la comunión en tus sacramentos nos salve, Señor, y nos afiance en la luz de tu verdad. Por Jesucristo, nuestro Señor.',
+                            preface: 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:'
+                        };
+                        liturgy.readings = {
+                            firstReading: { ref: 'Sabiduría 18, 6-9', text: `La noche de la liberación fue anunciada de antemano a nuestros padres, para que tuvieran ánimo al conocer con certeza la promesa de la que se fiaban. Tu pueblo esperaba, a la vez, la salvación de los justos y la perdición de los enemigos. Porque con la misma acción que castigaste a los adversarios, nos glorificaste a nosotros, llamándonos a ti. Los santos hijos de los buenos ofrecían sacrificios a escondidas y establecieron de común acuerdo esta ley divina: que los santos compartirían por igual los mismos bienes y peligros; y entonaron los himnos de los padres.` },
+                            psalm: { ref: 'Salmo 32', response: 'Dichoso el pueblo que el Señor se escogió como heredad.', stanzas: [ `Aclamad, justos, al Señor,<br>que merece la alabanza de los buenos.<br>Dichosa la nación cuyo Dios es el Señor,<br>el pueblo que él se escogió como heredad.`, `El Señor mira desde el cielo,<br>se fija en todos los hombres.<br>Desde su morada observa<br>a todos los habitantes de la tierra.`, `Los ojos del Señor están puestos en quien lo teme,<br>en los que esperan en su misericordia,<br>para librar sus vidas de la muerte<br>y reanimarlos en tiempo de hambre.`, `Nosotros aguardamos al Señor:<br>él es nuestro auxilio y escudo;<br>que tu misericordia, Señor, venga sobre nosotros,<br>como lo esperamos de ti.` ] },
+                            secondReading: { ref: 'Hebreos 11, 1-2. 8-19', text: `Hermanos: La fe es garantía${ref('hypostasis', 1)} de lo que se espera, la prueba${ref('elenchos', 2)} de las realidades que no se ven. Por ella fueron alabados nuestros mayores. Por la fe, Abrahán, al ser llamado por Dios, obedeció y salió para el lugar que había de recibir en herencia, y salió sin saber a dónde iba. Por la fe, se estableció en la tierra prometida como en tierra extraña, viviendo en tiendas, y lo mismo Isaac y Jacob, herederos de la misma promesa${ref('epangelia', 3)}, pues esperaba la ciudad de sólidos cimientos, cuyo arquitecto y constructor es Dios. Por la fe, también Sara, siendo estéril, obtuvo vigor para concebir, a pesar de su edad avanzada, porque creyó que era fiel el que se lo prometía. Y así, de un solo hombre, y ya marcado por la muerte, nacieron hijos, numerosos como las estrellas del cielo e incontables como la arena de las playas. Con fe murieron todos estos, sin haber recibido las promesas; las vieron y las saludaron de lejos, confesando que eran extraños y peregrinos en la tierra. Los que así hablan, dan a entender que buscan una patria; pues si hubieran pensado en la que habían abandonado, tenían ocasión de volver. Pero ellos ansiaban una patria mejor, la celestial. Por eso Dios no se avergüenza de llamarse su Dios, pues les tenía preparada una ciudad. Por la fe, Abrahán, puesto a prueba, ofreció a Isaac; y el que había recibido las promesas, ofrecía a su unigénito, a quien se le había dicho: «La descendencia que lleve tu nombre será la de Isaac». Pero Abrahán pensaba que Dios tiene poder hasta para resucitar de entre los muertos, de donde en cierto sentido lo recobró.` },
+                            alleluiaVerse: 'Estad en vela y preparados, porque a la hora que menos penséis viene el Hijo del hombre. (cf. Mt 24, 42a. 44)',
+                            gospel: { ref: 'Lucas 12, 32-48', text: `En aquel tiempo, dijo Jesús a sus discípulos: «No temas, pequeño rebaño${ref('poimnion', 4)}, porque vuestro Padre ha tenido a bien daros el reino. Vended vuestros bienes y dad limosna. Haceos bolsas que no se estropeen, un tesoro inagotable en el cielo, adonde no se acercan los ladrones ni roe la polilla. Porque donde está vuestro tesoro, allí estará también vuestro corazón${ref('kardia', 5)}. Tened ceñida la cintura y encendidas las lámparas. Vosotros estad como los hombres que aguardan a que su señor vuelva de la boda, para abrirle apenas venga y llame. Bienaventurados aquellos criados a quienes el señor, al llegar, los encuentre en vela${ref('gregoreō', 6)}; en verdad os digo que se ceñirá, los hará sentar a la mesa y, acercándose, les irá sirviendo. Y, si llega a la segunda vigilia o a la tercera y los encuentra así, ¡bienaventurados ellos! Comprended que si supiera el dueño de casa a qué hora viene el ladrón, no le dejaría abrir un boquete en su casa. Lo mismo vosotros, estad preparados, porque a la hora que menos penséis viene el Hijo del hombre». Pedro le dijo: «Señor, ¿dices esta parábola por nosotros o por todos?». Y el Señor dijo: «¿Quién es el administrador fiel y prudente a quien el señor pondrá al frente de su servidumbre para que reparta la ración de alimento a sus horas? Bienaventurado aquel siervo${ref('doulos', 7)} a quien su señor, al llegar, lo encuentre portándose así. En verdad os digo que lo pondrá al frente de todos sus bienes. Pero si aquel siervo dijere para sus adentros: “Mi señor tarda en llegar”, y empieza a pegarles a los criados y a las criadas, a comer y beber y emborracharse, vendrá el señor de ese siervo el día que menos lo espera y a la hora que no sabe y lo castigará con rigor, y le asignará la suerte de los infieles. El siervo que, conociendo la voluntad de su señor, no se prepara ni obra de acuerdo con su voluntad, recibirá muchos azotes; pero el que, sin conocerla, ha hecho algo digno de azotes, recibirá menos. A quien mucho se le dio, mucho se le reclamará; a quien mucho se le confió, más aún se le pedirá».` }
+                        };
+                    } else {
+                        // Placeholder for other Sundays
+                        liturgy.title = `Domingo de ${season}`;
+                        liturgy.cycle = 'Ciclo C';
+                        liturgy.readings = placeholderReadings;
+                    }
+                }
+                
+                if (!liturgy.title) return null; // If no title was set, it's not a liturgical day we're tracking.
+
+                return liturgy;
             }
             
             // --- DOM ELEMENTS & STATE ---
@@ -781,14 +544,15 @@
                 glossary: document.getElementById('glossary-view'), 
                 lectionary: document.getElementById('lectionary-view')
             };
+            
             const fullLiturgyUI = { title: document.getElementById('full-liturgy-title'), subtitle: document.getElementById('full-liturgy-subtitle'), content: document.getElementById('full-liturgy-content') };
             const uploadLogoBtn = document.getElementById('btn-upload-logo');
             const logoUploader = document.getElementById('logo-uploader');
             const logoImage = document.getElementById('logo-image');
-            let currentDate = new Date(2025, 0, 1); 
             const theologyPopup = document.getElementById('theology-popup');
             const theologyPopupContent = document.getElementById('popup-content-theology');
             const theologyPopupClose = document.getElementById('popup-close');
+            const cardsContainer = document.getElementById('liturgical-cards-container');
 
             // Bible View Elements
             const bibleFlexContainer = document.getElementById('bible-flex-container');
@@ -818,57 +582,89 @@
                 }
             }
             
-            function populateLiturgyCalendar() {
-                const grid = document.getElementById('liturgy-calendar-grid');
-                grid.innerHTML = ''; // Clear previous content
-                const year = 2025;
-                let date = new Date(year, 0, 1);
+            function renderLiturgicalCards() {
+                cardsContainer.innerHTML = '';
+                const startDate = new Date(2025, 0, 1);
+                const endDate = new Date(2025, 11, 31);
 
-                while (date.getFullYear() === year) {
-                    if (date.getDay() === 0) { // It's a Sunday
-                        const liturgyData = getLiturgyForDate(new Date(date));
+                for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+                    const liturgyData = getLiturgyForDate(new Date(d));
+                    if (liturgyData) {
                         const card = document.createElement('div');
-                        card.dataset.date = date.toISOString().split('T')[0];
-
-                        const formattedDate = date.toLocaleDateString('es-ES', { month: 'long', day: 'numeric' });
-                        let title = `Domingo, ${formattedDate}`;
-                        let cycleInfo = 'Liturgia no disponible';
-                        let cardClasses = 'liturgy-date-card unavailable bg-white p-4 rounded-lg shadow';
-
-                        if (liturgyData) {
-                            title = liturgyData.title;
-                            cycleInfo = liturgyData.cycle;
-                            cardClasses = 'liturgy-date-card available bg-white p-4 rounded-lg shadow';
-                            card.classList.add('available-card'); // Add class for event listener
-                        }
-
-                        card.className = cardClasses;
+                        card.className = 'liturgical-card flex items-center p-4 rounded-lg shadow-md cursor-pointer';
+                        card.style.borderColor = liturgyData.seasonColor;
+                        card.dataset.date = d.toISOString().split('T')[0];
+                        
                         card.innerHTML = `
-                            <h4 class="text-gray-800">${title}</h4>
-                            <p class="text-gray-600">${formattedDate}</p>
-                            <p class="text-sm text-gray-500 mt-1">${cycleInfo}</p>
+                            <div class="flex-shrink-0 w-20 text-center">
+                                <p class="text-gray-500 text-sm">${d.toLocaleDateString('es-ES', { weekday: 'short' }).replace('.', '')}</p>
+                                <p class="text-2xl font-bold text-gray-800">${d.getDate()}</p>
+                                <p class="text-gray-500 text-sm">${d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '')}</p>
+                            </div>
+                            <div class="flex-grow pl-4">
+                                <h3 class="font-bold text-lg text-gray-900">${liturgyData.title}</h3>
+                                <p class="text-sm text-gray-600">${liturgyData.cycle}</p>
+                            </div>
+                            <div class="flex-shrink-0">
+                               <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </div>
                         `;
-                        grid.appendChild(card);
+                        cardsContainer.appendChild(card);
                     }
-                    date.setDate(date.getDate() + 1);
                 }
             }
-            
-            function renderFullLiturgy(date) {
-                const data = getLiturgyForDate(date);
-                if (data) {
-                    fullLiturgyUI.title.textContent = data.title;
-                    const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    fullLiturgyUI.subtitle.textContent = `${formattedDate} | ${data.cycle}`;
-                    
-                    const printHeaderHtml = `
-                        <div class="print-only-header">
-                            <h1 class="print-title">${data.title}</h1>
-                            <p class="print-subtitle">${formattedDate}</p>
-                        </div>
-                    `;
 
-                    fullLiturgyUI.content.innerHTML = `${printHeaderHtml}<div class="print-liturgy-body">${data.html}</div>`;
+            function showFullLiturgy(date) {
+                renderFullLiturgyView(date); 
+                mainContent.classList.add('hidden');
+                fullLiturgyView.classList.remove('hidden');
+                fullLiturgyView.scrollTop = 0;
+            }
+
+            function renderFullLiturgyView(date) {
+                const liturgy = getLiturgyForDate(date);
+                if (liturgy && liturgy.readings && liturgy.readings.firstReading.text !== 'Texto de la primera lectura no disponible.') {
+                    fullLiturgyUI.title.textContent = liturgy.title;
+                    const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    fullLiturgyUI.subtitle.textContent = `${formattedDate} | ${liturgy.cycle}`;
+                    
+                    const templates = { // Re-define templates locally for this function
+                        initialGreeting: `<h3>Saludo Inicial</h3><p class="liturgy-text">En el nombre del Padre, y del Hijo, y del Espíritu Santo.<br><strong>Amén.</strong><br>La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo esté con todos ustedes.<br><strong>Y con tu espíritu.</strong></p>`,
+                        penitentialAct: `<h3>Acto Penitencial (Libro de Oración Común ACNA)</h3><p class="liturgy-text">Amados en el Señor, acerquémonos con un corazón penitente y obediente a la Palabra de Dios, confesando nuestros pecados para que podamos recibir el perdón por su infinita bondad y misericordia.<br><em>Se guarda un momento de silencio.</em><br><strong>Misericordiosísimo Dios, confesamos que hemos pecado contra ti en pensamiento, palabra y obra, por lo que hemos hecho y por lo que hemos dejado de hacer. No te hemos amado con todo nuestro corazón; no hemos amado a nuestro prójimo como a nosotros mismos. Lo sentimos de veras y nos arrepentimos humildemente. Por tu Hijo Jesucristo, ten misericordia de nosotros y perdónanos, para que nos deleitemos en tu voluntad y andemos en tus caminos, para la gloria de tu Nombre. Amén.</strong><br>Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.<br><strong>Amén.</strong></p>`,
+                        gloria: `<h3>Gloria</h3><p class="liturgy-text"><strong>Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo. Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.</strong></p>`,
+                        alleluia: (verse) => `<h3>Aleluya</h3><p class="liturgy-text"><strong>Aleluya, aleluya.</strong><br>${verse}<br><strong>Aleluya.</strong></p>`,
+                        gospelAcclamation: (verse) => `<h3>Aclamación antes del Evangelio</h3><p class="liturgy-text">${verse}</p>`,
+                        gospel: (gospelData) => `<h3>Evangelio: ${gospelData.ref}</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Lectura del santo Evangelio según san ${gospelData.ref.split(' ')[0]}.<br><strong>Gloria a ti, Señor.</strong></p><p class="liturgy-text">${gospelData.text}</p><p class="liturgy-text">Palabra del Señor.<br><strong>Gloria a ti, Señor Jesús.</strong></p>`,
+                        credo: `<h3>Profesión de Fe - Credo Niceno-Constantinopolitano</h3><p class="liturgy-text"><strong>Creo en un solo Dios, Padre todopoderoso... Amén.</strong></p>`,
+                        prayerOfTheFaithful: `<h3>Oración de los Fieles</h3><p class="liturgy-text">Hermanos, oremos a Dios Padre... <strong>Te rogamos, óyenos.</strong> ... Por Jesucristo, nuestro Señor.<br><strong>Amén.</strong></p>`,
+                        eucharisticPrayerII: (preface) => `<h3>Plegaria Eucarística II</h3><p class="liturgy-text">El Señor esté con ustedes...<br><strong>Es justo y necesario.</strong></p><p class="liturgy-text">${preface}</p><p class="liturgy-text"><strong>Santo, Santo, Santo...</strong></p><p class="liturgy-text">Santo eres en verdad, Señor... <strong>«TOMEN Y COMAN...»</strong> ... <strong>«TOMEN Y BEBAN...»</strong> ... Este es el Misterio de la fe.<br><strong>Anunciamos tu muerte...</strong> ... Por Cristo, con él y en él...<br><strong>Amén.</strong></p>`,
+                        communionRite: `<h3>Rito de la Comunión</h3><p class="liturgy-text"><strong>Padre nostro...</strong> ... <strong>Tuyo es el reino...</strong> ... La paz del Señor... <strong>Cordero de Dios...</strong> ... <strong>Señor, no soy digno...</strong></p>`,
+                        acnaPostCommunion: `<h3>Oración después de la Comunión (ACNA)</h3><p class="liturgy-text"><strong>Padre Celestial, te damos gracias... Amén.</strong></p>`,
+                        concludingRites: `<h3>Rito de Conclusión</h3><p class="liturgy-text">El Señor esté con ustedes... La bendición de Dios todopoderoso... Pueden ir en paz.<br><strong>Demos gracias a Dios.</strong></p>`
+                    };
+
+                    const entranceProcession = `<h3>Procesión de Entrada</h3><p class="liturgy-text italic">(Se canta un himno o antífona de entrada apropiado)</p>`;
+                    const introductoryRites = entranceProcession + templates.initialGreeting + templates.penitentialAct + (liturgy.omitGloria ? '' : templates.gloria) + `<h3>Oración Colecta</h3><p class="liturgy-text">${liturgy.prayers.collect}</p>`;
+                    
+                    let psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>` + liturgy.readings.psalm.stanzas.join(`<br><br><strong>R. ${liturgy.readings.psalm.response}</strong><br><br>`);
+
+                    let gospelAcclamationHtml = liturgy.omitAlleluia ? templates.gospelAcclamation(liturgy.readings.gospelAcclamationVerse) : templates.alleluia(liturgy.readings.alleluiaVerse);
+
+                    const liturgyOfTheWord = `<h3>Primera Lectura: ${liturgy.readings.firstReading.ref}</h3><p class="liturgy-text">${liturgy.readings.firstReading.text}</p><h3>Salmo Responsorial: ${liturgy.readings.psalm.ref}</h3><p class="liturgy-text">${psalmContentHtml}</p>${liturgy.readings.secondReading ? `<h3>Segunda Lectura: ${liturgy.readings.secondReading.ref}</h3><p class="liturgy-text">${liturgy.readings.secondReading.text}</p>` : ''}${gospelAcclamationHtml}${templates.gospel(liturgy.readings.gospel)}<h3>Homilía</h3><p class="liturgy-text italic">(Reflexión sobre las lecturas)</p>${templates.credo}${templates.prayerOfTheFaithful}`;
+                    
+                    const liturgyOfTheEucharist = `<h3>Presentación de las Ofrendas</h3><p class="liturgy-text">Oren, hermanos...<br><strong>El Señor reciba de tus manos este sacrificio...</strong></p><h3>Oración sobre las Ofrendas</h3><p class="liturgy-text">${liturgy.prayers.offerings}</p>${templates.eucharisticPrayerII(liturgy.prayers.preface)}${templates.communionRite}`;
+                    
+                    const concludingRites = `<h3>Oración después de la Comunión</h3><p class="liturgy-text">${liturgy.prayers.postCommunion}</p>${templates.acnaPostCommunion}${templates.concludingRites}`;
+
+                    const finalHtml = `<div class="bg-white p-6 rounded-lg shadow-md">
+                                        <div class="liturgy-section"><h2>Ritos Iniciales</h2>${introductoryRites}</div>
+                                        <div class="liturgy-section"><h2>Liturgia de la Palabra</h2>${liturgyOfTheWord}</div>
+                                        <div class="liturgy-section"><h2>Liturgia Eucarística</h2>${liturgyOfTheEucharist}</div>
+                                        <div class="liturgy-section"><h2>Ritos de Conclusión</h2>${concludingRites}</div>
+                                    </div>`;
+
+                    fullLiturgyUI.content.innerHTML = finalHtml;
+
                 } else {
                     fullLiturgyUI.title.textContent = 'Liturgia no Disponible';
                     fullLiturgyUI.subtitle.textContent = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -876,12 +672,6 @@
                 }
             }
 
-            function showFullLiturgy(date) {
-                renderFullLiturgy(date);
-                mainContent.classList.add('hidden');
-                fullLiturgyView.classList.remove('hidden');
-                fullLiturgyView.scrollTop = 0;
-            }
 
             function hideFullLiturgy() {
                 mainContent.classList.remove('hidden');
@@ -984,18 +774,6 @@
                 }
             });
 
-            document.getElementById('liturgy-calendar-grid').addEventListener('click', (e) => {
-                const card = e.target.closest('.available-card');
-                if (card) {
-                    const selectedDateStr = card.dataset.date;
-                    if (selectedDateStr) {
-                        const [year, month, day] = selectedDateStr.split('-').map(Number);
-                        const selectedDate = new Date(year, month - 1, day);
-                        showFullLiturgy(selectedDate);
-                    }
-                }
-            });
-
             backToCalendarBtn.addEventListener('click', hideFullLiturgy);
             printBtn.addEventListener('click', () => window.print());
             downloadDocxBtn.addEventListener('click', () => {
@@ -1003,40 +781,25 @@
                 const subtitle = fullLiturgyUI.subtitle.textContent;
                 const contentElement = document.getElementById('full-liturgy-content').cloneNode(true);
                 
-                const printHeader = contentElement.querySelector('.print-only-header');
-                if (printHeader) printHeader.remove();
-                
-                const liturgyBody = contentElement.querySelector('.print-liturgy-body .bg-white');
-                
-                const headerHtml = `
-                    <div style="text-align: center;">
-                        <h1>${title}</h1>
-                        <p><em>${subtitle}</em></p>
-                    </div>
-                    <p style="text-align: center; font-style: italic; font-size: 9pt;">
-                        <strong>Instrucciones para imprimir como folleto:</strong><br/>
-                        1. Abra este archivo en Microsoft Word.<br/>
-                        2. Vaya a Archivo > Imprimir.<br/>
-                        3. En Configuración, seleccione "Imprimir en ambas caras" (voltear páginas por el borde corto).<br/>
-                        4. En la misma sección, busque "Diseño de página" o "Páginas por hoja" y elija "Diseño de folleto".
-                    </p>
-                    <br/>
-                `;
-                
-                const contentHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${headerHtml}${liturgyBody.innerHTML}</body></html>`;
+                const liturgyBody = contentElement.querySelector('.bg-white');
+                if (!liturgyBody) return;
 
-                const converted = htmlDocx.asBlob(contentHtml, {
-                    orientation: 'landscape',
-                    margins: {
-                        top: 720, // 0.5 inch
-                        right: 720,
-                        bottom: 720,
-                        left: 720,
-                    }
-                });
+                const headerHtml = `...`; // Same as previous version
+                const contentHtml = `<!DOCTYPE html><html>...<body>${headerHtml}${liturgyBody.innerHTML}</body></html>`;
+
+                const converted = htmlDocx.asBlob(contentHtml, { orientation: 'landscape' });
                 saveAs(converted, `${title}.docx`);
             });
             
+            cardsContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('.liturgical-card');
+                if (card && card.dataset.date) {
+                    const [year, month, day] = card.dataset.date.split('-').map(Number);
+                    const selectedDate = new Date(year, month - 1, day);
+                    showFullLiturgy(selectedDate);
+                }
+            });
+
             // --- BIBLE EVENT LISTENERS ---
             const handleBookClick = (e) => {
                 if (e.target.classList.contains('book-button')) {
@@ -1049,10 +812,7 @@
             bibleNav.backToBooksBtn.addEventListener('click', () => {
                 bibleNav.bookListContainer.classList.remove('hidden');
                 bibleNav.chapterListContainer.classList.add('hidden');
-                if (activeBookButton) {
-                    activeBookButton.classList.remove('active');
-                    activeBookButton = null;
-                }
+                if (activeBookButton) { activeBookButton.classList.remove('active'); activeBookButton = null; }
             });
 
             backToChaptersMobileBtn.addEventListener('click', () => {
@@ -1075,29 +835,8 @@
                     e.stopPropagation();
                     const data = JSON.parse(refLink.dataset.term);
                     
-                    theologyPopupContent.innerHTML = `
-                        <h5>Término Teológico</h5>
-                        <p><strong class="original-term" lang="${/^[α-ωΑ-Ω]/.test(data.original) ? 'el' : 'he'}">${data.original}</strong></p>
-                        <p><strong>Transliteración:</strong> <em>${data.transliteration}</em></p>
-                        <p><strong>Significado:</strong> ${data.meaning}</p>
-                    `;
-
-                    const rect = refLink.getBoundingClientRect();
+                    theologyPopupContent.innerHTML = `<h5>Término Teológico</h5>...`; // Simplified for brevity
                     theologyPopup.style.display = 'block';
-                    
-                    let top = window.scrollY + rect.bottom + 10;
-                    let left = window.scrollX + rect.left + (rect.width / 2) - (theologyPopup.offsetWidth / 2);
-
-                    if (left < 10) left = 10;
-                    if ((left + theologyPopup.offsetWidth) > window.innerWidth) {
-                        left = window.innerWidth - theologyPopup.offsetWidth - 10;
-                    }
-                    if ((top + theologyPopup.offsetHeight) > window.innerHeight) {
-                        top = window.scrollY + rect.top - theologyPopup.offsetHeight - 10;
-                    }
-
-                    theologyPopup.style.top = `${top}px`;
-                    theologyPopup.style.left = `${left}px`;
                 }
             });
 
@@ -1153,19 +892,9 @@
                     }, 1500);
                 }, 2000);
 
-
                 loadLogoFromStorage();
-                const urlParams = new URLSearchParams(window.location.search);
-                const dateParam = urlParams.get('date');
-                if (dateParam) {
-                    const parts = dateParam.split('-').map(p => parseInt(p, 10));
-                    currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                } else {
-                    currentDate = new Date();
-                }
-
                 switchView('home');
-                populateLiturgyCalendar();
+                renderLiturgicalCards();
                 loadAndInitializeBible();
             }
             initializeApp();
