@@ -47,16 +47,33 @@
             margin-left: 1px;
             font-weight: 900;
         }
+        
+        /* --- Mobile-Optimized Popup/Modal Styles --- */
+        #theology-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 100;
+        }
         #theology-popup {
             display: none;
-            position: absolute;
-            background-color: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            padding: 1.5rem;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center the popup */
             width: 90%;
-            max-width: 350px;
+            max-width: 450px; /* Slightly wider for more content */
+            max-height: 80vh; /* Prevent it from being too tall */
+            overflow-y: auto; /* Allow scrolling within the popup */
+            background-color: white;
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
             z-index: 110;
             font-family: 'Merriweather', serif;
             font-size: 0.95rem;
@@ -149,7 +166,7 @@
             font-size: 1.1rem; sm:font-size: 1.25rem; margin-top: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
 
-        /* New Menu */
+        /* Main Menu */
         .main-nav-button {
             padding: 0.5rem 0;
             border-bottom: 3px solid transparent;
@@ -379,6 +396,8 @@
 </main>
     </div>
 
+    <!-- Mobile-Optimized Popup -->
+    <div id="theology-popup-overlay"></div>
     <div id="theology-popup">
         <span id="popup-close">&times;</span>
         <div id="popup-content-theology"></div>
@@ -550,6 +569,7 @@
             const logoUploader = document.getElementById('logo-uploader');
             const logoImage = document.getElementById('logo-image');
             const theologyPopup = document.getElementById('theology-popup');
+            const theologyPopupOverlay = document.getElementById('theology-popup-overlay');
             const theologyPopupContent = document.getElementById('popup-content-theology');
             const theologyPopupClose = document.getElementById('popup-close');
             const cardsContainer = document.getElementById('liturgical-cards-container');
@@ -776,18 +796,60 @@
 
             backToCalendarBtn.addEventListener('click', hideFullLiturgy);
             printBtn.addEventListener('click', () => window.print());
+            
             downloadDocxBtn.addEventListener('click', () => {
                 const title = fullLiturgyUI.title.textContent;
                 const subtitle = fullLiturgyUI.subtitle.textContent;
                 const contentElement = document.getElementById('full-liturgy-content').cloneNode(true);
-                
+
+                // Remove interactive elements for the DOCX
+                contentElement.querySelectorAll('.ref-link').forEach(el => {
+                    const sup = document.createElement('sup');
+                    sup.textContent = el.textContent;
+                    el.parentNode.replaceChild(sup, el);
+                });
+
                 const liturgyBody = contentElement.querySelector('.bg-white');
                 if (!liturgyBody) return;
 
-                const headerHtml = `...`; // Same as previous version
-                const contentHtml = `<!DOCTYPE html><html>...<body>${headerHtml}${liturgyBody.innerHTML}</body></html>`;
+                // Create a proper header for the document
+                const headerHtml = `
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h1 style="font-size: 18pt; font-weight: bold;">${title}</h1>
+                        <p style="font-size: 12pt; font-style: italic;">${subtitle}</p>
+                    </div>
+                `;
 
-                const converted = htmlDocx.asBlob(contentHtml, { orientation: 'landscape' });
+                // Create the main content with two columns for printing
+                const twoColumnContent = `<div style="column-count: 2; column-gap: 40px;">${liturgyBody.innerHTML}</div>`;
+
+                const fullHtmlForDocx = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <style>
+                            body { font-family: 'Times New Roman', Times, serif; font-size: 10pt; }
+                            h1, h2, h3 { font-family: 'Times New Roman', Times, serif; }
+                            h2 { font-size: 14pt; border-bottom: 1px solid black; padding-bottom: 4px; margin-top: 16px; break-after: avoid; }
+                            h3 { font-size: 11pt; }
+                            .liturgy-section { break-inside: avoid; }
+                            p { margin-top: 0.5em; margin-bottom: 0.5em; }
+                            strong { font-weight: bold; }
+                            em, .italic { font-style: italic; }
+                        </style>
+                    </head>
+                    <body>
+                        ${headerHtml}
+                        ${twoColumnContent}
+                    </body>
+                    </html>
+                `;
+
+                const converted = htmlDocx.asBlob(fullHtmlForDocx, {
+                    orientation: 'landscape',
+                    margins: { top: 720, right: 720, bottom: 720, left: 720 } // 1 inch margins
+                });
                 saveAs(converted, `${title}.docx`);
             });
             
@@ -827,7 +889,13 @@
             });
 
 
-            // --- THEOLOGY POPUP LISTENERS ---
+            // --- THEOLOGY POPUP LISTENERS (MOBILE OPTIMIZED) ---
+            function closeTheologyPopup() {
+                theologyPopup.style.display = 'none';
+                theologyPopupOverlay.style.display = 'none';
+                document.body.style.overflow = ''; // Restore background scrolling
+            }
+
             fullLiturgyView.addEventListener('click', function(e) {
                 const refLink = e.target.closest('.ref-link');
                 if (refLink) {
@@ -835,20 +903,23 @@
                     e.stopPropagation();
                     const data = JSON.parse(refLink.dataset.term);
                     
-                    theologyPopupContent.innerHTML = `<h5>Término Teológico</h5>...`; // Simplified for brevity
+                    theologyPopupContent.innerHTML = `
+                        <h5 class="flex items-center justify-between flex-wrap gap-y-1">
+                            <span class="font-bold">Término Teológico</span>
+                            <span class="text-sm font-normal text-gray-500 font-mono">${data.transliteration}</span>
+                        </h5>
+                        <p class="original-term text-teal-700 my-3">${data.original}</p>
+                        <p class="text-slate-700">${data.meaning}</p>
+                    `;
+                    
+                    theologyPopupOverlay.style.display = 'block';
                     theologyPopup.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
                 }
             });
 
-            theologyPopupClose.addEventListener('click', () => {
-                theologyPopup.style.display = 'none';
-            });
-
-            document.addEventListener('click', function(e) {
-                if (theologyPopup.style.display === 'block' && !theologyPopup.contains(e.target) && !e.target.closest('.ref-link')) {
-                    theologyPopup.style.display = 'none';
-                }
-            }, true);
+            theologyPopupClose.addEventListener('click', closeTheologyPopup);
+            theologyPopupOverlay.addEventListener('click', closeTheologyPopup);
 
             // --- LOGO UPLOAD LISTENERS ---
             uploadLogoBtn.addEventListener('click', () => {
