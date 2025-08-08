@@ -129,40 +129,6 @@
             .liturgy-section h2 { font-size: 1.5rem; }
             .liturgy-section h3 { font-size: 1.1rem; }
         }
-        
-        /* --- NEW BIBLE VIEW STYLES --- */
-        .bible-nav-card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .bible-nav-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        }
-        .bible-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-        }
-        .bible-book-card, .bible-chapter-card {
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-        }
-        /* Style for verse numbers */
-        #chapter-content-view > p > sup:first-child { 
-            font-size: 0.65em; vertical-align: super; color: #0f766e; font-weight: bold; margin-right: 0.2em; line-height: 1; 
-        }
-        .verse-wrapper {
-            margin-bottom: 0.25rem;
-            padding: 0.1rem 0;
-            transition: background-color 0.2s;
-            line-height: 1.9;
-        }
-        .has-commentary {
-            background-color: #f0fdfa; /* teal-50 */
-            border-left: 4px solid #14b8a6; /* teal-500 */
-            padding: 0.5rem 1rem;
-            margin: 0.5rem -1rem;
-            border-radius: 8px;
-        }
 
         .fade-in {
             animation: fadeIn 0.4s ease-in-out;
@@ -268,7 +234,7 @@
         <nav id="mobile-nav-links" class="flex flex-col items-center gap-8">
             <a data-view="home" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Inicio</a>
             <a data-view="liturgy" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Liturgia</a>
-            <a data-view="bible" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Biblia</a>
+            <a href="https://www.bibleserver.com/NVI/G%C3%A9nesis1" target="_blank" rel="noopener noreferrer" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600">Biblia</a>
             <a data-view="glossary" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Recursos</a>
             <a data-view="lectionary" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Leccionario</a>
             <a href="https://www.bibleserver.com/nicodemus-ai" target="_blank" rel="noopener noreferrer" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600">Nicodemus IA</a>
@@ -292,7 +258,7 @@
                 <nav class="hidden lg:flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 md:gap-x-6">
                     <a id="btn-home" class="main-nav-button cursor-pointer">Inicio</a>
                     <a id="btn-liturgy" class="main-nav-button cursor-pointer">Liturgia</a>
-                    <a id="btn-bible" class="main-nav-button cursor-pointer">Biblia</a>
+                    <a href="https://www.bibleserver.com/NVI/G%C3%A9nesis1" target="_blank" rel="noopener noreferrer" class="main-nav-button">Biblia</a>
                     <a id="btn-glossary" class="main-nav-button cursor-pointer">Recursos</a>
                     <a id="btn-lectionary" class="main-nav-button cursor-pointer">Leccionario</a>
                     <a href="https://www.bibleserver.com/nicodemus-ai" target="_blank" rel="noopener noreferrer" class="main-nav-button">Nicodemus IA</a>
@@ -323,48 +289,6 @@
                     <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center border-b-2 border-amber-400 pb-3">Calendario Litúrgico 2025</h2>
                     <div id="liturgical-cards-container" class="space-y-4">
                         <!-- Liturgical cards will be inserted here by JavaScript -->
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <div id="bible-view" class="hidden">
-            <main class="container mx-auto p-4">
-                <div id="bible-header" class="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md mb-6">
-                     <div class="flex items-center">
-                        <button id="bible-back-btn" class="hidden mr-4 text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-200">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <h2 id="bible-view-title" class="text-xl sm:text-2xl font-bold text-gray-800">Biblia</h2>
-                     </div>
-                </div>
-        
-                <div id="bible-navigation-content">
-                    <!-- 1. Testament Selection -->
-                    <div id="testament-selector-view" class="fade-in">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div id="select-ot" class="bible-nav-card cursor-pointer bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg text-center">
-                                <h3 class="text-2xl font-bold text-teal-800">Antiguo Testamento</h3>
-                            </div>
-                            <div id="select-nt" class="bible-nav-card cursor-pointer bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg text-center">
-                                <h3 class="text-2xl font-bold text-teal-800">Nuevo Testamento</h3>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <!-- 2. Book Selection -->
-                    <div id="book-selector-view" class="hidden fade-in bible-grid">
-                        <!-- Book cards will be injected here -->
-                    </div>
-        
-                    <!-- 3. Chapter Selection -->
-                    <div id="chapter-selector-view" class="hidden fade-in bible-grid">
-                         <!-- Chapter cards will be injected here -->
-                    </div>
-        
-                    <!-- 4. Chapter Content -->
-                    <div id="chapter-content-view" class="hidden fade-in bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-inner max-w-none">
-                         <!-- Chapter text will be injected here -->
                     </div>
                 </div>
             </main>
@@ -444,7 +368,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // --- HELPER FUNCTIONS ---
             const addDays = (d, days) => { const res = new Date(d); res.setDate(d.getDate() + days); return res; };
-            const placeholderChapter = (numChapters) => Array.from({ length: numChapters }, (_, i) => [{ verse: 1, text: `[Texto del capítulo ${i + 1} no cargado para optimizar el rendimiento.]` }]);
 
             // --- THEOLOGICAL DATA & HELPERS (GLOBAL SCOPE) ---
             const terms = {
@@ -455,673 +378,9 @@
                 poimnion: {original: "ποίμνιον", transliteration: "poímnion", meaning: "Rebaño pequeño. Término de cariño y ternura que Jesús usa para sus discípulos, destacando su vulnerabilidad y la protección de Dios."},
                 kardia: {original: "καρδία", transliteration: "kardía", meaning: "Corazón. En la Biblia, no es solo el asiento de las emociones, sino el centro del intelecto, la voluntad y toda la persona."},
                 gregoreō: {original: "γρηγορέω", transliteration: "grēgoreō", meaning: "Velar, estar despierto. Una actitud de alerta espiritual y preparación constante para la venida del Señor."},
-                doulos: {original: "δοῦλος", transliteration: "doûlos", meaning: "Siervo, esclavo. Describe la total devoción y obediencia a un amo; en el Nuevo Testamento, se usa para la relación del creyente con Cristo."},
-                // Terms for Genesis 11
-                saphah: { original: "שָׂפָה", transliteration: "śāp̄āh", meaning: "'Lengua', 'labio', 'idioma'. Aquí se usa junto con 'palabras' para enfatizar una unidad total de comunicación y propósito entre los hombres.", commentary: "<strong>Joseph Ratzinger (Benedicto XVI), 'En el principio creó Dios':</strong> 'La unidad de lengua no es solo un hecho lingüístico, sino la expresión de una unidad espiritual y de una voluntad común. Esta unidad, sin embargo, se vuelve peligrosa cuando se dirige hacia un proyecto de auto-glorificación y autosuficiencia que excluye a Dios, como en Babel.'" },
-                lebenah: { original: "לְבֵנָה", transliteration: "leḇēnāh", meaning: "'Ladrillo'. A diferencia de la piedra, que es una creación natural de Dios, el ladrillo es un producto de la tecnología humana. Su uso aquí es significativo.", commentary: "El texto subraya que usaron ladrillo 'en lugar de piedra' y asfalto 'en lugar de mortero'. Esto representa un intento de construir una civilización basada en la invención humana, independiente de los materiales provistos por el Creador. Es un símbolo de la autosuficiencia que busca reemplazar la dependencia de Dios por la confianza en la propia capacidad técnica." },
-                babel: { original: "בָּבֶל", transliteration: "Bāḇel", meaning: "El nombre de la ciudad, que en acadio (Bāb-ili) significa 'Puerta de Dios', es reinterpretado irónicamente en hebreo a partir del verbo 'bālal', que significa 'confundir'.", commentary: "<strong>CIC 57:</strong> 'La torre de Babel, símbolo de la soberbia colectiva, es el reverso de Pentecostés. La confusión de lenguas castiga el orgullo del hombre que intenta construir la unidad por sus propias fuerzas. En Pentecostés, el Espíritu Santo crea la unidad en la diversidad, permitiendo que todos entiendan el único Evangelio en su propia lengua. Babel es la deconstrucción; Pentecostés es la reconstrucción en Cristo.'" }
+                doulos: {original: "δοῦλος", transliteration: "doûlos", meaning: "Siervo, esclavo. Describe la total devoción y obediencia a un amo; en el Nuevo Testamento, se usa para la relación del creyente con Cristo."}
             };
             const ref = (key, num) => `<span class="ref-link" data-term='${JSON.stringify(terms[key]).replace(/'/g, "&#39;")}'><sup>${num}</sup></span>`;
-
-            // --- COMPLETE BIBLE DATA (VERIFIED WITH VATICAN.VA) ---
-            const bibleData = [
-                // Old Testament - 46 Books
-                {
-                    name: "Génesis",
-                    testament: "OT",
-                    chapters: [
-                        // Capítulo 1 (CEE Version)
-                        [
-                            { verse: 1, text: "Al principio creó Dios el cielo y la tierra." },
-                            { verse: 2, text: "La tierra era un caos informe; sobre la faz del abismo, la tiniebla. Y el aliento de Dios se cernía sobre la faz de las aguas." },
-                            { verse: 3, text: "Dijo Dios: «Exista la luz». Y la luz existió." },
-                            { verse: 4, text: "Vio Dios que la luz era buena. Y separó Dios la luz de la tiniebla." },
-                            { verse: 5, text: "Llamó Dios a la luz «día» y a la tiniebla llamó «noche». Pasó una tarde, pasó una mañana: el día primero." },
-                            { verse: 6, text: "Dijo Dios: «Exista un firmamento entre las aguas, que separe aguas de aguas»." },
-                            { verse: 7, text: "Hizo Dios el firmamento y separó las aguas de debajo del firmamento de las aguas de encima del firmamento. Y así fue." },
-                            { verse: 8, text: "Llamó Dios al firmamento «cielo». Pasó una tarde, pasó una mañana: el día segundo." },
-                            { verse: 9, text: "Dijo Dios: «Júntense las aguas de debajo del cielo en un solo lugar, y que aparezca lo seco». Y así fue." },
-                            { verse: 10, text: "Llamó Dios a lo seco «tierra», y a la masa de las aguas llamó «mar». Y vio Dios que era bueno." },
-                            { verse: 11, text: "Dijo Dios: «Produzca la tierra vegetación: hierbas que den semilla y árboles frutales que den fruto según su especie, con su semilla dentro, sobre la tierra». Y así fue." },
-                            { verse: 12, text: "La tierra produjo vegetación: hierbas que dan semilla según su especie, y árboles que dan fruto con su semilla dentro, según su especie. Y vio Dios que era bueno." },
-                            { verse: 13, text: "Pasó una tarde, pasó una mañana: el día tercero." },
-                            { verse: 14, text: "Dijo Dios: «Existan lumbreras en el firmamento del cielo para separar el día de la noche, y que sirvan de señales para las fiestas, los días y los años;" },
-                            { verse: 15, text: "y que sirvan de lumbreras en el firmamento del cielo para alumbrar sobre la tierra». Y así fue." },
-                            { verse: 16, text: "Hizo Dios las dos grandes lumbreras: la lumbrera mayor para regir el día, y la lumbrera menor para regir la noche; y las estrellas." },
-                            { verse: 17, text: "Las puso Dios en el firmamento del cielo para alumbrar sobre la tierra," },
-                            { verse: 18, text: "para regir el día y la noche, y para separar la luz de la tiniebla. Y vio Dios que era bueno." },
-                            { verse: 19, text: "Pasó una tarde, pasó una mañana: el día cuarto." },
-                            { verse: 20, text: "Dijo Dios: «Bullan las aguas de seres vivos, y que las aves vuelen sobre la tierra, por el firmamento del cielo»." },
-                            { verse: 21, text: "Creó Dios los grandes monstruos marinos y todos los seres vivos que se mueven y que las aguas bullen según sus especies, y todas las aves aladas según sus especies. Y vio Dios que era bueno." },
-                            { verse: 22, text: "Los bendijo Dios, diciendo: «Sean fecundos y multiplíquense, y llenen las aguas de los mares; y que las aves se multipliquen en la tierra»." },
-                            { verse: 23, text: "Pasó una tarde, pasó una mañana: el día quinto." },
-                            { verse: 24, text: "Dijo Dios: «Produzca la tierra seres vivos según sus especies: ganados, reptiles y bestias de la tierra según sus especies». Y así fue." },
-                            { verse: 25, text: "Hizo Dios las bestias de la tierra según sus especies, los ganados según sus especies y todos los reptiles del campo según sus especies. Y vio Dios que era bueno." },
-                            { verse: 26, text: "Dijo Dios: «Hagamos al hombre a nuestra imagen, según nuestra semejanza; que domine los peces del mar, las aves del cielo, los ganados, y a toda la tierra, y a todos los reptiles que se arrastran por la tierra»." },
-                            { verse: 27, text: "Y creó Dios al hombre a su imagen, a imagen de Dios lo creó; varón y mujer los creó." },
-                            { verse: 28, text: "Y los bendijo Dios, y les dijo Dios: «Sean fecundos y multiplíquense, llenen la tierra y sométanla; dominen los peces del mar, las aves del cielo y todos los animales que se mueven sobre la tierra»." },
-                            { verse: 29, text: "Dijo Dios: «Miren, les doy toda hierba que da semilla sobre la faz de toda la tierra, y todo árbol que tiene fruto que da semilla; esto les servirá de alimento." },
-                            { verse: 30, text: "Y a toda bestia de la tierra, a toda ave del cielo y a todo lo que se arrastra sobre la tierra, que tiene aliento de vida, toda hierba verde les doy por alimento». Y así fue." },
-                            { verse: 31, text: "Vio Dios todo lo que había hecho, y he aquí que era muy bueno. Pasó una tarde, pasó una mañana: el día sexto." }
-                        ],
-                        // Capítulo 2 (completo)
-                        [
-                            { verse: 1, text: "Así quedaron acabados los cielos y la tierra, y todo el ejército de ellos." },
-                            { verse: 2, text: "Y acabó Dios en el día séptimo la obra que hizo; y reposó el día séptimo de toda la obra que hizo." },
-                            { verse: 3, text: "Y bendijo Dios al día séptimo, y lo santificó, porque en él reposó de toda la obra que había hecho en la creación." },
-                            { verse: 4, text: "Estos son los orígenes de los cielos y de la tierra cuando fueron creados, el día que el Señor Dios hizo la tierra y los cielos," },
-                            { verse: 5, text: "y toda planta del campo antes que fuese en la tierra, y toda hierba del campo antes que naciese; porque el Señor Dios aún no había hecho llover sobre la tierra, ni había hombre para que labrase la tierra," },
-                            { verse: 6, text: "sino que subía de la tierra un vapor, el cual regaba toda la faz de la tierra." },
-                            { verse: 7, text: "Entonces el Señor Dios formó al hombre del polvo de la tierra, y sopló en su nariz aliento de vida, y fue el hombre un ser viviente." },
-                            { verse: 8, text: "Y el Señor Dios plantó un huerto en Edén, al oriente; y puso allí al hombre que había formado." },
-                            { verse: 9, text: "Y el Señor Dios hizo nacer de la tierra todo árbol delicioso a la vista, y bueno para comer; también el árbol de vida en medio del huerto, y el árbol de la ciencia del bien y del mal." },
-                            { verse: 10, text: "Y salía de Edén un río para regar el huerto, y de allí se repartía en cuatro brazos." },
-                            { verse: 11, text: "El nombre del uno era Pisón; este es el que rodea toda la tierra de Havila, donde hay oro;" },
-                            { verse: 12, text: "y el oro de aquella tierra es bueno; hay allí también bedelio y ónice." },
-                            { verse: 13, text: "El nombre del segundo río es Gihón; este es el que rodea toda la tierra de Cus." },
-                            { verse: 14, text: "Y el nombre del tercer río es Hidekel; este es el que va al oriente de Asiria. Y el cuarto río es el Éufrates." },
-                            { verse: 15, text: "Tomó, pues, el Señor Dios al hombre, y lo puso en el huerto de Edén, para que lo labrara y lo guardase." },
-                            { verse: 16, text: "Y mandó el Señor Dios al hombre, diciendo: «De todo árbol del huerto podrás comer;" },
-                            { verse: 17, text: "mas del árbol de la ciencia del bien y del mal no comerás; porque el día que de él comieres, ciertamente morirás»." },
-                            { verse: 18, text: "Y dijo el Señor Dios: «No es bueno que el hombre esté solo; le haré ayuda idónea para él»." },
-                            { verse: 19, text: "El Señor Dios formó, pues, de la tierra toda bestia del campo, y toda ave de los cielos, y las trajo a Adán para que viese cómo las había de llamar; y todo lo que Adán llamó a los animales vivientes, ese es su nombre." },
-                            { verse: 20, text: "Y puso Adán nombre a toda bestia y ave de los cielos y a todo ganado del campo; mas para Adán no se halló ayuda idónea para él." },
-                            { verse: 21, text: "Entonces el Señor Dios hizo caer sueño profundo sobre Adán, y mientras este dormía, tomó una de sus costillas, y cerró la carne en su lugar." },
-                            { verse: 22, text: "Y de la costilla que el Señor Dios tomó del hombre, hizo una mujer, y la trajo al hombre." },
-                            { verse: 23, text: "Dijo entonces Adán: «Esto es ahora hueso de mis huesos y carne de mi carne; esta será llamada Varona, porque del varón fue tomada»." },
-                            { verse: 24, text: "Por tanto, dejará el hombre a su padre y a su madre, y se unirá a su mujer, y serán una sola carne." },
-                            { verse: 25, text: "Y estaban ambos desnudos, Adán y su mujer, y no se avergonzaban." }
-                        ],
-                        // Capítulo 3 (completo)
-                        [
-                            { verse: 1, text: "La serpiente era el más astuto de todos los animales del campo que el Señor Dios había hecho. Y dijo a la mujer: «¿Conque Dios les ha dicho que no coman de ningún árbol del jardín?»." },
-                            { verse: 2, text: "La mujer respondió a la serpiente: «Podemos comer del fruto de los árboles del jardín;" },
-                            { verse: 3, text: "pero del fruto del árbol que está en medio del jardín, Dios nos ha dicho: “No coman de él ni lo toquen, para que no mueran”»." },
-                            { verse: 4, text: "La serpiente dijo a la mujer: «De ninguna manera morirán." },
-                            { verse: 5, text: "Es que Dios sabe que el día en que coman de él, se les abrirán los ojos y serán como Dios, conocedores del bien y del mal»." },
-                            { verse: 6, text: "Entonces la mujer vio que el árbol era bueno para comer, agradable a los ojos y deseable para adquirir sabiduría. Tomó de su fruto y comió. Y dio también a su marido, que estaba con ella, y él comió." },
-                            { verse: 7, text: "Se les abrieron los ojos a los dos y conocieron que estaban desnudos; y cosiendo hojas de higuera se hicieron unos ceñidores." },
-                            { verse: 8, text: "Oyeron la voz del Señor Dios que se paseaba por el jardín a la brisa del día; y el hombre y su mujer se ocultaron de la presencia del Señor Dios entre los árboles del jardín." },
-                            { verse: 9, text: "El Señor Dios llamó al hombre y le dijo: «¿Dónde estás?»." },
-                            { verse: 10, text: "Él respondió: «Oí tu voz en el jardín, y tuve miedo, porque estaba desnudo, y me escondí»." },
-                            { verse: 11, text: "Le dijo: «¿Quién te ha hecho saber que estabas desnudo? ¿Acaso has comido del árbol del que te prohibí comer?»." },
-                            { verse: 12, text: "El hombre respondió: «La mujer que me diste por compañera me dio del árbol, y comí»." },
-                            { verse: 13, text: "Dijo el Señor Dios a la mujer: «¿Qué es lo que has hecho?». La mujer respondió: «La serpiente me engañó, y comí»." },
-                            { verse: 14, text: "El Señor Dios dijo a la serpiente: «Por haber hecho esto, maldita seas entre todas las bestias y entre todos los animales del campo. Te arrastrarás sobre tu vientre y comerás polvo todos los días de tu vida." },
-                            { verse: 15, text: "Pongo hostilidad entre ti y la mujer, entre tu descendencia y la suya; ella te herirá en la cabeza, mientras tú la herirás en el talón»." },
-                            { verse: 16, text: "A la mujer le dijo: «Multiplicaré los dolores de tus embarazos; con dolor darás a luz a los hijos. Hacia tu marido irá tu apetencia, y él te dominará»." },
-                            { verse: 17, text: "Al hombre le dijo: «Porque hiciste caso a la voz de tu mujer y comiste del árbol del que te prohibí comer, maldito sea el suelo por tu causa. Con fatiga sacarás de él el alimento todos los días de tu vida." },
-                            { verse: 18, text: "Espinos y abrojos te producirá, y comerás la hierba del campo." },
-                            { verse: 19, text: "Con el sudor de tu rostro comerás el pan, hasta que vuelvas al suelo, pues de él fuiste tomado. Porque polvo eres y al polvo volverás»." },
-                            { verse: 20, text: "El hombre llamó a su mujer Eva, por ser la madre de todos los vivientes." },
-                            { verse: 21, text: "El Señor Dios hizo para Adán y su mujer túnicas de piel y los vistió." },
-                            { verse: 22, text: "Y dijo el Señor Dios: «He aquí que el hombre se ha hecho como uno de nosotros, conocedor del bien y del mal. Ahora, que no vaya a alargar su mano y tome también del árbol de la vida, coma y viva para siempre»." },
-                            { verse: 23, text: "Y el Señor Dios lo expulsó del jardín de Edén, para que labrara el suelo de donde había sido tomado." },
-                            { verse: 24, text: "Expulsó al hombre y puso al oriente del jardín de Edén a los querubines y la llama de la espada zigzagueante, para guardar el camino del árbol de la vida." }
-                        ],
-                        // Capítulo 4 (completo)
-                        [
-                            { verse: 1, text: "El hombre conoció a Eva, su mujer, la cual concibió y dio a luz a Caín, y dijo: «He adquirido un varón con el favor del Señor»." },
-                            { verse: 2, text: "Volvió a dar a luz, a su hermano Abel. Abel fue pastor de ovejas y Caín, labrador." },
-                            { verse: 3, text: "Pasado un tiempo, Caín presentó al Señor una ofrenda de los frutos del suelo." },
-                            { verse: 4, text: "Abel, por su parte, ofreció de los primogénitos de su rebaño, de la grasa de los mismos. El Señor se fijó en Abel y en su ofrenda," },
-                            { verse: 5, text: "pero no se fijó en Caín ni en su ofrenda. Caín se enfureció y andaba abatido." },
-                            { verse: 6, text: "El Señor dijo a Caín: «¿Por qué te enfureces y andas abatido?" },
-                            { verse: 7, text: "¿No es cierto que si obras bien podrás mantener la cabeza erguida? En cambio, si no obras bien, el pecado acecha a la puerta y te codicia, pero tú debes dominarlo»." },
-                            { verse: 8, text: "Caín dijo a su hermano Abel: «Vamos al campo». Y, cuando estaban en el campo, Caín atacó a su hermano Abel y lo mató." },
-                            { verse: 9, text: "El Señor dijo a Caín: «¿Dónde está tu hermano Abel?». Respondió: «No sé. ¿Soy yo el guardián de mi hermano?»." },
-                            { verse: 10, text: "El Señor le dijo: «¿Qué has hecho? La voz de la sangre de tu hermano clama a mí desde la tierra." },
-                            { verse: 11, text: "Por eso, maldito seas, lejos de este suelo que abrió su boca para recibir de tu mano la sangre de tu hermano." },
-                            { verse: 12, text: "Aunque labres el suelo, no te dará más su fruto. Vagabundo y errante serás en la tierra»." },
-                            { verse: 13, text: "Caín dijo al Señor: «Mi culpa es demasiado grande para soportarla." },
-                            { verse: 14, text: "Si hoy me expulsas de este suelo, tendré que ocultarme de tu rostro y seré vagabundo y errante por la tierra. Cualquiera que me encuentre me matará»." },
-                            { verse: 15, text: "El Señor le respondió: «No será así. Si alguien mata a Caín, la venganza será siete veces mayor». Y el Señor puso una señal a Caín, para que, si alguien lo encontraba, no lo matara." },
-                            { verse: 16, text: "Caín se alejó de la presencia del Señor y habitó en el país de Nod, al este de Edén." },
-                            { verse: 17, text: "Caín conoció a su mujer, la cual concibió y dio a luz a Henoc. Después edificó una ciudad y le puso el nombre de su hijo, Henoc." },
-                            { verse: 18, text: "A Henoc le nació Irad, e Irad engendró a Mejuyael; Mejuyael engendró a Metusael, y Metusael engendró a Lámec." },
-                            { verse: 19, text: "Lámec tomó dos mujeres: una se llamaba Adá y la otra Silá." },
-                            { verse: 20, text: "Adá dio a luz a Yabal, que fue el padre de los que habitan en tiendas y tienen ganado." },
-                            { verse: 21, text: "Su hermano se llamaba Yubal, que fue el padre de todos los que tocan la cítara y la flauta." },
-                            { verse: 22, text: "Silá, por su parte, dio a luz a Tubalcaín, forjador de toda clase de herramientas de bronce y de hierro. La hermana de Tubalcaín fue Naamá." },
-                            { verse: 23, text: "Dijo Lámec a sus mujeres: «Adá y Silá, escuchen mi voz; mujeres de Lámec, oigan mi palabra: “Yo maté a un hombre por una herida que me hizo y a un joven por un golpe que recibí." },
-                            { verse: 24, text: "Si la venganza de Caín valía por siete, la de Lámec valdrá por setenta y siete”»." },
-                            { verse: 25, text: "Adán conoció de nuevo a su mujer, la cual dio a luz un hijo, y lo llamó Set, diciendo: «Dios me ha dado otra descendencia en lugar de Abel, porque lo mató Caín»." },
-                            { verse: 26, text: "También a Set le nació un hijo, y lo llamó Enós. Entonces se comenzó a invocar el nombre del Señor." }
-                        ],
-                        // Capítulo 5 (completo)
-                        [
-                            { verse: 1, text: "Este es el libro de la descendencia de Adán. El día en que Dios creó al hombre, lo hizo a imagen de Dios." },
-                            { verse: 2, text: "Varón y mujer los creó, los bendijo y los llamó «Hombre», el día de su creación." },
-                            { verse: 3, text: "Adán tenía ciento treinta años cuando engendró un hijo a su semejanza, según su imagen, y lo llamó Set." },
-                            { verse: 4, text: "Después de engendrar a Set, Adán vivió ochocientos años y engendró hijos e hijas." },
-                            { verse: 5, text: "El total de los días que vivió Adán fue de novecientos treinta años, y murió." },
-                            { verse: 6, text: "Set tenía ciento cinco años cuando engendró a Enós." },
-                            { verse: 7, text: "Después de engendrar a Enós, Set vivió ochocientos siete años y engendró hijos e hijas." },
-                            { verse: 8, text: "El total de los días de Set fue de novecientos doce años, y murió." },
-                            { verse: 9, text: "Enós tenía noventa años cuando engendró a Cainán." },
-                            { verse: 10, text: "Después de engendrar a Cainán, Enós vivió ochocientos quince años y engendró hijos e hijas." },
-                            { verse: 11, text: "El total de los días de Enós fue de novecientos cinco años, y murió." },
-                            { verse: 12, text: "Cainán tenía setenta años cuando engendró a Mahalalel." },
-                            { verse: 13, text: "Después de engendrar a Mahalalel, Cainán vivió ochocientos cuarenta años y engendró hijos e hijas." },
-                            { verse: 14, text: "El total de los días de Cainán fue de novecientos diez años, y murió." },
-                            { verse: 15, text: "Mahalalel tenía sesenta y cinco años cuando engendró a Yéred." },
-                            { verse: 16, text: "Después de engendrar a Yéred, Mahalalel vivió ochocientos treinta años y engendró hijos e hijas." },
-                            { verse: 17, text: "El total de los días de Mahalalel fue de ochocientos noventa y cinco años, y murió." },
-                            { verse: 18, text: "Yéred tenía ciento sesenta y dos años cuando engendró a Henoc." },
-                            { verse: 19, text: "Después de engendrar a Henoc, Yéred vivió ochocientos años y engendró hijos e hijas." },
-                            { verse: 20, text: "El total de los días de Yéred fue de novecientos sesenta y dos años, y murió." },
-                            { verse: 21, text: "Henoc tenía sesenta y cinco años cuando engendró a Matusalén." },
-                            { verse: 22, text: "Henoc anduvo con Dios. Después de engendrar a Matusalén, Henoc vivió trescientos años y engendró hijos e hijas." },
-                            { verse: 23, text: "El total de los días de Henoc fue de trescientos sesenta y cinco años." },
-                            { verse: 24, text: "Henoc anduvo con Dios, y desapareció, porque Dios se lo llevó." },
-                            { verse: 25, text: "Matusalén tenía ciento ochenta y siete años cuando engendró a Lámec." },
-                            { verse: 26, text: "Después de engendrar a Lámec, Matusalén vivió setecientos ochenta y dos años y engendró hijos e hijas." },
-                            { verse: 27, text: "El total de los días de Matusalén fue de novecientos sesenta y nueve años, y murió." },
-                            { verse: 28, text: "Lámec tenía ciento ochenta y dos años cuando engendró un hijo," },
-                            { verse: 29, text: "y lo llamó Noé, diciendo: «Este nos consolará de nuestros trabajos y de la fatiga de nuestras manos, en esta tierra que maldijo el Señor»." },
-                            { verse: 30, text: "Después de engendrar a Noé, Lámec vivió quinientos noventa y cinco años y engendró hijos e hijas." },
-                            { verse: 31, text: "El total de los días de Lámec fue de setecientos setenta y siete años, y murió." },
-                            { verse: 32, text: "Noé tenía quinientos años cuando engendró a Sem, a Cam y a Jafet." }
-                        ],
-                        // Capítulo 6 (completo)
-                        [
-                            { verse: 1, text: "Cuando la humanidad comenzó a multiplicarse sobre la faz de la tierra y les nacieron hijas," },
-                            { verse: 2, text: "vieron los hijos de Dios que las hijas de los hombres eran hermosas, y tomaron de entre ellas por mujeres a las que bien quisieron." },
-                            { verse: 3, text: "Entonces dijo el Señor: «No permanecerá para siempre mi aliento en el hombre, porque no es más que carne; que sus días sean ciento veinte años»." },
-                            { verse: 4, text: "En aquellos días había gigantes en la tierra, y también después, cuando los hijos de Dios se unieron a las hijas de los hombres y ellas les dieron hijos: estos fueron los héroes de la antigüedad, hombres de renombre." },
-                            { verse: 5, text: "Vio el Señor que la maldad del hombre en la tierra era grande y que todos los designios de su corazón se inclinaban continuamente al mal." },
-                            { verse: 6, text: "Se arrepintió el Señor de haber hecho al hombre en la tierra, y le pesó en su corazón." },
-                            { verse: 7, text: "Y dijo el Señor: «Borraré de la faz de la tierra al hombre que he creado, desde el hombre hasta el ganado, los reptiles y las aves del cielo, porque me arrepiento de haberlos hecho»." },
-                            { verse: 8, text: "Pero Noé halló gracia a los ojos del Señor." },
-                            { verse: 9, text: "Esta es la historia de Noé: Noé fue el hombre más justo y cabal de su tiempo. Noé anduvo con Dios." },
-                            { verse: 10, text: "Noé engendró tres hijos: Sem, Cam y Jafet." },
-                            { verse: 11, text: "La tierra estaba corrompida en la presencia de Dios; la tierra se llenó de violencia." },
-                            { verse: 12, text: "Vio Dios la tierra, y he aquí que estaba corrompida, porque toda carne había corrompido su camino sobre la tierra." },
-                            { verse: 13, text: "Dijo Dios a Noé: «He decidido acabar con toda carne, porque la tierra está llena de violencia por culpa de ellos. Por eso, los voy a exterminar de la tierra." },
-                            { verse: 14, text: "Hazte un arca de madera de ciprés; en el arca harás compartimentos y la calafatearás con brea por dentro y por fuera." },
-                            { verse: 15, text: "La harás de esta manera: trescientos codos de longitud, cincuenta codos de anchura y treinta codos de altura." },
-                            { verse: 16, text: "Harás al arca una cubierta y, a un codo del borde, la rematarás por la parte de arriba. Pondrás la puerta del arca en su costado y harás en ella un piso bajo, uno segundo y uno tercero." },
-                            { verse: 17, text: "Por mi parte, voy a traer sobre la tierra el diluvio, las aguas, para exterminar toda carne que tiene hálito de vida bajo el cielo. Todo cuanto existe en la tierra perecerá." },
-                            { verse: 18, text: "Pero contigo estableceré mi alianza. Entrarás en el arca tú y tus hijos, tu mujer y las mujeres de tus hijos contigo." },
-                            { verse: 19, text: "Y de todos los vivientes, de toda carne, meterás en el arca una pareja de cada especie para que sobrevivan contigo; serán macho y hembra." },
-                            { verse: 20, text: "De cada especie de aves, de cada especie de ganados, de cada especie de reptiles del suelo, entrará contigo una pareja para que sobrevivan." },
-                            { verse: 21, text: "Por tu parte, recoge toda clase de alimentos y almacénalos; te servirán de comida a ti y a ellos»." },
-                            { verse: 22, text: "Noé lo hizo así; todo lo que Dios le había mandado, así lo hizo." }
-                        ],
-                        // Capítulo 7 (completo)
-                        [
-                            { verse: 1, text: "Dijo el Señor a Noé: «Entra en el arca tú y toda tu casa, pues he visto que eres el único justo ante mí en esta generación." },
-                            { verse: 2, text: "De todo animal puro tomarás para ti siete parejas, macho y su hembra; y de todo animal que no es puro, una pareja, macho y su hembra." },
-                            { verse: 3, text: "También de las aves del cielo, siete parejas, macho y hembra, para que perviva su descendencia sobre la faz de toda la tierra." },
-                            { verse: 4, text: "Porque dentro de siete días haré llover sobre la tierra durante cuarenta días y cuarenta noches, y borraré de la faz del suelo a todos los seres que hice»." },
-                            { verse: 5, text: "Noé hizo todo lo que el Señor le había mandado." },
-                            { verse: 6, text: "Tenía Noé seiscientos años cuando el diluvio de aguas vino sobre la tierra." },
-                            { verse: 7, text: "Entró Noé en el arca, y con él sus hijos, su mujer y las mujeres de sus hijos, para librarse de las aguas del diluvio." },
-                            { verse: 8, text: "De los animales puros y de los animales que no son puros, de las aves y de todo lo que repta por el suelo," },
-                            { verse: 9, text: "entraron con Noé en el arca de dos en dos, macho y hembra, como Dios había mandado a Noé." },
-                            { verse: 10, text: "Pasados los siete días, vinieron sobre la tierra las aguas del diluvio." },
-                            { verse: 11, text: "El año seiscientos de la vida de Noé, el mes segundo, el día diecisiete del mes, en ese día, se rompieron todas las fuentes del gran abismo y se abrieron las compuertas del cielo." },
-                            { verse: 12, text: "Y estuvo lloviendo sobre la tierra cuarenta días y cuarenta noches." },
-                            { verse: 13, text: "En aquel mismo día entraron en el arca Noé y sus hijos, Sem, Cam y Jafet, la mujer de Noé y las tres mujeres de sus hijos con ellos." },
-                            { verse: 14, text: "Y con ellos toda clase de fieras según sus especies, toda clase de ganados según sus especies, toda clase de reptiles que reptan sobre la tierra según sus especies, y toda clase de aves según sus especies: toda clase de pájaros, todo ser alado." },
-                            { verse: 15, text: "Entraron con Noé en el arca, de dos en dos, de toda carne que tiene hálito de vida." },
-                            { verse: 16, text: "Y los que entraron eran macho y hembra de toda carne, como le había mandado Dios. Y el Señor cerró la puerta detrás de él." },
-                            { verse: 17, text: "El diluvio duró cuarenta días sobre la tierra. Crecieron las aguas y levantaron el arca, que se elevó por encima de la tierra." },
-                            { verse: 18, text: "Subieron las aguas y crecieron mucho sobre la tierra, y el arca flotaba sobre la faz de las aguas." },
-                            { verse: 19, text: "Subieron las aguas mucho, muchísimo sobre la tierra, y quedaron cubiertos todos los montes más altos que hay bajo todo el cielo." },
-                            { verse: 20, text: "Quince codos por encima subieron las aguas, y los montes quedaron cubiertos." },
-                            { verse: 21, text: "Pereció toda carne que se mueve sobre la tierra: aves, ganados, fieras, todo lo que repta sobre la tierra y todos los hombres." },
-                            { verse: 22, text: "Todo lo que en tierra firme tenía en sus narices hálito de vida, murió." },
-                            { verse: 23, text: "Borró a todos los seres que había sobre la faz del suelo, desde el hombre hasta el ganado, los reptiles y las aves del cielo; fueron borrados de la tierra. Solo quedó Noé y los que estaban con él en el arca." },
-                            { verse: 24, text: "Las aguas prevalecieron sobre la tierra ciento cincuenta días." }
-                        ],
-                        // Capítulo 8 (completo)
-                        [
-                            { verse: 1, text: "Se acordó Dios de Noé y de todas las fieras y de todos los ganados que estaban con él en el arca. E hizo Dios pasar un viento sobre la tierra, y las aguas comenzaron a bajar." },
-                            { verse: 2, text: "Se cerraron las fuentes del abismo y las compuertas del cielo, y cesó la lluvia del cielo." },
-                            { verse: 3, text: "Las aguas fueron retirándose de sobre la tierra gradualmente. Al cabo de ciento cincuenta días, las aguas habían menguado." },
-                            { verse: 4, text: "El mes séptimo, el día diecisiete del mes, el arca se posó sobre los montes de Ararat." },
-                            { verse: 5, text: "Las aguas fueron menguando hasta el mes décimo. El día primero del mes décimo, aparecieron las cimas de los montes." },
-                            { verse: 6, text: "Al cabo de cuarenta días, abrió Noé la ventana que había hecho en el arca" },
-                            { verse: 7, text: "y soltó al cuervo, el cual estuvo saliendo y volviendo hasta que se secaron las aguas sobre la tierra." },
-                            { verse: 8, text: "Después soltó a la paloma, para ver si las aguas habían disminuido sobre la faz del suelo." },
-                            { verse: 9, text: "Pero la paloma, no hallando donde posar la planta de su pie, volvió a él, al arca, porque las aguas cubrían toda la faz de la tierra. Él alargó su mano, la tomó y la metió consigo en el arca." },
-                            { verse: 10, text: "Esperó otros siete días y volvió a soltar la paloma fuera del arca." },
-                            { verse: 11, text: "La paloma volvió a él al atardecer, y he aquí que traía en su pico una hoja de olivo recién arrancada. Así supo Noé que las aguas habían disminuido sobre la tierra." },
-                            { verse: 12, text: "Esperó otros siete días y soltó la paloma, que ya no volvió más a él." },
-                            { verse: 13, text: "El año seiscientos uno, el mes primero, el día primero del mes, se secaron las aguas sobre la tierra. Noé retiró la cubierta del arca, miró, y he aquí que la superficie del suelo estaba seca." },
-                            { verse: 14, text: "El mes segundo, el día veintisiete del mes, la tierra estaba seca." },
-                            { verse: 15, text: "Entonces habló Dios a Noé, diciendo:" },
-                            { verse: 16, text: "«Sal del arca tú y tu mujer, tus hijos y las mujeres de tus hijos contigo." },
-                            { verse: 17, text: "Saca contigo a todos los vivientes de toda carne que están contigo: aves, ganados y todos los reptiles que reptan sobre la tierra, para que se esparzan por la tierra, sean fecundos y se multipliquen sobre la tierra»." },
-                            { verse: 18, text: "Salió, pues, Noé, y sus hijos, su mujer y las mujeres de sus hijos con él." },
-                            { verse: 19, text: "Todas las fieras, todos los reptiles, todas las aves, todo lo que se mueve sobre la tierra, según sus especies, salieron del arca." },
-                            { verse: 20, text: "Construyó Noé un altar al Señor y, tomando de todo animal puro y de toda ave pura, ofreció holocaustos en el altar." },
-                            { verse: 21, text: "Al aspirar el Señor el calmante aroma, dijo el Señor en su corazón: «Nunca más maldeciré el suelo por causa del hombre, porque los designios del corazón del hombre son malos desde su juventud. Nunca más volveré a herir a todo ser viviente como he hecho." },
-                            { verse: 22, text: "Mientras dure la tierra, sementera y siega, frío y calor, verano e invierno, día y noche, no cesarán»." }
-                        ],
-                        // Capítulo 9 (completo)
-                        [
-                            { verse: 1, text: "Bendijo Dios a Noé y a sus hijos, y les dijo: «Sean fecundos, multiplíquense y llenen la tierra." },
-                            { verse: 2, text: "Infundiré temor y espanto de ustedes en todos los animales de la tierra, en todas las aves del cielo, en todo lo que se mueve por el suelo y en todos los peces del mar; quedan en sus manos." },
-                            { verse: 3, text: "Todo lo que se mueve y tiene vida les servirá de alimento; se lo doy todo, como les di la hierba verde." },
-                            { verse: 4, text: "Pero no comerán carne con su vida, es decir, con su sangre." },
-                            { verse: 5, text: "Pediré cuentas de la sangre de ustedes, que es su vida; se la pediré a cualquier animal. Y al hombre le pediré cuentas de la vida de su prójimo." },
-                            { verse: 6, text: "Si alguien derrama la sangre de un hombre, otro hombre derramará su sangre; porque a imagen de Dios fue hecho el hombre." },
-                            { verse: 7, text: "Ustedes, sean fecundos y multiplíquense, pululen por la tierra y domínenla»." },
-                            { verse: 8, text: "Dijo Dios a Noé y a sus hijos con él:" },
-                            { verse: 9, text: "«Miren, yo establezco mi alianza con ustedes y con su descendencia después de ustedes," },
-                            { verse: 10, text: "y con todo ser viviente que está con ustedes: aves, ganados y todas las fieras de la tierra que están con ustedes; con todos los que salieron del arca, con todo animal de la tierra." },
-                            { verse: 11, text: "Establezco mi alianza con ustedes: nunca más será exterminada toda carne por las aguas del diluvio, ni habrá más diluvio para destruir la tierra»." },
-                            { verse: 12, text: "Y dijo Dios: «Esta es la señal de la alianza que pongo entre yo y ustedes y todo ser viviente que está con ustedes, por generaciones perpetuas:" },
-                            { verse: 13, text: "Pongo mi arco en las nubes, y servirá de señal de la alianza entre yo y la tierra." },
-                            { verse: 14, text: "Cuando yo cubra de nubes la tierra y aparezca el arco en las nubes," },
-                            { verse: 15, text: "me acordaré de mi alianza, la que existe entre yo y ustedes y todo ser viviente de toda carne, y las aguas no volverán a ser un diluvio para destruir toda carne." },
-                            { verse: 16, text: "Estará el arco en las nubes, y yo lo veré para acordarme de la alianza perpetua entre Dios y todo ser viviente de toda carne que hay sobre la tierra»." },
-                            { verse: 17, text: "Y dijo Dios a Noé: «Esta es la señal de la alianza que he establecido entre yo y toda carne que hay sobre la tierra»." },
-                            { verse: 18, text: "Los hijos de Noé que salieron del arca fueron Sem, Cam y Jafet. Cam es el padre de Canaán." },
-                            { verse: 19, text: "Estos tres fueron los hijos de Noé, y a partir de ellos se pobló toda la tierra." },
-                            { verse: 20, text: "Noé, que era agricultor, comenzó a plantar una viña." },
-                            { verse: 21, text: "Bebió del vino, se embriagó y quedó desnudo en medio de su tienda." },
-                            { verse: 22, text: "Cam, padre de Canaán, vio la desnudez de su padre y salió a contárselo a sus dos hermanos." },
-                            { verse: 23, text: "Entonces Sem y Jafet tomaron un manto, se lo echaron sobre los hombros y, caminando hacia atrás, cubrieron la desnudez de su padre. Como sus rostros estaban vueltos, no vieron la desnudez de su padre." },
-                            { verse: 24, text: "Cuando Noé despertó de su embriaguez y supo lo que le había hecho su hijo menor," },
-                            { verse: 25, text: "dijo: «¡Maldito sea Canaán! Será el siervo más bajo de sus hermanos»." },
-                            { verse: 26, text: "Y añadió: «¡Bendito sea el Señor, el Dios de Sem! ¡Que Canaán sea su siervo!" },
-                            { verse: 27, text: "¡Que Dios engrandezca a Jafet! ¡Que habite en las tiendas de Sem, y que Canaán sea su siervo!»." },
-                            { verse: 28, text: "Vivió Noé después del diluvio trescientos cincuenta años." },
-                            { verse: 29, text: "El total de los días de Noé fue de novecientos cincuenta años, y murió." }
-                        ],
-                        // Capítulo 10 (completo)
-                        [
-                            { verse: 1, text: "Esta es la descendencia de los hijos de Noé: Sem, Cam y Jafet, a quienes les nacieron hijos después del diluvio." },
-                            { verse: 2, text: "Los hijos de Jafet: Gómer, Magog, Maday, Javán, Tubal, Mésec y Tiras." },
-                            { verse: 3, text: "Los hijos de Gómer: Asquenaz, Rifat y Togarma." },
-                            { verse: 4, text: "Los hijos de Javán: Elisa, Tarsis, Quitim y Dodanim." },
-                            { verse: 5, text: "A partir de estos se poblaron las islas de las naciones, en sus diversas tierras, cada cual según su lengua, por sus clanes y en sus naciones." },
-                            { verse: 6, text: "Los hijos de Cam: Cus, Misrayim, Put y Canaán." },
-                            { verse: 7, text: "Los hijos de Cus: Seba, Javilá, Sabtá, Ragama y Sabtecá. Los hijos de Ragama: Seba y Dedán." },
-                            { verse: 8, text: "Cus engendró a Nimrod, que fue el primer hombre poderoso en la tierra." },
-                            { verse: 9, text: "Era un valiente cazador delante del Señor. Por eso se dice: «Como Nimrod, valiente cazador delante del Señor»." },
-                            { verse: 10, text: "El comienzo de su reino fue Babel, Erec, Acad y Calné, en la tierra de Sinar." },
-                            { verse: 11, text: "De aquella tierra salió para Asur y edificó Nínive, Rejobot Ir, Cala," },
-                            { verse: 12, text: "y Resen, entre Nínive y Cala (aquella es la gran ciudad)." },
-                            { verse: 13, text: "Misrayim engendró a los ludeos, a los anameos, a los lehabitas, a los naftujitas," },
-                            { verse: 14, text: "a los patruseos, a los caslujitas (de donde salieron los filisteos) y a los caftoritas." },
-                            { verse: 15, text: "Canaán engendró a Sidón, su primogénito, y a Het," },
-                            { verse: 16, text: "y al jebuseo, al amorreo, al guirgaseo," },
-                            { verse: 17, text: "al heveo, al araceo, al sineo," },
-                            { verse: 18, text: "al arvadeo, al semareo y al jamateo. Después se dispersaron los clanes de los cananeos." },
-                            { verse: 19, text: "El territorio de los cananeos se extendía desde Sidón, en dirección a Guerar, hasta Gaza; y en dirección a Sodoma, Gomorra, Admá y Seboyim, hasta Lasa." },
-                            { verse: 20, text: "Estos son los hijos de Cam, por sus clanes y lenguas, en sus tierras y naciones." },
-                            { verse: 21, text: "También a Sem, padre de todos los hijos de Héber y hermano mayor de Jafet, le nacieron hijos." },
-                            { verse: 22, text: "Los hijos de Sem: Elam, Asur, Arfaxad, Lud y Aram." },
-                            { verse: 23, text: "Los hijos de Aram: Us, Hul, Guéter y Mas." },
-                            { verse: 24, text: "Arfaxad engendró a Sala, y Sala engendró a Héber." },
-                            { verse: 25, text: "A Héber le nacieron dos hijos: el nombre de uno fue Péleg, porque en sus días se dividió la tierra; y el nombre de su hermano, Joctán." },
-                            { verse: 26, text: "Joctán engendró a Almodad, Sélef, Jasarmávet, Yéraj," },
-                            { verse: 27, text: "Hadoram, Uzal, Diclá," },
-                            { verse: 28, text: "Obal, Abimael, Seba," },
-                            { verse: 29, text: "Ofir, Javilá y Jobab. Todos estos fueron hijos de Joctán." },
-                            { verse: 30, text: "El lugar donde habitaron se extendía desde Mesá en dirección a Sefar, la montaña de oriente." },
-                            { verse: 31, text: "Estos son los hijos de Sem, por sus clanes y lenguas, en sus tierras y naciones." },
-                            { verse: 32, text: "Estos son los clanes de los hijos de Noé, según sus genealogías, en sus naciones. A partir de ellos se dispersaron las naciones por la tierra después del diluvio." }
-                        ],
-                        // Capítulo 11 (completo)
-                        [
-                            { verse: 1, text: "Toda la tierra tenía una misma lengua y usaba las mismas palabras." },
-                            { verse: 2, text: "Al emigrar desde oriente, encontraron una llanura en el país de Sinar y se establecieron allí." },
-                            { verse: 3, text: "Y se dijeron unos a otros: «Vamos a hacer ladrillos y a cocerlos al fuego». Usaron ladrillos en vez de piedra, y asfalto en vez de argamasa." },
-                            { verse: 4, text: "Dijeron: «Vamos a construirnos una ciudad y una torre que alcance al cielo. Así nos haremos famosos y no nos dispersaremos por toda la faz de la tierra»." },
-                            { verse: 5, text: "El Señor bajó a ver la ciudad y la torre que estaban construyendo los hijos de Adán," },
-                            { verse: 6, text: "y se dijo el Señor: «He aquí que todos son un solo pueblo con una misma lengua. Si esto es el comienzo de su obra, nada de lo que se propongan hacer les resultará imposible." },
-                            { verse: 7, text: "Vamos, bajemos y confundamos allí su lengua, de modo que uno no entienda la lengua del otro»." },
-                            { verse: 8, text: "El Señor los dispersó desde allí por toda la faz de la tierra, y dejaron de construir la ciudad." },
-                            { verse: 9, text: "Por eso se la llamó Babel, porque allí confundió el Señor la lengua de toda la tierra, y desde allí los dispersó el Señor por toda la faz de la tierra." },
-                            { verse: 10, text: "Esta es la descendencia de Sem: A la edad de cien años, Sem engendró a Arfaxad, dos años después del diluvio." },
-                            { verse: 11, text: "Después de engendrar a Arfaxad, Sem vivió quinientos años, y engendró hijos e hijas." },
-                            { verse: 12, text: "Arfaxad tenía treinta y cinco años cuando engendró a Selaj." },
-                            { verse: 13, text: "Después de engendrar a Selaj, Arfaxad vivió cuatrocientos tres años, y engendró hijos e hijas." },
-                            { verse: 14, text: "Selaj tenía treinta años cuando engendró a Héber." },
-                            { verse: 15, text: "Después de engendrar a Héber, Selaj vivió cuatrocientos tres años, y engendró hijos e hijas." },
-                            { verse: 16, text: "Héber tenía treinta y cuatro años cuando engendró a Péleg." },
-                            { verse: 17, text: "Después de engendrar a Péleg, Héber vivió cuatrocientos treinta años, y engendró hijos e hijas." },
-                            { verse: 18, text: "Péleg tenía treinta años cuando engendró a Reú." },
-                            { verse: 19, text: "Después de engendrar a Reú, Péleg vivió doscientos nueve años, y engendró hijos e hijas." },
-                            { verse: 20, text: "Reú tenía treinta y dos años cuando engendró a Serug." },
-                            { verse: 21, text: "Después de engendrar a Serug, Reú vivió doscientos siete años, y engendró hijos e hijas." },
-                            { verse: 22, text: "Serug tenía treinta años cuando engendró a Najor." },
-                            { verse: 23, text: "Después de engendrar a Najor, Serug vivió doscientos años, y engendró hijos e hijas." },
-                            { verse: 24, text: "Najor tenía veintinueve años cuando engendró a Téraj." },
-                            { verse: 25, text: "Después de engendrar a Téraj, Najor vivió ciento diecinueve años, y engendró hijos e hijas." },
-                            { verse: 26, text: "Téraj tenía setenta años cuando engendró a Abrán, a Najor y a Harán." },
-                            { verse: 27, text: "Esta es la descendencia de Téraj: Téraj engendró a Abrán, a Najor y a Harán. Harán engendró a Lot." },
-                            { verse: 28, text: "Harán murió en vida de su padre Téraj, en su país natal, en Ur de los Caldeos." },
-                            { verse: 29, text: "Abrán y Najor tomaron mujeres. La mujer de Abrán se llamaba Saray, y la mujer de Najor, Milcá, hija de Harán, padre de Milcá y de Yiská." },
-                            { verse: 30, text: "Saray era estéril y no tenía hijos." },
-                            { verse: 31, text: "Téraj tomó a su hijo Abrán, a su nieto Lot, hijo de Harán, y a su nuera Saray, mujer de su hijo Abrán, y los sacó de Ur de los Caldeos para ir a la tierra de Canaán. Llegaron hasta Jarán y se establecieron allí." },
-                            { verse: 32, text: "Téraj vivió doscientos cinco años, y murió en Jarán." }
-                        ],
-                        // Capítulo 12 (completo)
-                        [
-                            { verse: 1, text: "El Señor dijo a Abrán: «Sal de tu tierra, de tu patria y de la casa de tu padre, a la tierra que yo te mostraré." },
-                            { verse: 2, text: "Haré de ti una gran nación, te bendeciré y engrandeceré tu nombre, y serás una bendición." },
-                            { verse: 3, text: "Bendeciré a los que te bendigan y maldeciré a los que te maldigan. En ti serán bendecidas todas las familias de la tierra»." },
-                            { verse: 4, text: "Abrán partió, como le había dicho el Señor, y Lot fue con él. Abrán tenía setenta y cinco años cuando salió de Jarán." },
-                            { verse: 5, text: "Abrán tomó a Saray, su mujer, y a Lot, hijo de su hermano, con todos los bienes que habían acumulado y las personas que habían adquirido en Jarán, y salieron para ir a la tierra de Canaán. Y llegaron a la tierra de Canaán." },
-                            { verse: 6, text: "Abrán atravesó el país hasta el lugar sagrado de Siquén, hasta la encina de Moré. En aquel tiempo los cananeos habitaban en el país." },
-                            { verse: 7, text: "El Señor se apareció a Abrán y le dijo: «A tu descendencia daré esta tierra». Entonces él construyó allí un altar al Señor, que se le había aparecido." },
-                            { verse: 8, text: "De allí pasó a la montaña, al oriente de Betel, y plantó su tienda, con Betel al occidente y Ay al oriente. Construyó allí un altar al Señor e invocó el nombre del Señor." },
-                            { verse: 9, text: "Abrán se trasladó por etapas hacia el Négueb." },
-                            { verse: 10, text: "Hubo hambre en el país, y Abrán bajó a Egipto para residir allí, pues el hambre era muy grande en el país." },
-                            { verse: 11, text: "Cuando estaba a punto de entrar en Egipto, dijo a Saray, su mujer: «Mira, sé que eres una mujer hermosa." },
-                            { verse: 12, text: "Cuando te vean los egipcios, dirán: “Es su mujer”, y me matarán, pero a ti te dejarán con vida." },
-                            { verse: 13, text: "Di, por favor, que eres mi hermana, para que me traten bien por tu causa y, gracias a ti, conserve yo la vida»." },
-                            { verse: 14, text: "Y así fue: cuando Abrán entró en Egipto, los egipcios vieron que la mujer era muy hermosa." },
-                            { verse: 15, text: "La vieron los oficiales del faraón y se la elogiaron, y la mujer fue llevada al palacio del faraón." },
-                            { verse: 16, text: "A Abrán lo trataron bien por causa de ella, y le dieron ovejas, vacas, asnos, siervos, siervas, asnas y camellos." },
-                            { verse: 17, text: "Pero el Señor hirió al faraón y a su casa con grandes plagas por causa de Saray, la mujer de Abrán." },
-                            { verse: 18, text: "Entonces el faraón llamó a Abrán y le dijo: «¿Qué es lo que has hecho conmigo? ¿Por qué no me dijiste que era tu mujer?" },
-                            { verse: 19, text: "¿Por qué dijiste: “Es mi hermana”, de modo que yo la tomé por mujer? Ahora, aquí tienes a tu mujer; tómala y vete»." },
-                            { verse: 20, text: "Y el faraón dio órdenes a sus hombres acerca de él, y lo despidieron a él, a su mujer y todo lo que le pertenecía." }
-                        ],
-                        // Capítulo 13 (completo)
-                        [
-                            { verse: 1, text: "Subió Abrán de Egipto al Négueb, con su mujer y todo lo suyo, y Lot con él." },
-                            { verse: 2, text: "Abrán era muy rico en ganado, plata y oro." },
-                            { verse: 3, text: "Se trasladó por etapas desde el Négueb hasta Betel, hasta el lugar donde había estado antes su tienda, entre Betel y Ay," },
-                            { verse: 4, text: "el lugar donde antes había erigido el altar. Y allí invocó Abrán el nombre del Señor." },
-                            { verse: 5, text: "También Lot, que iba con Abrán, tenía ovejas, vacas y tiendas." },
-                            { verse: 6, text: "La tierra no era suficiente para que habitaran juntos, porque sus posesiones eran inmensas, y no podían vivir juntos." },
-                            { verse: 7, text: "Hubo una disputa entre los pastores del ganado de Abrán y los pastores del ganado de Lot. Además, los cananeos y los perizitas habitaban entonces en el país." },
-                            { verse: 8, text: "Abrán dijo a Lot: «Que no haya disputas entre nosotros ni entre mis pastores y los tuyos, pues somos hermanos." },
-                            { verse: 9, text: "¿No tienes todo el país por delante? Sepárate de mí. Si vas a la izquierda, yo iré a la derecha; si vas a la derecha, yo iré a la izquierda»." },
-                            { verse: 10, text: "Lot alzó los ojos y vio toda la vega del Jordán, toda ella de regadío —esto era antes de que el Señor destruyera Sodoma y Gomorra—, como el jardín del Señor, como la tierra de Egipto en dirección a Soar." },
-                            { verse: 11, text: "Lot escogió para sí toda la vega del Jordán y se trasladó hacia el oriente. Así se separaron el uno del otro." },
-                            { verse: 12, text: "Abrán se estableció en la tierra de Canaán, mientras que Lot se estableció en las ciudades de la vega y plantó sus tiendas hasta Sodoma." },
-                            { verse: 13, text: "Los habitantes de Sodoma eran malvados y pecaban gravemente contra el Señor." },
-                            { verse: 14, text: "El Señor dijo a Abrán, después que Lot se separó de él: «Alza tus ojos y, desde el lugar donde estás, mira al norte, al sur, al oriente y al occidente." },
-                            { verse: 15, text: "Toda la tierra que ves te la daré a ti y a tu descendencia para siempre." },
-                            { verse: 16, text: "Haré tu descendencia como el polvo de la tierra: si alguien puede contar el polvo de la tierra, también podrá contar tu descendencia." },
-                            { verse: 17, text: "Levántate, recorre la tierra a lo largo y a lo ancho, porque a ti te la daré»." },
-                            { verse: 18, text: "Abrán trasladó su tienda y fue a establecerse junto a la encina de Mambré, que está en Hebrón, y construyó allí un altar al Señor." }
-                        ],
-                        // Capítulo 14 (completo)
-                        [
-                            { verse: 1, text: "En tiempos de Amrafel, rey de Sinar, de Aryok, rey de Elasar, de Kedorlaómer, rey de Elam, y de Tidal, rey de Goyim," },
-                            { verse: 2, text: "estos hicieron la guerra a Berá, rey de Sodoma, a Birsá, rey de Gomorra, a Sinab, rey de Admá, a Semeber, rey de Seboyim, y al rey de Belá (es decir, Soar)." },
-                            { verse: 3, text: "Todos estos se aliaron en el valle de Sidim (es decir, el mar de la Sal)." },
-                            { verse: 4, text: "Doce años habían servido a Kedorlaómer, y al decimotercer año se rebelaron." },
-                            { verse: 5, text: "Al decimocuarto año, llegó Kedorlaómer con los reyes que estaban con él, y derrotaron a los refaítas en Astarot Carnáin, a los zuzitas en Ham, a los emitas en la llanura de Quiryatáyim," },
-                            { verse: 6, text: "y a los hurritas en las montañas de Seír, hasta El Parán, que está junto al desierto." },
-                            { verse: 7, text: "Luego, volviendo, llegaron a En Mispat (es decir, Cadés) y devastaron todo el territorio de los amalecitas y también el de los amorreos que habitaban en Jasasón Tamar." },
-                            { verse: 8, text: "Salieron entonces el rey de Sodoma, el rey de Gomorra, el rey de Admá, el rey de Seboyim y el rey de Belá (es decir, Soar) y les presentaron batalla en el valle de Sidim:" },
-                            { verse: 9, text: "a Kedorlaómer, rey de Elam, a Tidal, rey de Goyim, a Amrafel, rey de Sinar, y a Aryok, rey de Elasar; cuatro reyes contra cinco." },
-                            { verse: 10, text: "El valle de Sidim estaba lleno de pozos de asfalto. El rey de Sodoma y el de Gomorra, al huir, cayeron en ellos, y los demás huyeron a la montaña." },
-                            { verse: 11, text: "Los vencedores tomaron todos los bienes de Sodoma y Gomorra y todos sus víveres, y se fueron." },
-                            { verse: 12, text: "Se llevaron también a Lot, sobrino de Abrán, y sus bienes, pues vivía en Sodoma." },
-                            { verse: 13, text: "Un fugitivo vino y se lo contó a Abrán el hebreo, que habitaba junto a la encina de Mambré el amorreo, hermano de Escol y de Aner, los cuales eran aliados de Abrán." },
-                            { verse: 14, text: "Cuando Abrán oyó que su pariente había sido hecho cautivo, movilizó a sus trescientos dieciocho hombres de confianza, nacidos en su casa, y persiguió a los reyes hasta Dan." },
-                            { verse: 15, text: "Y, cayendo sobre ellos de noche, él y sus siervos los derrotaron y los persiguieron hasta Hobá, que está al norte de Damasco." },
-                            { verse: 16, text: "Recuperó todos los bienes, y también a su pariente Lot con sus bienes, y a las mujeres y a la gente." },
-                            { verse: 17, text: "Cuando volvía de derrotar a Kedorlaómer y a los reyes que estaban con él, el rey de Sodoma le salió al encuentro en el valle de Savé (es decir, el valle del Rey)." },
-                            { verse: 18, text: "Melquisedec, rey de Salem, sacó pan y vino. Era sacerdote del Dios Altísimo." },
-                            { verse: 19, text: "Y lo bendijo diciendo: «¡Bendito sea Abrán por el Dios Altísimo, creador de cielo y tierra!" },
-                            { verse: 20, text: "¡Y bendito sea el Dios Altísimo, que ha entregado a tus enemigos en tu mano!». Y Abrán le dio el diezmo de todo." },
-                            { verse: 21, text: "El rey de Sodoma dijo a Abrán: «Dame las personas y quédate con los bienes»." },
-                            { verse: 22, text: "Pero Abrán respondió al rey de Sodoma: «Levanto mi mano ante el Señor, Dios Altísimo, creador de cielo y tierra:" },
-                            { verse: 23, text: "No tomaré ni un hilo ni la correa de una sandalia, nada de lo que es tuyo, para que no digas: “Yo he enriquecido a Abrán”." },
-                            { verse: 24, text: "Nada para mí, salvo lo que han comido los jóvenes y la parte de los hombres que vinieron conmigo: Aner, Escol y Mambré; ellos tomarán su parte»." }
-                        ],
-                        // Capítulo 15 (completo)
-                        [
-                            { verse: 1, text: "Después de estos sucesos, la palabra del Señor vino a Abrán en una visión: «No temas, Abrán. Yo soy tu escudo. Tu recompensa será muy grande»." },
-                            { verse: 2, text: "Respondió Abrán: «Señor Dios, ¿qué me vas a dar, si voy a morir sin hijos, y el heredero de mi casa es Eliezer de Damasco?»." },
-                            { verse: 3, text: "Añadió Abrán: «No me has dado descendencia, y un criado de mi casa será mi heredero»." },
-                            { verse: 4, text: "Pero la palabra del Señor vino a él: «No te heredará este, sino uno salido de tus entrañas, él te heredará»." },
-                            { verse: 5, text: "Lo sacó afuera y le dijo: «Mira al cielo y cuenta las estrellas, si puedes contarlas». Y añadió: «Así será tu descendencia»." },
-                            { verse: 6, text: "Creyó Abrán al Señor, y se le contó como justicia." },
-                            { verse: 7, text: "Y le dijo: «Yo soy el Señor, que te saqué de Ur de los Caldeos para darte en posesión esta tierra»." },
-                            { verse: 8, text: "Él respondió: «Señor Dios, ¿en qué conoceré que he de poseerla?»." },
-                            { verse: 9, text: "Le dijo: «Tráeme una novilla de tres años, una cabra de tres años, un carnero de tres años, una tórtola y un pichón»." },
-                            { verse: 10, text: "Él le trajo todos estos animales, los partió por la mitad y puso cada mitad frente a la otra, pero no partió las aves." },
-                            { verse: 11, text: "Las aves de rapiña bajaban sobre los cadáveres, pero Abrán las espantaba." },
-                            { verse: 12, text: "Cuando el sol estaba a punto de ponerse, un sueño profundo cayó sobre Abrán, y un terror, una gran oscuridad, cayó sobre él." },
-                            { verse: 13, text: "Dijo el Señor a Abrán: «Sabe con certeza que tu descendencia será extranjera en una tierra que no es suya; los esclavizarán y los oprimirán durante cuatrocientos años." },
-                            { verse: 14, text: "Pero yo juzgaré a la nación a la que servirán, y después saldrán con grandes riquezas." },
-                            { verse: 15, text: "Tú te reunirás en paz con tus padres y serás sepultado en buena vejez." },
-                            { verse: 16, text: "A la cuarta generación volverán aquí, porque la iniquidad de los amorreos todavía no ha llegado a su colmo»." },
-                            { verse: 17, text: "Cuando el sol se puso y sobrevino una densa oscuridad, un horno humeante y una antorcha de fuego pasaron entre aquellos trozos de animales." },
-                            { verse: 18, text: "Aquel día, el Señor hizo una alianza con Abrán, diciendo: «A tu descendencia doy esta tierra, desde el río de Egipto hasta el gran río, el río Éufrates:" },
-                            { verse: 19, text: "la tierra de los quenitas, los quenizitas, los cadmoneos," },
-                            { verse: 20, text: "los hititas, los perizitas, los refaítas," },
-                            { verse: 21, text: "los amorreos, los cananeos, los guirgaseos y los jebuseos»." }
-                        ],
-                        // Capítulo 16 (completo)
-                        [
-                            { verse: 1, text: "Saray, mujer de Abrán, no le daba hijos. Pero tenía una sierva egipcia llamada Agar." },
-                            { verse: 2, text: "Dijo Saray a Abrán: «Mira, el Señor me ha hecho estéril. Únete, por favor, a mi sierva; quizá por medio de ella tendré hijos». Abrán hizo caso a la voz de Saray." },
-                            { verse: 3, text: "Así, al cabo de diez años de habitar Abrán en la tierra de Canaán, Saray, mujer de Abrán, tomó a Agar, su sierva egipcia, y se la dio por mujer a Abrán, su marido." },
-                            { verse: 4, text: "Él se unió a Agar, la cual concibió. Al ver que había concebido, miraba con desprecio a su señora." },
-                            { verse: 5, text: "Dijo Saray a Abrán: «¡Esta afrenta es por tu culpa! Yo puse a mi sierva en tu regazo, y al ver que ha concebido, me mira con desprecio. Juzgue el Señor entre tú y yo»." },
-                            { verse: 6, text: "Respondió Abrán a Saray: «Ahí tienes a tu sierva; haz con ella lo que te parezca bien». Saray la maltrató, y ella huyó de su presencia." },
-                            { verse: 7, text: "El ángel del Señor la encontró junto a una fuente de agua en el desierto, la fuente que está en el camino de Sur," },
-                            { verse: 8, text: "y le dijo: «Agar, sierva de Saray, ¿de dónde vienes y a dónde vas?». Ella respondió: «Huyo de la presencia de mi señora Saray»." },
-                            { verse: 9, text: "El ángel del Señor le dijo: «Vuelve a tu señora y sométete a ella»." },
-                            { verse: 10, text: "Y añadió el ángel del Señor: «Multiplicaré tanto tu descendencia que no se podrá contar»." },
-                            { verse: 11, text: "Le dijo también el ángel del Señor: «He aquí que has concebido y darás a luz un hijo, y le pondrás por nombre Ismael, porque el Señor ha escuchado tu aflicción." },
-                            { verse: 12, text: "Será un hombre como un asno salvaje; su mano contra todos, y la mano de todos contra él; y habitará frente a todos sus hermanos»." },
-                            { verse: 13, text: "Ella llamó al Señor, que le había hablado, con este nombre: «Tú eres el Dios que me ve», pues dijo: «¿Acaso no he visto aquí al que me ve?»." },
-                            { verse: 14, text: "Por eso se llamó a aquel pozo «Pozo del Viviente que me ve». Está entre Cadés y Béred." },
-                            { verse: 15, text: "Agar dio a luz un hijo a Abrán, y Abrán llamó Ismael al hijo que le dio Agar." },
-                            { verse: 16, text: "Abrán tenía ochenta y seis años cuando Agar le dio a luz a Ismael." }
-                        ],
-                        // Capítulo 17 (completo)
-                        [
-                            { verse: 1, text: "Cuando Abrán tenía noventa y nueve años, se le apareció el Señor y le dijo: «Yo soy el Dios Todopoderoso. Anda en mi presencia y sé perfecto." },
-                            { verse: 2, text: "Estableceré mi alianza entre tú y yo, y te multiplicaré en gran manera»." },
-                            { verse: 3, text: "Abrán cayó rostro en tierra, y Dios le habló:" },
-                            { verse: 4, text: "«Por mi parte, esta es mi alianza contigo: serás padre de una multitud de pueblos." },
-                            { verse: 5, text: "Ya no te llamarás Abrán, sino Abrahán, porque te he constituido padre de una multitud de pueblos." },
-                            { verse: 6, text: "Te haré fecundo en gran manera, y de ti saldrán pueblos, y reyes nacerán de ti." },
-                            { verse: 7, text: "Estableceré mi alianza contigo y con tu descendencia después de ti, de generación en generación, como alianza perpetua, para ser tu Dios y el de tu descendencia después de ti." },
-                            { verse: 8, text: "Te daré a ti y a tu descendencia después de ti la tierra en que ahora resides como extranjero, toda la tierra de Canaán, en posesión perpetua, y seré su Dios»." },
-                            { verse: 9, text: "Dijo Dios a Abrahán: «Guarda mi alianza, tú y tu descendencia después de ti, de generación en generación." },
-                            { verse: 10, text: "Esta es mi alianza que han de guardar entre yo y ustedes y tu descendencia después de ti: será circuncidado todo varón entre ustedes." },
-                            { verse: 11, text: "Se circuncidarán la carne de su prepucio, y esa será la señal de la alianza entre yo y ustedes." },
-                            { verse: 12, text: "A los ocho días de nacer, será circuncidado todo varón entre ustedes, de generación en generación, tanto el nacido en casa como el comprado por dinero a cualquier extranjero que no sea de tu descendencia." },
-                            { verse: 13, text: "Deberá ser circuncidado el nacido en tu casa y el comprado por tu dinero. Mi alianza estará en su carne como alianza perpetua." },
-                            { verse: 14, text: "El varón incircunciso, que no haya circuncidado la carne de su prepucio, será borrado de su pueblo; ha roto mi alianza»." },
-                            { verse: 15, text: "Dijo Dios a Abrahán: «A Saray, tu mujer, no la llamarás Saray, sino Sara." },
-                            { verse: 16, text: "La bendeciré y te daré de ella un hijo. La bendeciré, y se convertirá en madre de pueblos; reyes de pueblos saldrán de ella»." },
-                            { verse: 17, text: "Abrahán cayó rostro en tierra y se rio, diciéndose en su corazón: «¿A un hombre de cien años le va a nacer un hijo? ¿Y Sara, a sus noventa años, va a dar a luz?»." },
-                            { verse: 18, text: "Y dijo Abrahán a Dios: «¡Ojalá Ismael viva en tu presencia!»." },
-                            { verse: 19, text: "Respondió Dios: «Ciertamente, Sara, tu mujer, te dará un hijo, y lo llamarás Isaac. Estableceré mi alianza con él como alianza perpetua para su descendencia después de él." },
-                            { verse: 20, text: "En cuanto a Ismael, también te he escuchado. Lo bendeciré, lo haré fecundo y lo multiplicaré en gran manera. Engendrará doce príncipes y haré de él una gran nación." },
-                            { verse: 21, text: "Pero mi alianza la estableceré con Isaac, el que Sara te dará a luz por este tiempo, el año que viene»." },
-                            { verse: 22, text: "Cuando acabó de hablar con él, Dios subió de junto a Abrahán." },
-                            { verse: 23, text: "Tomó entonces Abrahán a su hijo Ismael, a todos los nacidos en su casa y a todos los comprados por su dinero, a todo varón de la casa de Abrahán, y circuncidó la carne de su prepucio en aquel mismo día, como Dios le había dicho." },
-                            { verse: 24, text: "Abrahán tenía noventa y nueve años cuando circuncidó la carne de su prepucio." },
-                            { verse: 25, text: "Y su hijo Ismael tenía trece años cuando fue circuncidada la carne de su prepucio." },
-                            { verse: 26, text: "En el mismo día fueron circuncidados Abrahán y su hijo Ismael." },
-                            { verse: 27, text: "Y todos los hombres de su casa, tanto los nacidos en casa como los comprados por dinero a extranjeros, fueron circuncidados con él." }
-                        ],
-                        // Capítulo 18 (completo)
-                        [
-                            { verse: 1, text: "El Señor se apareció a Abrahán junto a la encina de Mambré, mientras él estaba sentado a la entrada de la tienda, en lo más caluroso del día." },
-                            { verse: 2, text: "Alzó los ojos y vio a tres hombres de pie cerca de él. Al verlos, corrió desde la entrada de la tienda a su encuentro, se postró en tierra" },
-                            { verse: 3, text: "y dijo: «Señor mío, si he hallado gracia a tus ojos, te ruego que no pases de largo junto a tu siervo." },
-                            { verse: 4, text: "Que traigan un poco de agua, se laven los pies y descansen bajo este árbol." },
-                            { verse: 5, text: "Traeré un bocado de pan para que recobren fuerzas antes de seguir su camino, pues para eso han pasado junto a su siervo». Ellos respondieron: «Haz como has dicho»." },
-                            { verse: 6, text: "Abrahán fue deprisa a la tienda, a donde estaba Sara, y le dijo: «¡Date prisa! Amasa tres medidas de flor de harina y haz unas tortas»." },
-                            { verse: 7, text: "Corrió Abrahán a la vacada, tomó un ternero tierno y bueno, y se lo dio a un criado, que se apresuró a prepararlo." },
-                            { verse: 8, text: "Tomó cuajada, leche y el ternero que había preparado, y se lo sirvió. Él se quedó de pie junto a ellos, bajo el árbol, mientras comían." },
-                            { verse: 9, text: "Le dijeron: «¿Dónde está Sara, tu mujer?». Él respondió: «Ahí, en la tienda»." },
-                            { verse: 10, text: "Dijo uno: «Volveré a ti, sin falta, el año que viene por este tiempo, y para entonces Sara, tu mujer, tendrá un hijo». Sara estaba escuchando a la entrada de la tienda, a sus espaldas." },
-                            { verse: 11, text: "Abrahán y Sara eran ancianos, de edad avanzada, y a Sara ya le había cesado la costumbre de las mujeres." },
-                            { verse: 12, text: "Sara se rio para sus adentros, diciendo: «¿Después de estar yo consumida, voy a tener este placer, siendo además mi señor un anciano?»." },
-                            { verse: 13, text: "Dijo el Señor a Abrahán: «¿Por qué se ha reído Sara, diciendo: “¿De verdad voy a dar a luz, siendo ya vieja?”?" },
-                            { verse: 14, text: "¿Hay algo imposible para el Señor? En el plazo fijado, volveré a ti, el año que viene por este tiempo, y Sara tendrá un hijo»." },
-                            { verse: 15, text: "Sara lo negó, diciendo: «No me he reído», pues tuvo miedo. Pero él dijo: «No es así; te has reído»." },
-                            { verse: 16, text: "Los hombres se levantaron de allí y se dirigieron hacia Sodoma. Abrahán los acompañaba para despedirlos." },
-                            { verse: 17, text: "El Señor se dijo: «¿Voy a ocultar a Abrahán lo que voy a hacer," },
-                            { verse: 18, text: "siendo así que Abrahán se convertirá en una nación grande y poderosa, y en él serán bendecidas todas las naciones de la tierra?" },
-                            { verse: 19, text: "Pues lo he elegido para que mande a sus hijos y a su casa después de él que guarden el camino del Señor, practicando la justicia y el derecho, para que el Señor cumpla en Abrahán lo que le ha prometido»." },
-                            { verse: 20, text: "Dijo el Señor: «El clamor contra Sodoma y Gomorra es grande, y su pecado es muy grave." },
-                            { verse: 21, text: "Voy a bajar a ver si han obrado en todo según el clamor que ha llegado hasta mí; y si no, lo sabré»." },
-                            { verse: 22, text: "Los hombres se marcharon de allí y se dirigieron a Sodoma, pero Abrahán permaneció de pie ante el Señor." },
-                            { verse: 23, text: "Se acercó Abrahán y dijo: «¿Vas a exterminar al justo con el malvado?" },
-                            { verse: 24, text: "Quizá haya cincuenta justos en la ciudad. ¿La exterminarás y no perdonarás a aquel lugar por los cincuenta justos que haya en él?" },
-                            { verse: 25, text: "Lejos de ti hacer tal cosa: matar al justo con el malvado, de modo que el justo y el malvado corran la misma suerte. ¡Lejos de ti! El juez de toda la tierra, ¿no va a hacer justicia?»." },
-                            { verse: 26, text: "Respondió el Señor: «Si encuentro en Sodoma cincuenta justos en la ciudad, perdonaré a todo el lugar por amor a ellos»." },
-                            { verse: 27, text: "Replicó Abrahán: «¡Me he atrevido a hablar a mi Señor, yo que soy polvo y ceniza!" },
-                            { verse: 28, text: "Quizá de los cincuenta justos falten cinco. ¿Destruirás por cinco toda la ciudad?». Dijo: «No la destruiré si encuentro allí cuarenta y cinco»." },
-                            { verse: 29, text: "Insistió de nuevo: «Quizá se encuentren allí cuarenta». Respondió: «No lo haré, por amor a los cuarenta»." },
-                            { verse: 30, text: "Dijo: «No se enoje mi Señor si sigo hablando. Quizá se encuentren allí treinta». Respondió: «No lo haré si encuentro allí treinta»." },
-                            { verse: 31, text: "Insistió: «Me he atrevido a hablar a mi Señor. Quizá se encuentren allí veinte». Respondió: «No la destruiré, por amor a los veinte»." },
-                            { verse: 32, text: "Dijo: «No se enoje mi Señor si hablo una vez más. Quizá se encuentren allí diez». Respondió: «No la destruiré, por amor a los diez»." },
-                            { verse: 33, text: "El Señor se fue en cuanto acabó de hablar con Abrahán, y Abrahán volvió a su lugar." }
-                        ],
-                        // Capítulo 19 (completo)
-                        [
-                            { verse: 1, text: "Los dos ángeles llegaron a Sodoma al atardecer. Lot estaba sentado a la puerta de Sodoma. Al verlos, Lot se levantó a su encuentro, se postró rostro en tierra" },
-                            { verse: 2, text: "y dijo: «Por favor, señores míos, vengan a casa de su siervo para pasar la noche y lavarse los pies. Mañana se levantarán temprano y seguirán su camino». Ellos respondieron: «No, pasaremos la noche en la plaza»." },
-                            { verse: 3, text: "Pero él les insistió tanto que fueron con él y entraron en su casa. Les preparó un banquete, coció panes ázimos y comieron." },
-                            { verse: 4, text: "Aún no se habían acostado, cuando los hombres de la ciudad, los hombres de Sodoma, rodearon la casa, desde el joven hasta el viejo, todo el pueblo sin excepción." },
-                            { verse: 5, text: "Llamaron a Lot y le dijeron: «¿Dónde están los hombres que han venido a tu casa esta noche? Sácanoslos para que abusemos de ellos»." },
-                            { verse: 6, text: "Lot salió a la entrada, cerró la puerta detrás de sí" },
-                            { verse: 7, text: "y dijo: «Por favor, hermanos míos, no cometan esa maldad." },
-                            { verse: 8, text: "Miren, tengo dos hijas que no han conocido varón. Se las sacaré y hagan con ellas lo que les parezca bien; pero a estos hombres no les hagan nada, pues han venido a cobijarse bajo mi techo»." },
-                            { verse: 9, text: "Ellos respondieron: «¡Quítate de en medio!». Y añadieron: «Este ha venido como un forastero y ya quiere actuar como juez. Ahora te trataremos a ti peor que a ellos». Y empujaban con violencia a Lot y se acercaban para romper la puerta." },
-                            { verse: 10, text: "Pero los hombres alargaron la mano, metieron a Lot en la casa con ellos y cerraron la puerta." },
-                            { verse: 11, text: "Y a los hombres que estaban a la entrada de la casa, desde el más joven hasta el más viejo, los hirieron de ceguera, de modo que se cansaron de buscar la entrada." },
-                            { verse: 12, text: "Los hombres dijeron a Lot: «¿A quién más tienes aquí? A tu yerno, a tus hijos, a tus hijas y a todos los tuyos en la ciudad, sácalos de este lugar," },
-                            { verse: 13, text: "porque vamos a destruir este lugar, pues su clamor ha llegado a ser grande ante el Señor, y el Señor nos ha enviado a destruirlo»." },
-                            { verse: 14, text: "Salió Lot y habló con sus yernos, los que iban a casarse con sus hijas, y les dijo: «¡Levántense, salgan de este lugar, porque el Señor va a destruir la ciudad!». Pero a sus yernos les pareció que bromeaba." },
-                            { verse: 15, text: "Al despuntar el alba, los ángeles apremiaban a Lot, diciendo: «¡Levántate, toma a tu mujer y a tus dos hijas que se encuentran aquí, para que no perezcas por el castigo de la ciudad!»." },
-                            { verse: 16, text: "Como él se demoraba, los hombres lo tomaron de la mano, a él, a su mujer y a sus dos hijas, por la misericordia que el Señor le tenía, lo sacaron y lo pusieron fuera de la ciudad." },
-                            { verse: 17, text: "Y, una vez que los sacaron, uno dijo: «¡Huye por tu vida! No mires atrás ni te detengas en toda la vega. Huye a la montaña, para que no perezcas»." },
-                            { verse: 18, text: "Lot les dijo: «¡No, por favor, señor mío!" },
-                            { verse: 19, text: "Tu siervo ha hallado gracia a tus ojos, y has engrandecido tu misericordia al salvarme la vida. Pero yo no puedo huir a la montaña, no sea que el mal me alcance y muera." },
-                            { verse: 20, text: "Mira, esa ciudad está cerca para huir allí, y es pequeña. Permíteme huir allá — ¿no es pequeña?— y así salvaré mi vida»." },
-                            { verse: 21, text: "Le respondió: «También en esto te he concedido tu petición: no destruiré la ciudad de la que hablas." },
-                            { verse: 22, text: "Date prisa, huye allá, porque no puedo hacer nada hasta que llegues». Por eso se llamó a la ciudad Soar." },
-                            { verse: 23, text: "El sol salía sobre la tierra cuando Lot llegó a Soar." },
-                            { verse: 24, text: "Entonces el Señor hizo llover sobre Sodoma y Gomorra azufre y fuego de parte del Señor, desde el cielo." },
-                            { verse: 25, text: "Destruyó aquellas ciudades, toda la vega, todos los habitantes de las ciudades y la vegetación del suelo." },
-                            { verse: 26, text: "La mujer de Lot miró atrás y se convirtió en una estatua de sal." },
-                            { verse: 27, text: "Abrahán se levantó de madrugada y fue al lugar donde había estado de pie ante el Señor." },
-                            { verse: 28, text: "Miró hacia Sodoma y Gomorra y toda la región de la vega, y vio que subía de la tierra una humareda, como la humareda de un horno." },
-                            { verse: 29, text: "Así, cuando Dios destruyó las ciudades de la vega, se acordó de Abrahán y salvó a Lot de la catástrofe que arrasó las ciudades en que Lot habitaba." },
-                            { verse: 30, text: "Lot subió de Soar y se estableció en la montaña con sus dos hijas, porque tenía miedo de quedarse en Soar. Y habitó en una cueva, él y sus dos hijas." },
-                            { verse: 31, text: "La mayor dijo a la menor: «Nuestro padre es anciano y no hay hombre en el país que se una a nosotras, como es costumbre en toda la tierra." },
-                            { verse: 32, text: "Vamos a dar de beber vino a nuestro padre, nos acostaremos con él y así conservaremos descendencia de nuestro padre»." },
-                            { verse: 33, text: "Aquella noche dieron de beber vino a su padre, y entró la mayor y se acostó con su padre, sin que él se diera cuenta de cuándo se acostó ni cuándo se levantó." },
-                            { verse: 34, text: "Al día siguiente, la mayor dijo a la menor: «Anoche me acosté yo con mi padre. Démosle de beber vino también esta noche, y entra tú a acostarte con él, y así conservaremos descendencia de nuestro padre»." },
-                            { verse: 35, text: "También aquella noche dieron de beber vino a su padre, y se levantó la menor y se acostó con él, sin que él se diera cuenta de cuándo se acostó ni cuándo se levantó." },
-                            { verse: 36, text: "Las dos hijas de Lot concibieron de su padre." },
-                            { verse: 37, text: "La mayor dio a luz un hijo y lo llamó Moab; es el padre de los moabitas hasta hoy." },
-                            { verse: 38, text: "La menor también dio a luz un hijo y lo llamó Ben Amí; es el padre de los amonitas hasta hoy." }
-                        ],
-                        // Capítulo 20 (completo)
-                        [
-                            { verse: 1, text: "Abrahán partió de allí hacia la tierra del Négueb y se estableció entre Cadés y Sur. Mientras residía en Guerar," },
-                            { verse: 2, text: "Abrahán decía de Sara, su mujer: «Es mi hermana». Abimélec, rey de Guerar, mandó a buscar a Sara y la tomó." },
-                            { verse: 3, text: "Pero Dios vino a Abimélec en un sueño nocturno y le dijo: «Vas a morir por la mujer que has tomado, pues está casada»." },
-                            { verse: 4, text: "Abimélec, que no se había acercado a ella, dijo: «Señor, ¿vas a matar a gente inocente?" },
-                            { verse: 5, text: "¿No me dijo él: “Es mi hermana”, y ella también dijo: “Es mi hermano”? Con corazón íntegro y manos limpias he hecho esto»." },
-                            { verse: 6, text: "Le dijo Dios en el sueño: «También yo sé que lo has hecho con corazón íntegro. Por eso te he impedido pecar contra mí y no te he permitido tocarla." },
-                            { verse: 7, text: "Ahora, devuelve la mujer a su marido, porque es un profeta; él rogará por ti y vivirás. Pero si no la devuelves, sabe que morirás sin remedio, tú y todos los tuyos»." },
-                            { verse: 8, text: "Abimélec se levantó de madrugada, llamó a todos sus siervos y les contó todo esto; y los hombres sintieron un gran temor." },
-                            { verse: 9, text: "Llamó Abimélec a Abrahán y le dijo: «¿Qué nos has hecho? ¿En qué he pecado contra ti para que trajeras sobre mí y sobre mi reino un pecado tan grande? Has hecho conmigo cosas que no se deben hacer»." },
-                            { verse: 10, text: "Y añadió Abimélec a Abrahán: «¿Qué pretendías al hacer esto?»." },
-                            { verse: 11, text: "Respondió Abrahán: «Pensé que en este lugar no había temor de Dios y que me matarían por causa de mi mujer." },
-                            { verse: 12, text: "Además, es verdad que es mi hermana, hija de mi padre, pero no hija de mi madre, y la tomé por mujer." },
-                            { verse: 13, text: "Cuando Dios me hizo salir errante de la casa de mi padre, le dije: “Este es el favor que me harás: en todo lugar a donde vayamos, dirás de mí: ‘Es mi hermano’”»." },
-                            { verse: 14, text: "Tomó Abimélec ovejas y vacas, siervos y siervas, y se los dio a Abrahán, y le devolvió a Sara, su mujer." },
-                            { verse: 15, text: "Y dijo Abimélec: «Mi tierra está a tu disposición; habita donde te parezca bien»." },
-                            { verse: 16, text: "A Sara le dijo: «He dado a tu hermano mil siclos de plata. Esto será para ti una vindicación ante todos los que están contigo, y ante todos quedarás justificada»." },
-                            { verse: 17, text: "Abrahán rogó a Dios, y Dios sanó a Abimélec, a su mujer y a sus siervas, y pudieron tener hijos," },
-                            { verse: 18, text: "porque el Señor había cerrado por completo toda matriz en la casa de Abimélec por causa de Sara, mujer de Abrahán." }
-                        ],
-                        // Placeholder for remaining chapters
-                        ...Array.from({ length: 30 }, (_, i) => [{ verse: 1, text: `[Texto del capítulo ${i + 21} no cargado para optimizar el rendimiento.]` }])
-                    ]
-                },
-                { name: "Éxodo", testament: "OT", chapters: placeholderChapter(40) },
-                { name: "Levítico", testament: "OT", chapters: placeholderChapter(27) },
-                { name: "Números", testament: "OT", chapters: placeholderChapter(36) },
-                { name: "Deuteronomio", testament: "OT", chapters: placeholderChapter(34) },
-                { name: "Josué", testament: "OT", chapters: placeholderChapter(24) },
-                { name: "Jueces", testament: "OT", chapters: placeholderChapter(21) },
-                { name: "Rut", testament: "OT", chapters: placeholderChapter(4) },
-                { name: "1 Samuel", testament: "OT", chapters: placeholderChapter(31) },
-                { name: "2 Samuel", testament: "OT", chapters: placeholderChapter(24) },
-                { name: "1 Reyes", testament: "OT", chapters: placeholderChapter(22) },
-                { name: "2 Reyes", testament: "OT", chapters: placeholderChapter(25) },
-                { name: "1 Crónicas", testament: "OT", chapters: placeholderChapter(29) },
-                { name: "2 Crónicas", testament: "OT", chapters: placeholderChapter(36) },
-                { name: "Esdras", testament: "OT", chapters: placeholderChapter(10) },
-                { name: "Nehemías", testament: "OT", chapters: placeholderChapter(13) },
-                { name: "Tobías", testament: "OT", chapters: placeholderChapter(14) },
-                { name: "Judit", testament: "OT", chapters: placeholderChapter(16) },
-                { name: "Ester", testament: "OT", chapters: placeholderChapter(10) },
-                { name: "1 Macabeos", testament: "OT", chapters: placeholderChapter(16) },
-                { name: "2 Macabeos", testament: "OT", chapters: placeholderChapter(15) },
-                { name: "Job", testament: "OT", chapters: placeholderChapter(42) },
-                { name: "Salmos", testament: "OT", chapters: placeholderChapter(150) },
-                { name: "Proverbios", testament: "OT", chapters: placeholderChapter(31) },
-                { name: "Eclesiastés", testament: "OT", chapters: placeholderChapter(12) },
-                { name: "Cantar de los Cantares", testament: "OT", chapters: placeholderChapter(8) },
-                { name: "Sabiduría", testament: "OT", chapters: placeholderChapter(19) },
-                { name: "Eclesiástico (Sirácida)", testament: "OT", chapters: placeholderChapter(51) },
-                { name: "Isaías", testament: "OT", chapters: placeholderChapter(66) },
-                { name: "Jeremías", testament: "OT", chapters: placeholderChapter(52) },
-                { name: "Lamentaciones", testament: "OT", chapters: placeholderChapter(5) },
-                { name: "Baruc", testament: "OT", chapters: placeholderChapter(6) },
-                { name: "Ezequiel", testament: "OT", chapters: placeholderChapter(48) },
-                { name: "Daniel", testament: "OT", chapters: placeholderChapter(14) },
-                { name: "Oseas", testament: "OT", chapters: placeholderChapter(14) },
-                { name: "Joel", testament: "OT", chapters: placeholderChapter(4) },
-                { name: "Amós", testament: "OT", chapters: placeholderChapter(9) },
-                { name: "Abdías", testament: "OT", chapters: placeholderChapter(1) },
-                { name: "Jonás", testament: "OT", chapters: placeholderChapter(4) },
-                { name: "Miqueas", testament: "OT", chapters: placeholderChapter(7) },
-                { name: "Nahúm", testament: "OT", chapters: placeholderChapter(3) },
-                { name: "Habacuc", testament: "OT", chapters: placeholderChapter(3) },
-                { name: "Sofonías", testament: "OT", chapters: placeholderChapter(3) },
-                { name: "Ageo", testament: "OT", chapters: placeholderChapter(2) },
-                { name: "Zacarías", testament: "OT", chapters: placeholderChapter(14) },
-                { name: "Malaquías", testament: "OT", chapters: placeholderChapter(3) },
-                // New Testament - 27 Books
-                { name: "Mateo", testament: "NT", chapters: placeholderChapter(28) },
-                { name: "Marcos", testament: "NT", chapters: placeholderChapter(16) },
-                { name: "Lucas", testament: "NT", chapters: placeholderChapter(24) },
-                { name: "Juan", testament: "NT", chapters: placeholderChapter(21) },
-                { name: "Hechos de los Apóstoles", testament: "NT", chapters: placeholderChapter(28) },
-                { name: "Romanos", testament: "NT", chapters: placeholderChapter(16) },
-                { name: "1 Corintios", testament: "NT", chapters: placeholderChapter(16) },
-                { name: "2 Corintios", testament: "NT", chapters: placeholderChapter(13) },
-                { name: "Gálatas", testament: "NT", chapters: placeholderChapter(6) },
-                { name: "Efesios", testament: "NT", chapters: placeholderChapter(6) },
-                { name: "Filipenses", testament: "NT", chapters: placeholderChapter(4) },
-                { name: "Colosenses", testament: "NT", chapters: placeholderChapter(4) },
-                { name: "1 Tesalonicenses", testament: "NT", chapters: placeholderChapter(5) },
-                { name: "2 Tesalonicenses", testament: "NT", chapters: placeholderChapter(3) },
-                { name: "1 Timoteo", testament: "NT", chapters: placeholderChapter(6) },
-                { name: "2 Timoteo", testament: "NT", chapters: placeholderChapter(4) },
-                { name: "Tito", testament: "NT", chapters: placeholderChapter(3) },
-                { name: "Filemón", testament: "NT", chapters: placeholderChapter(1) },
-                { name: "Hebreos", testament: "NT", chapters: placeholderChapter(13) },
-                { name: "Santiago", testament: "NT", chapters: placeholderChapter(5) },
-                { name: "1 Pedro", testament: "NT", chapters: placeholderChapter(5) },
-                { name: "2 Pedro", testament: "NT", chapters: placeholderChapter(3) },
-                { name: "1 Juan", testament: "NT", chapters: placeholderChapter(5) },
-                { name: "2 Juan", testament: "NT", chapters: placeholderChapter(1) },
-                { name: "3 Juan", testament: "NT", chapters: placeholderChapter(1) },
-                { name: "Judas", testament: "NT", chapters: placeholderChapter(1) },
-                { name: "Apocalipsis", testament: "NT", chapters: placeholderChapter(22) },
-            ];
 
             // --- COMPLETE LITURGICAL DATA GENERATOR ---
             function getLiturgyForDate(date) {
@@ -1241,14 +500,12 @@
             const mainNavButtons = { 
                 home: document.getElementById('btn-home'),
                 liturgy: document.getElementById('btn-liturgy'), 
-                bible: document.getElementById('btn-bible'),
                 glossary: document.getElementById('btn-glossary'), 
                 lectionary: document.getElementById('btn-lectionary')
             };
             const views = { 
                 home: document.getElementById('home-view'),
                 liturgy: document.getElementById('liturgy-view'), 
-                bible: document.getElementById('bible-view'),
                 glossary: document.getElementById('glossary-view'), 
                 lectionary: document.getElementById('lectionary-view')
             };
@@ -1262,28 +519,6 @@
             const theologyPopupContent = document.getElementById('popup-content-theology');
             const theologyPopupClose = document.getElementById('popup-close');
             const cardsContainer = document.getElementById('liturgical-cards-container');
-
-            // --- BIBLE VIEW ELEMENTS ---
-            const bibleHeader = {
-                backBtn: document.getElementById('bible-back-btn'),
-                title: document.getElementById('bible-view-title')
-            };
-            const bibleViews = {
-                testament: document.getElementById('testament-selector-view'),
-                book: document.getElementById('book-selector-view'),
-                chapter: document.getElementById('chapter-selector-view'),
-                content: document.getElementById('chapter-content-view')
-            };
-            const bibleSelectors = {
-                selectOT: document.getElementById('select-ot'),
-                selectNT: document.getElementById('select-nt')
-            };
-            let bibleNavState = {
-                level: 'root', // root, testament, book, chapter
-                testament: null,
-                bookIndex: null,
-                chapterIndex: null
-            };
 
             // --- FUNCTIONS ---
             function switchView(viewName) {
@@ -1350,7 +585,7 @@
                         alleluia: (verse) => `<h3>Aleluya</h3><p class="liturgy-text"><strong>Aleluya, aleluya.</strong><br>${verse}<br><strong>Aleluya.</strong></p>`,
                         gospelAcclamation: (verse) => `<h3>Aclamación antes del Evangelio</h3><p class="liturgy-text">${verse}</p>`,
                         gospel: (gospelData) => `<h3>Evangelio: ${gospelData.ref}</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Lectura del santo Evangelio según san ${gospelData.ref.split(' ')[0]}.<br><strong>Gloria a ti, Señor.</strong></p><p class="liturgy-text">${gospelData.text}</p><p class="liturgy-text">Palabra del Señor.<br><strong>Gloria a ti, Señor Jesús.</strong></p>`,
-                        credo: `<h3>Profesión de Fe - Credo Niceno</h3><p class="liturgy-text"><strong>Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvación bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato; padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos, y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y del Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica и apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.</strong></p>`,
+                        credo: `<h3>Profesión de Fe - Credo Niceno</h3><p class="liturgy-text"><strong>Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvation bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato; padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos, y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y del Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica и apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.</strong></p>`,
                         prayerOfTheFaithful: `<h3>Oración de los Fieles</h3><p class="liturgy-text">Hermanos, oremos a Dios Padre todopoderoso, que escucha siempre la oración de sus hijos. Digamos con fe:<br><strong>Te rogamos, óyenos.</strong><br><em>(Se presentan las intenciones)</em><br>Escucha, Padre, nuestra oración y concédenos aquellos dones que con fe te pedimos. Por Jesucristo, nuestro Señor.<br><strong>Amén.</strong></p>`,
                         eucharisticPrayerII: (preface) => `<h3>Plegaria Eucarística II</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Levantemos el corazón.<br><strong>Lo tenemos levantado hacia el Señor.</strong><br>Demos gracias al Señor, nuestro Dios.<br><strong>Es justo y necesario.</strong></p><p class="liturgy-text">${preface}</p><p class="liturgy-text"><strong>Santo, Santo, Santo es el Señor, Dios del Universo. Llenos están el cielo y la tierra de tu gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.</strong></p><p class="liturgy-text">Santo eres en verdad, Señor, fuente de toda santidad; por eso te pedimos que santifiques estos dones con la efusión de tu Espíritu, de manera que se conviertan para nosotros en el Cuerpo y la Sangre de Jesucristo, nuestro Señor. El cual, cuando iba a ser entregado a su Pasión, voluntariamente aceptada, tomó pan, dándote gracias, lo partió y lo dio a sus discípulos, diciendo: <strong>«TOMEN Y COMAN TODOS DE ÉL, PORQUE ESTO ES MI CUERPO, QUE SERÁ ENTREGADO POR USTEDES».</strong> Del mismo modo, acabada la cena, tomó el cáliz, y, dándote gracias de nuevo, lo pasó a sus discípulos, diciendo: <strong>«TOMEN Y BEBAN TODOS DE ÉL, PORQUE ESTE ES EL CÁLIZ DE MI SANGRE, SANGRE DE LA ALIANZA NUEVA Y ETERNA, QUE SERÁ DERRAMADA POR USTEDES Y POR MUCHOS PARA EL PERDÓN DE LOS PECADOS. HAGAN ESTO EN CONMEMORACIÓN MÍA».</strong> Este es el Misterio de la fe.<br><strong>Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!</strong></p><p class="liturgy-text">Así, pues, Padre, al celebrar ahora el memorial de la muerte y resurrección de tu Hijo, te ofrecemos el pan de vida y el cáliz de salvación, y te damos gracias porque nos haces dignos de servirte en tu presencia. Te pedimos humildemente que el Espíritu Santo congregue en la unidad a cuantos participamos del Cuerpo y la Sangre de Cristo. Por Cristo, con él y en él, a ti, Dios Padre omnipotente, en la unidad del Espíritu Santo, todo honor y toda gloria por los siglos de los siglos.<br><strong>Amén.</strong></p>`,
                         communionRite: `<h3>Rito de la Comunión</h3><p class="liturgy-text">Fieles a la recomendación del Salvador y siguiendo su divina enseñanza, nos atrevemos a decir:<br><strong>Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.</strong><br>Líbranos de todos los males, Señor, y concédenos la paz en nuestros días, para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.<br><strong>Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.</strong><br>Señor Jesucristo, que dijiste a tus apóstoles: «La paz les dejo, mi paz les doy», no tengas en cuenta nossos pecados, sino la fe de tu Iglesia y, conforme a tu palabra, concédele la paz y la unidad. Tú que vives y reinas por los siglos de los siglos.<br><strong>Amén.</strong><br>La paz del Señor esté siempre con ustedes.<br><strong>Y con tu espíritu.</strong></p><p class="liturgy-text"><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, danos la paz.</strong></p><p class="liturgy-text">Este es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.<br><strong>Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.</strong></p>`,
@@ -1397,72 +632,6 @@
                 const savedLogo = localStorage.getItem('userLogo');
                 if (savedLogo) {
                     logoImage.src = savedLogo;
-                }
-            }
-
-            // --- BIBLE NAVIGATION LOGIC ---
-            function updateBibleView() {
-                // Hide all views first
-                Object.values(bibleViews).forEach(v => v.classList.add('hidden'));
-
-                switch (bibleNavState.level) {
-                    case 'testament':
-                        bibleViews.book.innerHTML = '';
-                        bibleData.forEach((book, index) => {
-                            if (book.testament === bibleNavState.testament) {
-                                const card = document.createElement('button');
-                                card.className = 'bible-book-card text-center p-4 bg-white/70 backdrop-blur-sm rounded-lg shadow hover:bg-teal-100 border border-gray-200';
-                                card.textContent = book.name;
-                                card.dataset.bookIndex = index;
-                                bibleViews.book.appendChild(card);
-                            }
-                        });
-                        bibleHeader.title.textContent = bibleNavState.testament === 'OT' ? 'Antiguo Testamento' : 'Nuevo Testamento';
-                        bibleViews.book.classList.remove('hidden');
-                        bibleHeader.backBtn.classList.remove('hidden');
-                        break;
-
-                    case 'book':
-                        const book = bibleData[bibleNavState.bookIndex];
-                        bibleViews.chapter.innerHTML = '';
-                        // Use book.chapters.length which is the correct number of chapters
-                        for (let i = 1; i <= book.chapters.length; i++) {
-                            const card = document.createElement('button');
-                            card.className = 'bible-chapter-card flex items-center justify-center aspect-square p-2 bg-white/70 backdrop-blur-sm rounded-lg shadow hover:bg-teal-100 border border-gray-200';
-                            card.textContent = i;
-                            card.dataset.chapterIndex = i - 1;
-                            bibleViews.chapter.appendChild(card);
-                        }
-                        bibleHeader.title.textContent = book.name;
-                        bibleViews.chapter.classList.remove('hidden');
-                        bibleHeader.backBtn.classList.remove('hidden');
-                        break;
-
-                    case 'chapter':
-                        const bookData = bibleData[bibleNavState.bookIndex];
-                        const chapterData = bookData.chapters[bibleNavState.chapterIndex];
-                        bibleViews.content.innerHTML = ''; // Clear previous content
-                        
-                        chapterData.forEach((verse) => {
-                            const p = document.createElement('p');
-                            p.className = 'verse-wrapper';
-                            if (verse.text.includes('ref-link')) {
-                                p.classList.add('has-commentary');
-                            }
-                            p.innerHTML = `<sup>${verse.verse}</sup>${verse.text}`;
-                            bibleViews.content.appendChild(p);
-                        });
-
-                        bibleHeader.title.textContent = `${bookData.name} ${bibleNavState.chapterIndex + 1}`;
-                        bibleViews.content.classList.remove('hidden');
-                        bibleHeader.backBtn.classList.remove('hidden');
-                        break;
-
-                    default: // root
-                        bibleViews.testament.classList.remove('hidden');
-                        bibleHeader.title.textContent = 'Biblia';
-                        bibleHeader.backBtn.classList.add('hidden');
-                        break;
                 }
             }
 
@@ -1539,51 +708,8 @@
                 }
             });
 
-            // --- BIBLE EVENT LISTENERS ---
-            bibleSelectors.selectOT.addEventListener('click', () => {
-                bibleNavState.level = 'testament';
-                bibleNavState.testament = 'OT';
-                updateBibleView();
-            });
-
-            bibleSelectors.selectNT.addEventListener('click', () => {
-                bibleNavState.level = 'testament';
-                bibleNavState.testament = 'NT';
-                updateBibleView();
-            });
-
-            bibleViews.book.addEventListener('click', (e) => {
-                const card = e.target.closest('.bible-book-card');
-                if (card) {
-                    bibleNavState.level = 'book';
-                    bibleNavState.bookIndex = parseInt(card.dataset.bookIndex);
-                    updateBibleView();
-                }
-            });
-
-            bibleViews.chapter.addEventListener('click', (e) => {
-                const card = e.target.closest('.bible-chapter-card');
-                if (card) {
-                    bibleNavState.level = 'chapter';
-                    bibleNavState.chapterIndex = parseInt(card.dataset.chapterIndex);
-                    updateBibleView();
-                }
-            });
-
-            bibleHeader.backBtn.addEventListener('click', () => {
-                if (bibleNavState.level === 'chapter') {
-                    bibleNavState.level = 'book';
-                } else if (bibleNavState.level === 'book') {
-                    bibleNavState.level = 'testament';
-                } else if (bibleNavState.level === 'testament') {
-                    bibleNavState.level = 'root';
-                }
-                updateBibleView();
-            });
-
             // --- THEOLOGY POPUP LISTENERS ---
             fullLiturgyView.addEventListener('click', showTheologyPopup);
-            bibleViews.content.addEventListener('click', showTheologyPopup);
             theologyPopupClose.addEventListener('click', closeTheologyPopup);
             theologyPopupOverlay.addEventListener('click', closeTheologyPopup);
 
@@ -1652,7 +778,6 @@
                 loadLogoFromStorage();
                 switchView('home');
                 renderLiturgicalCards();
-                updateBibleView(); // Initialize the bible view to its root state
             }
             initializeApp();
         });
