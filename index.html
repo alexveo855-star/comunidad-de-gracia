@@ -234,8 +234,8 @@
         <nav id="mobile-nav-links" class="flex flex-col items-center gap-8">
             <a data-view="home" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Inicio</a>
             <a data-view="liturgy" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Liturgia</a>
-            <a href="https://www.bibleserver.com/NVI/G%C3%A9nesis1" target="_blank" rel="noopener noreferrer" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600">Biblia</a>
-            <a data-view="glossary" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Recursos</a>
+            <a href="https://www.bibleserver.com/es/NVI/G%C3%A9nesis1" target="_blank" rel="noopener noreferrer" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600">Biblia</a>
+            <a data-view="glossary" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Libro de Oración Común</a>
             <a data-view="lectionary" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Leccionario</a>
             <a href="https://www.bibleserver.com/nicodemus-ai" target="_blank" rel="noopener noreferrer" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600">Nicodemus IA</a>
         </nav>
@@ -258,8 +258,8 @@
                 <nav class="hidden lg:flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-4 md:gap-x-6">
                     <a id="btn-home" class="main-nav-button cursor-pointer">Inicio</a>
                     <a id="btn-liturgy" class="main-nav-button cursor-pointer">Liturgia</a>
-                    <a href="https://www.bibleserver.com/NVI/G%C3%A9nesis1" target="_blank" rel="noopener noreferrer" class="main-nav-button">Biblia</a>
-                    <a id="btn-glossary" class="main-nav-button cursor-pointer">Recursos</a>
+                    <a href="https://www.bibleserver.com/es/NVI/G%C3%A9nesis1" target="_blank" rel="noopener noreferrer" class="main-nav-button">Biblia</a>
+                    <a id="btn-glossary" class="main-nav-button cursor-pointer">Libro de Oración Común</a>
                     <a id="btn-lectionary" class="main-nav-button cursor-pointer">Leccionario</a>
                     <a href="https://www.bibleserver.com/nicodemus-ai" target="_blank" rel="noopener noreferrer" class="main-nav-button">Nicodemus IA</a>
                     <a id="btn-upload-logo" class="main-nav-button cursor-pointer">
@@ -297,7 +297,7 @@
         <div id="glossary-view" class="hidden">
             <main class="container mx-auto p-4 md:p-8">
                 <div class="bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
-                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">ACNA: Libro de Oración Común y Recursos</h2>
+                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Libro de Oración Común (2019)</h2>
                     <div class="mt-8 text-center bg-stone-100 p-6 sm:p-8 rounded-lg shadow">
                         <p class="text-lg text-gray-700 mb-4">Para acceder a los recursos del Libro de Oración Común, por favor haz clic en el siguiente botón. El sitio se abrirá en una nueva pestaña del navegador.</p>
                         <a href="https://bcp2019.anglicanchurch.net/index.php/downloads-espanol/" target="_blank" rel="noopener noreferrer" class="inline-block bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors shadow-md">
@@ -373,7 +373,7 @@
             const terms = {
                 // Terms for Liturgy
                 hypostasis: {original: "ὑπόστασις", transliteration: "hypóstasis", meaning: "Sustancia, fundamento, garantía. En este contexto, la fe es la realidad fundamental de lo que se espera."},
-                elenchos: {original: "ἔλεγχος", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
+                elenchos: {original: "ἔλεγχos", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
                 epangelia: {original: "ἐπαγγελία", transliteration: "epangelía", meaning: "Promesa. Un compromiso divino que es el objeto de la esperanza y la fe del creyente."},
                 poimnion: {original: "ποίμνιον", transliteration: "poímnion", meaning: "Rebaño pequeño. Término de cariño y ternura que Jesús usa para sus discípulos, destacando su vulnerabilidad y la protección de Dios."},
                 kardia: {original: "καρδία", transliteration: "kardía", meaning: "Corazón. En la Biblia, no es solo el asiento de las emociones, sino el centro del intelecto, la voluntad y toda la persona."},
@@ -390,22 +390,53 @@
                 const toYYYYMMDD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
                 const dateString = toYYYYMMDD(date);
                 
+                // --- Key Liturgical Dates for 2025 (Cycle C) ---
+                const firstSundayOfAdvent2024 = new Date(2024, 11, 1);
+                const christmasDay = new Date(2025, 11, 25);
+                const epiphanySunday = new Date(2025, 0, 5);
+                const baptismOfTheLord = new Date(2025, 0, 12);
+                const ashWednesday = new Date(2025, 2, 5);
                 const easter = new Date(2025, 3, 20);
-                const firstSundayOfAdvent = new Date(2025, 10, 30);
+                const pentecost = new Date(2025, 5, 8);
+                const trinitySunday = new Date(2025, 5, 15);
+                const christTheKing = new Date(2025, 10, 23);
+                const firstSundayOfAdvent2025 = new Date(2025, 10, 30);
 
-                let season = 'Ordinary Time';
-                let seasonColor = '#16a34a'; // green-600
-                if (date >= firstSundayOfAdvent && date < new Date(2025, 11, 25)) { season = 'Advent'; seasonColor = '#6d28d9'; } // violet-700
-                else if ((date >= new Date(2025, 11, 25)) || (date < new Date(2025, 0, 12))) { season = 'Christmas'; seasonColor = '#ca8a04'; } // yellow-600
-                else if (date >= new Date(2025, 2, 5) && date < easter) { season = 'Lent'; seasonColor = '#9333ea'; } // purple-600
-                else if (date >= easter && date <= addDays(easter, 50)) { season = 'Easter'; seasonColor = '#f59e0b'; } // amber-500
-
-                let liturgy = {
-                    title: '', cycle: '', omitGloria: false, omitCredo: false, omitAlleluia: false, seasonColor: seasonColor,
-                    prayers: { collect: '', offerings: '', postCommunion: '', preface: ''},
-                    readings: { firstReading: null, psalm: null, secondReading: null, alleluiaVerse: null, gospelAcclamationVerse: null, gospel: null }
+                // Helper to count Sundays between two dates (inclusive of start)
+                const countSundays = (start, end) => {
+                    let count = 0;
+                    let current = new Date(start);
+                    while (current <= end) {
+                        if (current.getDay() === 0) {
+                            count++;
+                        }
+                        current.setDate(current.getDate() + 1);
+                    }
+                    return count;
                 };
-                
+
+                let season = '';
+                let seasonColor = '#16a34a'; // Default green
+                let title = '';
+                let cycle = 'Ciclo C';
+
+                // Determine Season
+                if (date >= firstSundayOfAdvent2025) {
+                    season = 'Advent'; seasonColor = '#6d28d9';
+                } else if (date >= pentecost) {
+                    season = 'Season after Pentecost'; seasonColor = '#16a34a';
+                } else if (date >= easter) {
+                    season = 'Easter'; seasonColor = '#f59e0b';
+                } else if (date >= ashWednesday) {
+                    season = 'Lent'; seasonColor = '#9333ea';
+                } else if (date > epiphanySunday) {
+                    season = 'Season after Epiphany'; seasonColor = '#16a34a';
+                } else if (date >= new Date(2024, 11, 25)) {
+                    season = 'Christmas'; seasonColor = '#ca8a04';
+                } else {
+                    season = 'Advent'; seasonColor = '#6d28d9';
+                }
+
                 const placeholderReadings = {
                     firstReading: { ref: 'Lectura I', text: 'Texto de la primera lectura no disponible.' },
                     psalm: { ref: 'Salmo Responsorial', response: 'Respuesta del salmo.', stanzas: ['Estrofa del salmo no disponible.'] },
@@ -414,74 +445,93 @@
                     gospel: { ref: 'Evangelio', text: 'Texto del Evangelio no disponible.' }
                 };
 
-                // --- SEASONAL FLAGS ---
-                if (season === 'Advent' || season === 'Lent') { liturgy.omitGloria = true; }
-                if (season === 'Lent') { liturgy.omitAlleluia = true; }
-
                 // --- SOLEMNITIES AND FEASTS (OVERRIDE SUNDAY LOGIC) ---
                 const solemnities = {
-                    '2025-01-01': { title: 'Santa María, Madre de Dios', seasonColor: '#e5e7eb' },
-                    '2025-01-05': { title: 'Epifanía del Señor', seasonColor: '#e5e7eb' }, // Sunday
-                    '2025-01-12': { title: 'Bautismo del Señor', seasonColor: '#e5e7eb' }, // Sunday
-                    '2025-03-05': { title: 'Miércoles de Ceniza', seasonColor: '#9333ea' },
-                    '2025-04-13': { title: 'Domingo de Ramos', seasonColor: '#dc2626' }, // Sunday
-                    '2025-04-17': { title: 'Jueves Santo (Misa de la Cena del Señor)', seasonColor: '#e5e7eb' },
-                    '2025-04-18': { title: 'Viernes Santo (Pasión del Señor)', seasonColor: '#dc2626' },
-                    '2025-04-19': { title: 'Sábado Santo (Vigilia Pascual)', seasonColor: '#f59e0b' },
-                    '2025-04-20': { title: 'Domingo de Pascua', seasonColor: '#f59e0b' }, // Sunday
-                    '2025-06-01': { title: 'Ascensión del Señor', seasonColor: '#e5e7eb' }, // Sunday
-                    '2025-06-08': { title: 'Domingo de Pentecostés', seasonColor: '#dc2626' }, // Sunday
-                    '2025-06-15': { title: 'Santísima Trinidad', seasonColor: '#e5e7eb' }, // Sunday
-                    '2025-06-22': { title: 'Santísimo Cuerpo y Sangre de Cristo', seasonColor: '#e5e7eb' }, // Sunday
-                    '2025-08-15': { title: 'Asunción de la Virgen María', seasonColor: '#e5e7eb' },
-                    '2025-11-01': { title: 'Todos los Santos', seasonColor: '#e5e7eb' },
-                    '2025-11-23': { title: 'Jesucristo, Rey del Universo', seasonColor: '#e5e7eb' }, // Sunday
-                    '2025-12-08': { title: 'Inmaculada Concepción de la Virgen María', seasonColor: '#e5e7eb' },
-                    '2025-12-25': { title: 'Natividad del Señor (Navidad)', seasonColor: '#f59e0b' },
+                    '2025-01-01': { title: 'La Circuncisión y Santo Nombre de Nuestro Señor Jesucristo', color: '#e5e7eb' },
+                    '2025-01-06': { title: 'La Epifanía de Nuestro Señor Jesucristo', color: '#e5e7eb' },
+                    '2025-03-05': { title: 'Miércoles de Ceniza', color: '#9333ea' },
+                    '2025-04-17': { title: 'Jueves Santo', color: '#e5e7eb' },
+                    '2025-04-18': { title: 'Viernes Santo', color: '#dc2626' },
+                    '2025-04-19': { title: 'Sábado Santo', color: '#e5e7eb' },
+                    '2025-08-15': { title: 'Santa María Virgen, Madre de Nuestro Señor Jesucristo', color: '#e5e7eb' },
+                    '2025-11-01': { title: 'Día de Todos los Santos', color: '#e5e7eb' },
+                    '2025-12-25': { title: 'El Día de Navidad', color: '#f59e0b' },
                 };
 
                 if (solemnities[dateString]) {
-                    liturgy.title = solemnities[dateString].title;
-                    liturgy.seasonColor = solemnities[dateString].seasonColor;
-                    liturgy.cycle = 'Solemnidad';
-                    liturgy.readings = placeholderReadings; 
+                    title = solemnities[dateString].title;
+                    seasonColor = solemnities[dateString].color;
+                    cycle = 'Día Santo';
                 }
 
-                // --- ORDINARY SUNDAYS (CYCLE C) ---
-                if (date.getDay() === 0 && !solemnities[dateString]) {
-                     if (dateString === '2025-07-27') {
-                        liturgy.title = 'XVII Domingo del Tiempo Ordinario';
-                        liturgy.cycle = 'Ciclo C';
-                        liturgy.readings = placeholderReadings;
-                    } else if (dateString === '2025-08-03') {
-                        liturgy.title = 'XVIII Domingo del Tiempo Ordinario';
-                        liturgy.cycle = 'Ciclo C';
-                        liturgy.readings = placeholderReadings;
-                    } else if (dateString === '2025-08-10') {
-                        liturgy.title = 'XIX Domingo del Tiempo Ordinario';
-                        liturgy.cycle = 'Ciclo C';
-                        liturgy.prayers = {
-                            collect: 'Dios todopoderoso y eterno, a quien podemos llamar Padre, aumenta en nuestros corações el espíritu de hijos adoptivos, para que merezcamos entrar un día en la herencia prometida. Por nuestro Señor Jesucristo.',
-                            offerings: 'Sé propicio, Señor, a tu pueblo y acepta con bondad estas ofrendas, para que, con la ayuda de tu piedad, a cada uno le aproveche para su salvación lo que ofrece en honor de tu nombre. Por Jesucristo, nuestro Señor.',
-                            postCommunion: 'Que la comunión en tus sacramentos nos salve, Señor, y nos afiance en la luz de tu verdad. Por Jesucristo, nuestro Señor.',
-                            preface: 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:'
-                        };
-                        liturgy.readings = {
-                            firstReading: { ref: 'Sabiduría 18, 6-9', text: `La noche de la liberación fue anunciada de antemano a nuestros padres, para que tuvieran ánimo al conocer con certeza la promesa de la que se fiaban. Tu pueblo esperaba, a la vez, la salvación de los justos y la perdición de los enemigos. Porque con la misma acción que castigaste a los adversarios, nos glorificaste a nosotros, llamándonos a ti. Los santos hijos de los buenos ofrecían sacrificios a escondidas y establecieron de común acuerdo esta ley divina: que los santos compartirían por igual los mismos bienes y peligros; y entonaron los himnos de los padres.` },
-                            psalm: { ref: 'Salmo 32', response: 'Dichoso el pueblo que el Señor se escogió como heredad.', stanzas: [ `Aclamad, justos, al Señor,<br>que merece la alabanza de los buenos.<br>Dichosa la nación cuyo Dios es el Señor,<br>el pueblo que él se escogió como heredad.`, `El Señor mira desde el cielo,<br>se fija en todos los hombres.<br>Desde su morada observa<br>a todos los habitantes de la tierra.`, `Los ojos del Señor están puestos en quien lo teme,<br>en los que esperan en su misericordia,<br>para librar sus vidas de la muerte<br>y reanimarlos en tiempo de hambre.`, `Nosotros aguardamos al Señor:<br>él es nuestro auxilio y escudo;<br>que tu misericordia, Señor, venga sobre nosotros,<br>como lo esperamos de ti.` ] },
-                            secondReading: { ref: 'Hebreos 11, 1-2. 8-19', text: `Hermanos: La fe es garantía${ref('hypostasis', 1)} de lo que se espera, la prueba${ref('elenchos', 2)} de las realidades que no se ven. Por ella fueron alabados nuestros mayores. Por la fe, Abrahán, al ser llamado por Dios, obedeció y salió para el lugar que había de recibir en herencia, y salió sin saber a dónde iba. Por la fe, se estableció en la tierra prometida como en tierra extraña, viviendo en tiendas, y lo mismo Isaac y Jacob, herederos de la misma promesa${ref('epangelia', 3)}, pues esperaba la ciudad de sólidos cimientos, cuyo arquitecto y constructor es Dios. Por la fe, también Sara, siendo estéril, obtuvo vigor para concebir, a pesar de su edad avanzada, porque creyó que era fiel el que se lo prometía. Y así, de un solo hombre, y ya marcado por la muerte, nacieron hijos, numerosos como las estrellas del cielo e incontables como la arena de las playas. Con fe murieron todos estos, sin haber recibido las promesas; las vieron y las saludaron de lejos, confesando que eran extraños y peregrinos en la terra. Los que así hablan, dan a entender que buscan una patria; pues si hubieran pensado en la que habían abandonado, tenían ocasión de volver. Pero ellos ansiaban una patria mejor, la celestial. Por eso Dios no se avergüenza de llamarse su Dios, pues les tenía preparada una ciudad. Por la fe, Abrahán, puesto a prueba, ofreció a Isaac; y el que había recibido las promesas, ofrecía a su unigénito, a quien se le había dicho: «La descendencia que lleve tu nombre será la de Isaac». Pero Abrahán pensaba que Dios tiene poder hasta para resucitar de entre los muertos, de donde en cierto sentido lo recobró.` },
-                            alleluiaVerse: 'Estad en vela y preparados, porque a la hora que menos penséis viene el Hijo del hombre. (cf. Mt 24, 42a. 44)',
-                            gospel: { ref: 'Lucas 12, 32-48', text: `En aquel tiempo, dijo Jesús a sus discípulos: «No temas, pequeño rebaño${ref('poimnion', 4)}, porque vuestro Padre ha tenido a bien daros el reino. Vended vuestros bienes y dad limosna. Haceos bolsas que no se estropeen, un tesoro inagotable en el cielo, adonde no se acercan los ladrones ni roe la polilla. Porque donde está vuestro tesoro, allí estará también vuestro corazón${ref('kardia', 5)}. Tened ceñida la cintura y encendidas las lámparas. Vosotros estad como los hombres que aguardan a que su señor vuelva de la boda, para abrirle apenas venga y llame. Bienaventurados aquellos criados a quienes el señor, al llegar, los encuentre en vela${ref('gregoreō', 6)}; en verdad os digo que se ceñirá, los hará sentar a la mesa y, acercándose, les irá sirviendo. Y, si llega a la segunda vigilia o a la tercera y los encuentra así, ¡bienaventurados ellos! Comprended que si supiera el dueño de casa a qué hora viene el ladrón, no le dejaría abrir un boquete en su casa. Lo mismo vosotros, estad preparados, porque a la hora que menos penséis viene el Hijo del hombre». Pedro le dijo: «Señor, ¿dices esta parábola por nosotros o por todos?». Y el Señor dijo: «¿Quién es el administrador fiel y prudente a quien el señor pondrá al frente de su servidumbre para que reparta la ración de alimento a sus horas? Bienaventurado aquel siervo${ref('doulos', 7)} a quien su señor, al llegar, lo encuentre portándose así. En verdad os digo que lo pondrá al frente de todos sus bienes. Pero si aquel siervo dijere para sus adentros: “Mi señor tarda en llegar”, y empieza a pegarles a los criados y a las criadas, a comer y beber y emborracharse, vendrá el señor de ese siervo el día que menos lo espera y a la hora que no sabe y lo castigará con rigor, y le asignará la suerte de los infieles. El siervo que, conociendo la voluntad de su señor, no se prepara ni obra de acuerdo con su voluntad, recibirá muchos azotes; pero el que, sin conocerla, ha hecho algo digno de azotes, recibirá menos. A quien mucho se le dio, mucho se le reclamará; a quien mucho se le confió, más aún se le pedirá».` }
-                        };
-                    } else {
-                        // Placeholder for other Sundays
-                        liturgy.title = `Domingo de ${season}`;
-                        liturgy.cycle = 'Ciclo C';
-                        liturgy.readings = placeholderReadings;
+                // --- SUNDAY TITLES (LOC 2019) ---
+                if (date.getDay() === 0 && !title) {
+                    const ordinals = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "Séptimo", "Octavo", "Noveno", "Décimo"];
+
+                    if (date >= firstSundayOfAdvent2025) {
+                        const sundayIndex = countSundays(firstSundayOfAdvent2025, date);
+                        title = `El ${ordinals[sundayIndex - 1]} Domingo de Adviento`;
+                    } else if (date.getTime() === christTheKing.getTime()) {
+                        title = 'El Último Domingo después de Pentecostés: Cristo Rey';
+                    } else if (date.getTime() === trinitySunday.getTime()) {
+                        title = "El Domingo de la Santísima Trinidad";
+                    } else if (date > trinitySunday) {
+                        const sundayIndex = countSundays(trinitySunday, date);
+                        title = `El ${ordinals[sundayIndex] || (sundayIndex + 1) + 'º'} Domingo después de Pentecostés`;
+                    } else if (date.getTime() === pentecost.getTime()) {
+                        title = 'El Día de Pentecostés';
+                    } else if (date.getTime() === easter.getTime()) {
+                        title = 'Domingo de Pascua';
+                    } else if (date > easter) {
+                        const sundayIndex = countSundays(easter, date);
+                        title = `El ${ordinals[sundayIndex - 1]} Domingo de Pascua`;
+                    } else if (date.getTime() === addDays(ashWednesday, 46).getTime()) { // Palm Sunday
+                        title = 'Domingo de Ramos: La Pasión del Señor';
+                        seasonColor = '#dc2626';
+                    } else if (date > ashWednesday) {
+                        const sundayIndex = countSundays(addDays(ashWednesday, 4), date);
+                        title = `El ${ordinals[sundayIndex - 1]} Domingo de Cuaresma`;
+                    } else if (date.getTime() === baptismOfTheLord.getTime()) {
+                        title = 'El Bautismo de Nuestro Señor Jesucristo';
+                    } else if (date > epiphanySunday) {
+                        const sundayIndex = countSundays(epiphanySunday, date);
+                        title = `El ${ordinals[sundayIndex - 1]} Domingo después de la Epifanía`;
+                    } else if (date > new Date(2024, 11, 25)) {
+                        title = 'El Primer Domingo después de Navidad';
+                    } else if (date >= firstSundayOfAdvent2024) {
+                        const sundayIndex = countSundays(firstSundayOfAdvent2024, date);
+                        title = `El ${ordinals[sundayIndex - 1]} Domingo de Adviento`;
                     }
                 }
-                
-                if (!liturgy.title) return null; // If no title was set, it's not a liturgical day we're tracking.
+
+                if (!title) return null;
+
+                let liturgy = {
+                    title: title,
+                    cycle: cycle,
+                    omitGloria: (season === 'Advent' || season === 'Lent'),
+                    omitAlleluia: (season === 'Lent'),
+                    seasonColor: seasonColor,
+                    prayers: {},
+                    readings: placeholderReadings
+                };
+
+                // Specific data for the example date
+                if (dateString === '2025-08-10') {
+                    liturgy.prayers = {
+                        collect: 'Dios todopoderoso y eterno, a quien podemos llamar Padre, aumenta en nuestros corações el espíritu de hijos adoptivos, para que merezcamos entrar un día en la herencia prometida. Por nuestro Señor Jesucristo.',
+                        offerings: 'Sé propicio, Señor, a tu pueblo y acepta con bondad estas ofrendas, para que, con la ayuda de tu piedad, a cada uno le aproveche para su salvación lo que ofrece en honor de tu nombre. Por Jesucristo, nuestro Señor.',
+                        postCommunion: 'Que la comunión en tus sacramentos nos salve, Señor, y nos afiance en la luz de tu verdad. Por Jesucristo, nuestro Señor.',
+                        preface: 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:'
+                    };
+                    liturgy.readings = {
+                        firstReading: { ref: 'Sabiduría 18, 6-9', text: `La noche de la liberación fue anunciada de antemano a nuestros padres, para que tuvieran ánimo al conocer con certeza la promesa de la que se fiaban. Tu pueblo esperaba, a la vez, la salvación de los justos y la perdición de los enemigos. Porque con la misma acción que castigaste a los adversarios, nos glorificaste a nosotros, llamándonos a ti. Los santos hijos de los buenos ofrecían sacrificios a escondidas y establecieron de común acuerdo esta ley divina: que los santos compartirían por igual los mismos bienes y peligros; y entonaron los himnos de los padres.` },
+                        psalm: { ref: 'Salmo 32', response: 'Dichoso el pueblo que el Señor se escogió como heredad.', stanzas: [ `Aclamad, justos, al Señor,<br>que merece la alabanza de los buenos.<br>Dichosa la nación cuyo Dios es el Señor,<br>el pueblo que él se escogió como heredad.`, `El Señor mira desde el cielo,<br>se fija en todos los hombres.<br>Desde su morada observa<br>a todos los habitantes de la tierra.`, `Los ojos del Señor están puestos en quien lo teme,<br>en los que esperan en su misericordia,<br>para librar sus vidas de la muerte<br>y reanimarlos en tiempo de hambre.`, `Nosotros aguardamos al Señor:<br>él es nuestro auxilio y escudo;<br>que tu misericordia, Señor, venga sobre nosotros,<br>como lo esperamos de ti.` ] },
+                        secondReading: { ref: 'Hebreos 11, 1-2. 8-19', text: `Hermanos: La fe es garantía${ref('hypostasis', 1)} de lo que se espera, la prueba${ref('elenchos', 2)} de las realidades que no se ven. Por ella fueron alabados nuestros mayores. Por la fe, Abrahán, al ser llamado por Dios, obedeció y salió para el lugar que había de recibir en herencia, y salió sin saber a dónde iba. Por la fe, se estableció en la tierra prometida como en tierra extraña, viviendo en tiendas, y lo mismo Isaac y Jacob, herederos de la misma promesa${ref('epangelia', 3)}, pues esperaba la ciudad de sólidos cimientos, cuyo arquitecto y constructor es Dios. Por la fe, también Sara, siendo estéril, obtuvo vigor para concebir, a pesar de su edad avanzada, porque creyó que era fiel el que se lo prometía. Y así, de un solo hombre, y ya marcado por la muerte, nacieron hijos, numerosos como las estrellas del cielo e incontables como la arena de las playas. Con fe murieron todos estos, sin haber recibido las promesas; las vieron y las saludaron de lejos, confesando que eran extraños y peregrinos en la terra. Los que así hablan, dan a entender que buscan una patria; pues si hubieran pensado en la que habían abandonado, tenían ocasión de volver. Pero ellos ansiaban una patria mejor, la celestial. Por eso Dios no se avergüenza de llamarse su Dios, pues les tenía preparada una ciudad. Por la fe, Abrahán, puesto a prueba, ofreció a Isaac; y el que había recibido las promesas, ofrecía a su unigénito, a quien se le había dicho: «La descendencia que lleve tu nombre será la de Isaac». Pero Abrahán pensaba que Dios tiene poder hasta para resucitar de entre los muertos, de donde en cierto sentido lo recobró.` },
+                        alleluiaVerse: 'Estad en vela y preparados, porque a la hora que menos penséis viene el Hijo del hombre. (cf. Mt 24, 42a. 44)',
+                        gospel: { ref: 'Lucas 12, 32-48', text: `En aquel tiempo, dijo Jesús a sus discípulos: «No temas, pequeño rebaño${ref('poimnion', 4)}, porque vuestro Padre ha tenido a bien daros el reino. Vended vuestros bienes y dad limosna. Haceos bolsas que no se estropeen, un tesoro inagotable en el cielo, adonde no se acercan los ladrones ni roe la polilla. Porque donde está vuestro tesoro, allí estará también vuestro corazón${ref('kardia', 5)}. Tened ceñida la cintura y encendidas las lámparas. Vosotros estad como los hombres que aguardan a que su señor vuelva de la boda, para abrirle apenas venga y llame. Bienaventurados aquellos criados a quienes el señor, al llegar, los encuentre en vela${ref('gregoreō', 6)}; en verdad os digo que se ceñirá, los hará sentar a la mesa y, acercándose, les irá sirviendo. Y, si llega a la segunda vigilia o a la tercera y los encuentra así, ¡bienaventurados ellos! Comprended que si supiera el dueño de casa a qué hora viene el ladrón, no le dejaría abrir un boquete en su casa. Lo mismo vosotros, estad preparados, porque a la hora que menos penséis viene el Hijo del hombre». Pedro le dijo: «Señor, ¿dices esta parábola por nosotros o por todos?». Y el Señor dijo: «¿Quién es el administrador fiel y prudente a quien el señor pondrá al frente de su servidumbre para que reparta la ración de alimento a sus horas? Bienaventurado aquel siervo${ref('doulos', 7)} a quien su señor, al llegar, lo encuentre portándose así. En verdad os digo que lo pondrá al frente de todos sus bienes. Pero si aquel siervo dijere para sus adentros: “Mi señor tarda en llegar”, y empieza a pegarles a los criados y a las criadas, a comer y beber y emborracharse, vendrá el señor de ese siervo el día que menos lo espera y a la hora que no sabe y lo castigará con rigor, y le asignará la suerte de los infieles. El siervo que, conociendo la voluntad de su señor, no se prepara ni obra de acuerdo con su voluntad, recibirá muchos azotes; pero el que, sin conocerla, ha hecho algo digno de azotes, recibirá menos. A quien mucho se le dio, mucho se le reclamará; a quien mucho se le confió, más aún se le pedirá».` }
+                    };
+                }
 
                 return liturgy;
             }
@@ -537,7 +587,7 @@
                 const startDate = new Date(2025, 0, 1);
                 const endDate = new Date(2025, 11, 31);
 
-                for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+                for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                     const liturgyData = getLiturgyForDate(new Date(d));
                     if (liturgyData) {
                         const card = document.createElement('div');
@@ -686,17 +736,56 @@
                 });
 
                 const liturgyBody = contentElement.querySelector('.bg-white');
-                if (!liturgyBody) return;
+                if (!liturgyBody) {
+                    console.error("Liturgy content body not found for DOCX export.");
+                    return;
+                }
+                
+                const headerHtml = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1>${title}</h1>
+                        <p><em>${subtitle}</em></p>
+                    </div>
+                `;
 
-                const headerHtml = `...`; // Content omitted for brevity
+                const styles = `
+                    <style>
+                        body { font-family: 'Times New Roman', Times, serif; font-size: 10pt; }
+                        h1 { font-size: 16pt; font-weight: bold; }
+                        p { font-size: 12pt; }
+                        h2 { font-size: 14pt; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 5px; margin-top: 20px; }
+                        h3 { font-size: 11pt; font-weight: bold; margin-top: 15px; }
+                        .liturgy-text { margin-top: 10px; }
+                        strong { font-weight: bold; }
+                        em, i { font-style: italic; }
+                    </style>
+                `;
+
                 const twoColumnContent = `<div style="column-count: 2; column-gap: 40px;">${liturgyBody.innerHTML}</div>`;
-                const fullHtmlForDocx = `...`; // Content omitted for brevity
 
-                const converted = htmlDocx.asBlob(fullHtmlForDocx, {
-                    orientation: 'landscape',
-                    margins: { top: 720, right: 720, bottom: 720, left: 720 } 
-                });
-                saveAs(converted, `${title}.docx`);
+                const fullHtmlForDocx = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        ${styles}
+                    </head>
+                    <body>
+                        ${headerHtml}
+                        ${twoColumnContent}
+                    </body>
+                    </html>
+                `;
+
+                try {
+                    const converted = htmlDocx.asBlob(fullHtmlForDocx, {
+                        orientation: 'landscape',
+                        margins: { top: 720, right: 720, bottom: 720, left: 720 }
+                    });
+                    saveAs(converted, `${title}.docx`);
+                } catch (error) {
+                    console.error("Error generating DOCX file:", error);
+                }
             });
             
             cardsContainer.addEventListener('click', (e) => {
