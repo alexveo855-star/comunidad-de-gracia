@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IBCG APP - Liturgia 2025 (Ciclo C)</title>
     <!-- Favicon para Navegadores y Accesos Directos en Móviles -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🕊️%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🕊️%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🕊️%3C/text%E3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🕊️%3C/text%E3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -196,6 +196,97 @@
             pointer-events: none;
         }
 
+        /* New Lectionary Styles */
+        #lectionary-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        #month-selector {
+            @apply px-4 py-2 text-base font-medium text-gray-700 bg-white rounded-md shadow-sm border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500;
+        }
+        #current-month-year {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #374151;
+        }
+        .lectionary-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            text-align: center;
+        }
+        .calendar-header {
+            font-weight: bold;
+            color: #4b5563; /* gray-600 */
+            padding-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .calendar-day {
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 9999px;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+        }
+        .calendar-day:not(.empty):hover {
+            background-color: #f0fdfa; /* teal-50 */
+            color: #0f766e;
+        }
+        .calendar-day.is-sunday .day-number {
+            color: #0f766e; /* teal-700 */
+        }
+        .day-number {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .day-name {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .calendar-day.has-data {
+            position: relative;
+        }
+        .calendar-day.has-data::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #14b8a6; /* teal-500 */
+        }
+        .calendar-day.empty {
+            cursor: default;
+            pointer-events: none;
+        }
+        #lectionary-popup-close {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .office-section h5 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: 0.25rem;
+            color: #334155;
+            font-size: 1rem;
+        }
+        .office-section .liturgy-text {
+            border-left: none;
+            padding-left: 0;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+
         /* Print Styles */
         .print-only-header { display: none; }
         @media print {
@@ -309,16 +400,14 @@
         </div>
 
         <div id="lectionary-view" class="hidden">
-            <main class="container mx-auto p-4 md:p-8 flex items-center justify-center min-h-[85vh]">
-                <div class="w-full max-w-2xl bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
-                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Leccionario Diario 2025</h2>
-                    <div class="mt-8 text-center bg-stone-100 p-6 sm:p-8 rounded-lg shadow">
-                        <p class="text-lg text-gray-700 mb-6">El Leccionario Diario se abrirá en una nueva pestaña del navegador para una mejor experiencia de visualización.</p>
-                        <a href="https://liturgical-calendar.com/es/ACNA2019/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors shadow-md">
-                            <span>Abrir Leccionario</span>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                        </a>
+            <main class="container mx-auto p-4 md:p-8">
+                <div class="bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Oficio Diario - Leccionario (Año Uno)</h2>
+                    <div id="lectionary-controls">
+                        <h3 id="current-month-year"></h3>
+                        <select id="month-selector"></select>
                     </div>
+                    <div id="lectionary-day-grid-container"></div>
                 </div>
             </main>
         </div>
@@ -357,12 +446,24 @@
 </main>
     </div>
 
-    <!-- Mobile-Optimized Popup -->
+    <!-- Popups -->
     <div id="theology-popup-overlay"></div>
     <div id="theology-popup">
         <span id="popup-close">&times;</span>
         <div id="popup-content-theology"></div>
     </div>
+
+    <div id="lectionary-popup-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"></div>
+    <div id="lectionary-popup" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-2xl bg-white rounded-lg shadow-2xl z-50 max-h-[90vh] flex flex-col transition-transform duration-300 scale-95">
+        <header class="flex items-center justify-between p-4 border-b flex-shrink-0">
+            <h3 id="lectionary-popup-title" class="text-lg font-bold text-gray-800"></h3>
+            <button id="lectionary-popup-close" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+        </header>
+        <div id="lectionary-popup-body" class="p-6 overflow-y-auto">
+            <!-- Readings will be injected here -->
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -372,7 +473,7 @@
             // --- THEOLOGICAL DATA & HELPERS (GLOBAL SCOPE) ---
             const terms = {
                 // Terms for Liturgy
-                hypostasis: {original: "ὑπόστασις", transliteration: "hypóstasis", meaning: "Sustancia, fundamento, garantía. En este contexto, la fe es la realidad fundamental de lo que se espera."},
+                hypostasis: {original: "ὑπόσταις", transliteration: "hypóstasis", meaning: "Sustancia, fundamento, garantía. En este contexto, la fe es la realidad fundamental de lo que se espera."},
                 elenchos: {original: "ἔλεγχos", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
                 epangelia: {original: "ἐπαγγελία", transliteration: "epangelía", meaning: "Promesa. Un compromiso divino que es el objeto de la esperanza y la fe del creyente."},
                 poimnion: {original: "ποίμνιον", transliteration: "poímnion", meaning: "Rebaño pequeño. Término de cariño y ternura que Jesús usa para sus discípulos, destacando su vulnerabilidad y la protección de Dios."},
@@ -527,7 +628,7 @@
                     liturgy.readings = {
                         firstReading: { ref: 'Sabiduría 18, 6-9', text: `La noche de la liberación fue anunciada de antemano a nuestros padres, para que tuvieran ánimo al conocer con certeza la promesa de la que se fiaban. Tu pueblo esperaba, a la vez, la salvación de los justos y la perdición de los enemigos. Porque con la misma acción que castigaste a los adversarios, nos glorificaste a nosotros, llamándonos a ti. Los santos hijos de los buenos ofrecían sacrificios a escondidas y establecieron de común acuerdo esta ley divina: que los santos compartirían por igual los mismos bienes y peligros; y entonaron los himnos de los padres.` },
                         psalm: { ref: 'Salmo 32', response: 'Dichoso el pueblo que el Señor se escogió como heredad.', stanzas: [ `Aclamad, justos, al Señor,<br>que merece la alabanza de los buenos.<br>Dichosa la nación cuyo Dios es el Señor,<br>el pueblo que él se escogió como heredad.`, `El Señor mira desde el cielo,<br>se fija en todos los hombres.<br>Desde su morada observa<br>a todos los habitantes de la tierra.`, `Los ojos del Señor están puestos en quien lo teme,<br>en los que esperan en su misericordia,<br>para librar sus vidas de la muerte<br>y reanimarlos en tiempo de hambre.`, `Nosotros aguardamos al Señor:<br>él es nuestro auxilio y escudo;<br>que tu misericordia, Señor, venga sobre nosotros,<br>como lo esperamos de ti.` ] },
-                        secondReading: { ref: 'Hebreos 11, 1-2. 8-19', text: `Hermanos: La fe es garantía${ref('hypostasis', 1)} de lo que se espera, la prueba${ref('elenchos', 2)} de las realidades que no se ven. Por ella fueron alabados nuestros mayores. Por la fe, Abrahán, al ser llamado por Dios, obedeció y salió para el lugar que había de recibir en herencia, y salió sin saber a dónde iba. Por la fe, se estableció en la tierra prometida como en tierra extraña, viviendo en tiendas, y lo mismo Isaac y Jacob, herederos de la misma promesa${ref('epangelia', 3)}, pues esperaba la ciudad de sólidos cimientos, cuyo arquitecto y constructor es Dios. Por la fe, también Sara, siendo estéril, obtuvo vigor para concebir, a pesar de su edad avanzada, porque creyó que era fiel el que se lo prometía. Y así, de un solo hombre, y ya marcado por la muerte, nacieron hijos, numerosos como las estrellas del cielo e incontables como la arena de las playas. Con fe murieron todos estos, sin haber recibido las promesas; las vieron y las saludaron de lejos, confesando que eran extraños y peregrinos en la terra. Los que así hablan, dan a entender que buscan una patria; pues si hubieran pensado en la que habían abandonado, tenían ocasión de volver. Pero ellos ansiaban una patria mejor, la celestial. Por eso Dios no se avergüenza de llamarse su Dios, pues les tenía preparada una ciudad. Por la fe, Abrahán, puesto a prueba, ofreció a Isaac; y el que había recibido las promesas, ofrecía a su unigénito, a quien se le había dicho: «La descendencia que lleve tu nombre será la de Isaac». Pero Abrahán pensaba que Dios tiene poder hasta para resucitar de entre los muertos, de donde en cierto sentido lo recobró.` },
+                        secondReading: { ref: 'Hebreos 11, 1-2. 8-19', text: `Hermanos: La fe es garantía${ref('hypostasis', 1)} de lo que se espera, la prueba${ref('elenchos', 2)} de las realidades que no se ven. Por ella fueron alabados nuestros mayores. Por la fe, Abrahán, al ser llamado por Dios, obedeció y salió para el lugar que había de recibir en herencia, y salió sin saber a dónde iba. Por la fe, se estableció en la tierra prometida como en tierra extraña, viviendo en tiendas, y lo mismo Isaac y Jacob, herederos de la misma promesa${ref('epangelia', 3)}, pues esperaba la ciudad de sólidos cimientos, cuyo arquitecto y constructor es Dios. Por la fe, también Sara, siendo estéril, obtuvo vigor para concebir, a pesar de su edad avanzada, porque creyó que era fiel el que se lo prometía. Y así, de un solo hombre, y ya marcado por la muerte, nacieron hijos, numerosos como las estrellas del cielo e incontables como la arena de las playas. Con fe murieron todos estos, sin haber recibido las promesas; las vieron y las saludaron de lejos, confesando que eran extraños y peregrinos en la terra. Los que así hablan, dan a entender que buscan una patria; pues si hubieran pensado en la que habían abandonado, tenían ocasión de volver. Pero ellos ansiaban una patria mejor, la celestial. Por eso Dios no se avergenza de llamarse su Dios, pues les tenía preparada una ciudad. Por la fe, Abrahán, puesto a prueba, ofreció a Isaac; y el que había recibido las promesas, ofrecía a su unigénito, a quien se le había dicho: «La descendencia que lleve tu nombre será la de Isaac». Pero Abrahán pensaba que Dios tiene poder hasta para resucitar de entre los muertos, de donde en cierto sentido lo recobró.` },
                         alleluiaVerse: 'Estad en vela y preparados, porque a la hora que menos penséis viene el Hijo del hombre. (cf. Mt 24, 42a. 44)',
                         gospel: { ref: 'Lucas 12, 32-48', text: `En aquel tiempo, dijo Jesús a sus discípulos: «No temas, pequeño rebaño${ref('poimnion', 4)}, porque vuestro Padre ha tenido a bien daros el reino. Vended vuestros bienes y dad limosna. Haceos bolsas que no se estropeen, un tesoro inagotable en el cielo, adonde no se acercan los ladrones ni roe la polilla. Porque donde está vuestro tesoro, allí estará también vuestro corazón${ref('kardia', 5)}. Tened ceñida la cintura y encendidas las lámparas. Vosotros estad como los hombres que aguardan a que su señor vuelva de la boda, para abrirle apenas venga y llame. Bienaventurados aquellos criados a quienes el señor, al llegar, los encuentre en vela${ref('gregoreō', 6)}; en verdad os digo que se ceñirá, los hará sentar a la mesa y, acercándose, les irá sirviendo. Y, si llega a la segunda vigilia o a la tercera y los encuentra así, ¡bienaventurados ellos! Comprended que si supiera el dueño de casa a qué hora viene el ladrón, no le dejaría abrir un boquete en su casa. Lo mismo vosotros, estad preparados, porque a la hora que menos penséis viene el Hijo del hombre». Pedro le dijo: «Señor, ¿dices esta parábola por nosotros o por todos?». Y el Señor dijo: «¿Quién es el administrador fiel y prudente a quien el señor pondrá al frente de su servidumbre para que reparta la ración de alimento a sus horas? Bienaventurado aquel siervo${ref('doulos', 7)} a quien su señor, al llegar, lo encuentre portándose así. En verdad os digo que lo pondrá al frente de todos sus bienes. Pero si aquel siervo dijere para sus adentros: “Mi señor tarda en llegar”, y empieza a pegarles a los criados y a las criadas, a comer y beber y emborracharse, vendrá el señor de ese siervo el día que menos lo espera y a la hora que no sabe y lo castigará con rigor, y le asignará la suerte de los infieles. El siervo que, conociendo la voluntad de su señor, no se prepara ni obra de acuerdo con su voluntad, recibirá muchos azotes; pero el que, sin conocerla, ha hecho algo digno de azotes, recibirá menos. A quien mucho se le dio, mucho se le reclamará; a quien mucho se le confió, más aún se le pedirá».` }
                     };
@@ -564,10 +665,21 @@
             const uploadLogoBtn = document.getElementById('btn-upload-logo');
             const logoUploader = document.getElementById('logo-uploader');
             const logoImage = document.getElementById('logo-image');
+            
             const theologyPopup = document.getElementById('theology-popup');
             const theologyPopupOverlay = document.getElementById('theology-popup-overlay');
             const theologyPopupContent = document.getElementById('popup-content-theology');
             const theologyPopupClose = document.getElementById('popup-close');
+            
+            const lectionaryControls = document.getElementById('lectionary-controls');
+            const monthSelector = document.getElementById('month-selector');
+            const currentMonthYear = document.getElementById('current-month-year');
+            const lectionaryDayGridContainer = document.getElementById('lectionary-day-grid-container');
+            const lectionaryPopup = document.getElementById('lectionary-popup');
+            const lectionaryPopupOverlay = document.getElementById('lectionary-popup-overlay');
+            const lectionaryPopupTitle = document.getElementById('lectionary-popup-title');
+            const lectionaryPopupBody = document.getElementById('lectionary-popup-body');
+            const lectionaryPopupClose = document.getElementById('lectionary-popup-close');
             const cardsContainer = document.getElementById('liturgical-cards-container');
 
             // --- FUNCTIONS ---
@@ -714,6 +826,177 @@
                 document.body.style.overflow = ''; 
             }
 
+            // --- LECTIONARY LOGIC ---
+            const lectionaryData = {
+                // Data for August 2025 (Year 1)
+                "2025-08-01": { 
+                    collect: "Oh Señor, te rogamos que nos concedas un aumento de fe, esperanza y caridad; y, para que obtengamos lo que prometes, haznos amar lo que mandas; por Jesucristo nuestro Señor, que vive y reina contigo y el Espíritu Santo, un solo Dios, por los siglos de los siglos. Amén.",
+                    morning: { psalms: {ref: "Salmo 31", text: "En ti, Señor, busco refugio; jamás permitas que me avergüencen; en tu justicia, líbrame. Inclina a mí tu oído, y ven pronto a socorrerme. Sé tú mi roca de refugio, la fortaleza de mi salvación. Guíame, pues eres mi roca y mi fortaleza, dirígeme por amor a tu nombre. Líbrame de la trampa que me han tendido, porque tú eres mi refugio. En tus manos encomiendo mi espíritu; líbrame, Señor, Dios de la verdad. Odio a los que veneran ídolos vanos, pero yo en el Señor confío. Me alegro y me regocijo en tu amor, porque has visto mi aflicción y conoces las angustias de mi alma. No me entregaste en manos del enemigo, sino que me pusiste en un lugar espacioso. Ten compasión de mí, Señor, que estoy angustiado; el dolor está acabando con mis ojos, con mi alma, ¡con mi cuerpo! La vida se me va en angustias, y los años en lamentos; la tristeza debilita mis fuerzas, y mis huesos se van consumiendo. Soy el hazmerreír de todos mis enemigos, de mis vecinos y de mis parientes; de mí huyen los que me conocen, los que me ven en la calle. Me han olvidado, como si hubiera muerto; soy como una vasija hecha pedazos. Oigo los cuchicheos de la multitud; el terror me asalta por doquier, pues conspiran contra mí y traman quitarme la vida. Pero yo, Señor, en ti confío, y digo: «Tú eres mi Dios». Mi vida entera está en tus manos; líbrame de mis enemigos y perseguidores. Que tu rostro resplandezca sobre tu siervo; por tu gran amor, sálvame. Señor, no permitas que me avergüencen, porque a ti he clamado. Que sean avergonzados los malvados, y acallados en el sepulcro. Que sean silenciados sus labios mentirosos, porque hablan contra los justos con orgullo, desdén e insolencia. ¡Cuán grande es tu bondad, que atesoras para los que te temen, y que a la vista de la gente derramas sobre los que en ti se refugian! Al amparo de tu presencia los proteges de las intrigas humanas; en tu morada los resguardas de las lenguas contenciosas. ¡Bendito sea el Señor, pues me ha mostrado las maravillas de su amor cuando me hallaba en una ciudad sitiada! En mi angustia llegué a decir: «¡He sido arrojado de tu presencia!» Pero tú oíste mi voz suplicante cuando a ti clamé pidiendo ayuda. Amen al Señor, todos sus fieles; el Señor protege a los que le son leales, pero a los soberbios les da su merecido. ¡Cobren ánimo y ármense de valor, todos los que en el Señor esperan!"}, ot: {ref: "1 Samuel 2:11-26", text: "Luego Elcaná se fue a su casa en Ramá, pero el niño se quedó para servir al Señor bajo el cuidado del sacerdote Elí. Los hijos de Elí eran unos malvados, y no les importaba el Señor ni los deberes de los sacerdotes para con el pueblo. Cuando alguien ofrecía un sacrificio, el criado del sacerdote iba con un tenedor de tres dientes y, mientras se cocía la carne, lo metía en el perol, en la olla, en la caldera o en el caldero; y todo lo que sacaba el tenedor era para el sacerdote. Así trataban a todo israelita que iba a Siló. Es más, aun antes de que se quemara la grasa, el criado del sacerdote iba y le decía al que sacrificaba: «Dame carne para asársela al sacerdote, porque no te va a aceptar la carne cocida, sino cruda». Si el hombre le respondía: «Deja que primero se queme la grasa, y luego toma lo que quieras», el criado le contestaba: «No, dámela ahora mismo; de lo contrario, te la quitaré por la fuerza». El pecado de estos jóvenes era muy grave a los ojos del Señor, pues trataban con desprecio las ofrendas que pertenecían al Señor. El joven Samuel, por su parte, ministraba delante del Señor, vestido con un efod de lino. Cada año su madre le hacía una pequeña túnica y se la llevaba cuando iba con su esposo para ofrecer el sacrificio anual. Y Elí bendecía a Elcaná y a su esposa con estas palabras: «Que el Señor te dé hijos de esta mujer, para que tomen el lugar del que ella pidió y dedicó al Señor». Después de eso, regresaban a su casa. Y el Señor bendijo a Ana, y ella tuvo tres hijos y dos hijas. Mientras tanto, el joven Samuel crecía en la presencia del Señor. Elí, que ya era muy anciano, se enteró de todo lo que sus hijos le hacían a Israel y de que se acostaban con las mujeres que servían a la entrada del Tabernáculo de reunión. Así que les dijo: «¿Por qué hacen estas cosas? Todo el pueblo me habla de su mala conducta. ¡No, hijos míos! No es bueno el rumor que se oye entre el pueblo del Señor. Si alguien peca contra otra persona, Dios puede intervenir; pero si peca contra el Señor, ¿quién podrá interceder por él?» Sin embargo, ellos no le hicieron caso a la advertencia de su padre, pues el Señor había resuelto quitarles la vida. En cambio, el joven Samuel seguía creciendo y ganándose el aprecio del Señor y de la gente."}, nt: {ref: "Hechos 2:14-36", text: "Entonces Pedro, con los once, se puso de pie y dijo a voz en cuello: «Compatriotas judíos y todos ustedes que están en Jerusalén, déjenme explicarles lo que sucede; presten atención a mis palabras. Estos no están borrachos, como suponen ustedes. ¡Apenas son las nueve de la mañana! En realidad lo que pasa es lo que anunció el profeta Joel: “Sucederá que en los últimos días —dice Dios—, derramaré mi Espíritu sobre todo el género humano. Los hijos y las hijas de ustedes profetizarán, tendrán visiones los jóvenes y sueños los ancianos. En esos días derramaré mi Espíritu aun sobre mis siervos y mis siervas, y profetizarán. Arriba en el cielo y abajo en la tierra mostraré prodigios: sangre, fuego y nubes de humo. El sol se convertirá en tinieblas y la luna en sangre antes que llegue el día del Señor, día grande y glorioso. Y todo el que invoque el nombre del Señor será salvo”. »Pueblo de Israel, escuchen estas palabras: Jesús de Nazaret fue un hombre acreditado por Dios ante ustedes con milagros, señales y prodigios, los cuales Dios mismo realizó entre ustedes por medio de él, como bien lo saben. Este, que fue entregado por el determinado propósito y el previo conocimiento de Dios, ustedes lo mataron, clavándolo en la cruz por manos de impíos. Sin embargo, Dios lo resucitó, librándolo de las angustias de la muerte, porque era imposible que la muerte lo mantuviera bajo su dominio. En efecto, David dijo de él: “Veía yo al Señor siempre delante de mí; con él a mi derecha, nada me hará caer. Por eso mi corazón se alegra y canta con gozo mi lengua; mi cuerpo también vivirá en esperanza. No dejarás que mi vida termine en el sepulcro; no permitirás que tu Santo sufra corrupción. Me has dado a conocer los caminos de la vida; me llenarás de alegría en tu presencia”. »Hermanos, permítanme hablarles con franqueza sobre el patriarca David, que murió y fue sepultado, y cuyo sepulcro está entre nosotros hasta el día de hoy. Pero como era profeta y sabía que Dios le había jurado que uno de sus descendientes se sentaría en su trono, previendo esto, habló de la resurrección del Cristo, que no fue abandonado en el sepulcro ni su cuerpo sufrió corrupción. A este Jesús, Dios lo resucitó, y de ello todos nosotros somos testigos. Exaltado por el poder de Dios, y habiendo recibido del Padre el Espíritu Santo prometido, ha derramado esto que ustedes ahora ven y oyen. Porque David no subió al cielo, y sin embargo declaró: “Dijo el Señor a mi Señor: Siéntate a mi derecha, hasta que ponga a tus enemigos por estrado de tus pies”. »Por tanto, sépalo bien todo el pueblo de Israel que a este Jesús, a quien ustedes crucificaron, Dios lo ha hecho Señor y Cristo»."} }, 
+                    evening: { psalms: {ref: "Salmo 35", text: "Disputa, Señor, con los que contra mí contienden; combate a los que me combaten. Echa mano del escudo y del broquel, y levántate en mi ayuda. Empuña la lanza y el hacha, y haz frente a mis perseguidores. Quiero oírte decir: «Yo soy tu salvación». Queden confundidos y avergonzados los que procuran mi muerte; retrocedan y queden humillados los que traman mi mal. Que sean como la paja que se lleva el viento, acosados por el ángel del Señor. Que su senda se vuelva oscura y resbaladiza, perseguidos por el ángel del Señor. Sin motivo me tendieron una trampa; sin motivo cavaron una fosa para mí. Que la ruina los tome por sorpresa; que caigan en la trampa que me tendieron, que en su propia trampa se destruyan. Así mi alma se alegrará en el Señor y se deleitará en su salvación. Todo mi ser exclamará: «¿Quién como tú, Señor? Libras al pobre del que es más fuerte; al pobre y al necesitado, de quienes los explotan». Se presentan testigos despiadados y me interrogan por cosas que yo ignoro. Me pagan mal por bien, y mi alma se aflige. Cuando ellos se enfermaban, yo me vestía de luto; me afligía con ayunos, y oraba con la cabeza sobre el pecho. Como por un amigo o un hermano, andaba yo de luto; como quien llora por su madre, me humillaba con tristeza. Pero, cuando yo tropecé, se alegraron y se juntaron; se juntaron contra mí los que no conocía; me calumniaban sin cesar. Como impíos en un banquete, se burlaban de mí y rechinaban los dientes. ¿Hasta cuándo, Señor, vas a tolerarlo? Libra mi vida de sus ataques; ¡libra mi única vida de estos leones! Te daré gracias en la gran asamblea; ante una multitud te alabaré. No dejes que de mí se burlen mis enemigos traicioneros; no permitas que se guiñen el ojo los que me odian sin motivo. Porque no hablan de paz, sino que urden calumnias contra la gente pacífica de la tierra. De par en par abren la boca y gritan: «¡Ja, ja! ¡Con nuestros ojos lo hemos visto!» Tú lo has visto, Señor; no te quedes callado. ¡Señor, no te alejes de mí! ¡Despierta, Dios mío, y levántate! ¡Defiéndeme, Señor, y hazme justicia! Júzgame, Señor mi Dios, conforme a tu justicia; no dejes que de mí se burlen. No permitas que piensen: «¡Así queríamos!»; ni que digan: «¡Nos lo hemos tragado vivo!» Queden avergonzados y confundidos todos los que se alegran de mi desgracia; que la vergüenza y el deshonor cubran a todos los que se creen más que yo. Pero griten de alegría y regocijo los que se deleitan en mi vindicación, y digan siempre: «¡Exaltado sea el Señor, que se deleita en el bienestar de su siervo!» Con mi lengua proclamaré tu justicia, y todo el día te alabaré."}, ot: {ref: "1 Samuel 2:27-36", text: "Y vino un varón de Dios a Elí..."}, nt: {ref: "Marcos 1:1-13", text: "Principio del evangelio de Jesucristo, Hijo de Dios..."} }
+                },
+                "2025-08-02": { 
+                    collect: "Oh Dios, que declaras tu poder todopoderoso principalmente en mostrar misericordia y piedad: Concédenos tal medida de tu gracia, que, corriendo por el camino de tus mandamientos, obtengamos tus promesas de gracia y seamos hechos partícipes de tu tesoro celestial; por Jesucristo nuestro Señor. Amén.",
+                    morning: { psalms: {ref: "Salmo 30, 32", text: "Te exaltaré, Señor, porque me levantaste... Bienaventurado aquel cuya transgresión ha sido perdonada..."}, ot: {ref: "1 Samuel 3:1-21", text: "El joven Samuel ministraba al Señor en presencia de Elí..."}, nt: {ref: "Hechos 2:37-47", text: "Al oír esto, se compungieron de corazón..."} }, 
+                    evening: { psalms: {ref: "Salmo 36, 39", text: "La maldad del impío me dice al corazón... Yo dije: Atenderé a mis caminos, para no pecar con mi lengua..."}, ot: {ref: "1 Samuel 4:1-11", text: "Y salió Israel a la batalla contra los filisteos..."}, nt: {ref: "Marcos 1:14-28", text: "Después que Juan fue encarcelado, Jesús vino a Galilea..."} }
+                },
+                // ... (Continue for all days in August)
+                "2025-08-31": { 
+                    collect: "Señor de todo poder y majestad, cuyo amor eterno nos ha traído a la vida y nos sostiene en cada momento: Danos tal gratitud por tu bondad que te alabemos no solo con nuestros labios, sino en nuestras vidas, por Jesucristo nuestro Señor. Amén.",
+                    morning: { psalms: {ref: "Salmo 120, 121, 122", text: "A ti levanto mis ojos, a ti que habitas en los cielos..."}, ot: {ref: "2 Samuel 7:1-17", text: "Aconteció que cuando ya el rey habitaba en su casa..."}, nt: {ref: "Hechos 13:13-25", text: "Habiendo zarpado de Pafos, Pablo y sus compañeros..."} }, 
+                    evening: { psalms: {ref: "Salmo 123, 124, 125", text: "Si no hubiera sido por el Señor, que estuvo por nosotros..."}, ot: {ref: "Isaías 57:14-21", text: "Y se dirá: Allanad, allanad; barred el camino..."}, nt: {ref: "Apocalipsis 3:14-22", text: "Y escribe al ángel de la iglesia en Laodicea..."} }
+                }
+            };
+            const placeholderData = {
+                collect: "La colecta para este día aún no está disponible.",
+                morning: { psalms: {ref: "Salmos", text: "Aún no disponible"}, ot: {ref: "Antiguo Testamento", text: "Aún no disponible"}, nt: {ref: "Nuevo Testamento", text: "Aún no disponible"} },
+                evening: { psalms: {ref: "Salmos", text: "Aún no disponible"}, ot: {ref: "Antiguo Testamento", text: "Aún no disponible"}, nt: {ref: "Nuevo Testamento", text: "Aún no disponible"} }
+            };
+
+            function renderLectionaryInterface() {
+                const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                monthSelector.innerHTML = '';
+                monthNames.forEach((name, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = name;
+                    monthSelector.appendChild(option);
+                });
+
+                monthSelector.addEventListener('change', (e) => {
+                    const monthIndex = parseInt(e.target.value);
+                    renderCalendarForMonth(monthIndex);
+                });
+
+                const currentMonth = new Date().getMonth();
+                monthSelector.value = currentMonth;
+                renderCalendarForMonth(currentMonth);
+            }
+
+            function renderCalendarForMonth(monthIndex) {
+                const year = 2025;
+                const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                currentMonthYear.textContent = `${monthNames[monthIndex]} ${year}`;
+                
+                lectionaryDayGridContainer.innerHTML = '';
+                const grid = document.createElement('div');
+                grid.className = "lectionary-calendar-grid";
+
+                const dayHeaders = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+                dayHeaders.forEach(day => {
+                    const headerCell = document.createElement('div');
+                    headerCell.className = 'calendar-header';
+                    headerCell.textContent = day;
+                    grid.appendChild(headerCell);
+                });
+
+                const firstDayOfMonth = new Date(year, monthIndex, 1).getDay();
+                const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+                for (let i = 0; i < firstDayOfMonth; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = "calendar-day empty";
+                    grid.appendChild(emptyCell);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, monthIndex, day);
+                    const dateString = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    
+                    const cell = document.createElement('button');
+                    cell.className = "calendar-day";
+                    if (lectionaryData[dateString]) {
+                        cell.classList.add("has-data");
+                    }
+                    if (date.getDay() === 0) {
+                        cell.classList.add("is-sunday");
+                    }
+                    cell.dataset.date = dateString;
+                    cell.innerHTML = `<span class="day-number">${day}</span>`;
+                    grid.appendChild(cell);
+                }
+                lectionaryDayGridContainer.appendChild(grid);
+            }
+
+            function showLectionaryPopup(dateString) {
+                const data = lectionaryData[dateString] || placeholderData;
+                displayPopupContent(dateString, data);
+            }
+            
+            function displayPopupContent(dateString, data) {
+                const [year, month, day] = dateString.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                lectionaryPopupTitle.textContent = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                const buildOfficeHtml = (title, readings, collect) => {
+                    return `
+                        <div class="office-section mb-8">
+                            <h4 class="text-xl font-bold text-teal-700 border-b pb-2 mb-3">${title}</h4>
+                            
+                            <h5 class="font-bold">Apertura</h5>
+                            <p class="liturgy-text"><em>Una de las siguientes Sentencias de la Escritura es leída.</em></p>
+                            <p class="liturgy-text">“Así que humíllense bajo la poderosa mano de Dios, para que él los exalte a su debido tiempo. Depositen en él toda ansiedad, porque él cuida de ustedes.” (1 Pedro 5:6-7)</p>
+                            
+                            <h5 class="font-bold">Confesión de Pecado</h5>
+                            <p class="liturgy-text"><strong>Misericordiosísimo Dios, confesamos que hemos pecado contra ti en pensamiento, palabra y obra, por lo que hemos hecho y por lo que hemos dejado de hacer. No te hemos amado con todo nuestro corazón; no hemos amado a nuestro prójimo como a nosotros mismos. Lo sentimos de veras y nos arrepentimos humildemente. Por tu Hijo Jesucristo, ten misericordia de nosotros y perdónanos, para que nos deleitemos en tu voluntad y andemos en tus caminos, para la gloria de tu Nombre. Amén.</strong></p>
+                             <p class="liturgy-text"><em>El Obispo o Sacerdote se pone de pie y dice</em><br>Dios todopoderoso tenga misericordia de ustedes, perdone todos sus pecados por nuestro Señor Jesucristo, los fortalezca en toda bondad, y por el poder del Espíritu Santo los guarde en vida eterna. <strong>Amén.</strong></p>
+                            
+                            <h5 class="font-bold">El Invitatorio</h5>
+                            <p class="liturgy-text">Oficiante: Oh Señor, abre nuestros labios.<br><strong>Pueblo: Y nuestra boca proclamará tu alabanza.</strong></p>
+                            <p class="liturgy-text"><strong>Gloria al Padre, y al Hijo, y al Espíritu Santo; como era en el principio, es ahora y siempre, por los siglos de los siglos. Amén.</strong></p>
+                             <p class="liturgy-text"><em>Se dice o canta el Venite o el Himno Pascual.</em><br><strong>Venid, aclamemos al Señor con alegría; cantemos a la Roca que nos salva...</strong></p>
+
+                            <h5 class="font-bold">Salmos del Día: ${readings.psalms.ref}</h5>
+                            <p class="liturgy-text">${readings.psalms.text}</p>
+                            
+                            <h5 class="font-bold">Las Lecciones</h5>
+                            <p class="liturgy-text"><strong>Antiguo Testamento: ${readings.ot.ref}</strong><br>${readings.ot.text}</p>
+                            <p class="liturgy-text"><em>Aquí el Lector puede decir:</em> La Palabra del Señor. <br><strong>Gracias a Dios.</strong></p>
+                            <p class="liturgy-text"><strong>Nuevo Testamento: ${readings.nt.ref}</strong><br>${readings.nt.text}</p>
+                             <p class="liturgy-text"><em>Aquí el Lector puede decir:</em> La Palabra del Señor. <br><strong>Gracias a Dios.</strong></p>
+                            
+                            <h5 class="font-bold">El Credo de los Apóstoles</h5>
+                            <p class="liturgy-text"><strong>Creo en Dios Padre todopoderoso, creador del cielo y de la tierra. Creo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por el Espíritu Santo, nacido de la virgen María, padeció bajo el poder de Poncio Pilato, fue crucificado, muerto y sepultado. Descendió a los infiernos. Al tercer día resucitó de entre los muertos, subió a los cielos y está sentado a la diestra de Dios Padre todopoderoso. Desde allí vendrá a juzgar a vivos y muertos. Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección del cuerpo y la vida eterna. Amén.</strong></p>
+
+                            <h5 class="font-bold">Las Oraciones</h5>
+                            <p class="liturgy-text">El Señor sea con ustedes.<br><strong>Y con tu espíritu.</strong><br>Oremos.</p>
+                            <p class="liturgy-text"><strong>Padre nuestro que estás en los cielos, santificado sea tu Nombre, venga tu reino, hágase tu voluntad, en la tierra como en el cielo. Danos hoy nuestro pan de cada día. Y perdónanos nuestras deudas, como también nosotros perdonamos a nuestros deudores. Y no nos dejes caer en tentación, mas líbranos del mal. Porque tuyo es el reino, y el poder, y la gloria, por siempre jamás. Amén.</strong></p>
+                            
+                            <h5 class="font-bold">La Colecta del Día</h5>
+                            <p class="liturgy-text">${collect}</p>
+                            
+                            <h5 class="font-bold">Acción de Gracias General</h5>
+                            <p class="liturgy-text"><strong>Dios todopoderoso, Padre de toda misericordia, nosotros, tus indignos siervos, te damos muy humildes y sinceras gracias por toda tu bondad y tu amorosa amabilidad para con nosotros y para con todos los hombres. Te bendecimos por nuestra creación, preservación y todas las bendiciones de esta vida; pero sobre todo por tu inestimable amor en la redención del mundo por nuestro Señor Jesucristo; por los medios de gracia y por la esperanza de la gloria. Y, te suplicamos, que nos des el debido sentido de todas tus misericordias, para que nuestros corazones sean agradecidos, y que mostremos tu alabanza, no solo con nuestros labios, sino en nuestras vidas, entregándonos a tu servicio y caminando ante ti en santidad y justicia todos nuestros días; por Jesucristo nuestro Señor, a quien, contigo y el Espíritu Santo, sea todo honor y gloria, por los siglos de los siglos. Amén.</strong></p>
+
+                            <h5 class="font-bold">La Gracia</h5>
+                            <p class="liturgy-text">La gracia de nuestro Señor Jesucristo, el amor de Dios y la comunión del Espíritu Santo sea con todos nosotros por siempre jamás. <strong>Amén.</strong> (2 Corintios 13:14)</p>
+                        </div>
+                    `;
+                };
+
+                const morningPrayerHtml = buildOfficeHtml("Oración Matutina", data.morning, data.collect);
+                const eveningPrayerHtml = buildOfficeHtml("Oración Vespertina", data.evening, data.collect);
+
+                lectionaryPopupBody.innerHTML = morningPrayerHtml + '<hr class="my-8 border-gray-300">' + eveningPrayerHtml;
+
+                lectionaryPopupOverlay.classList.remove('hidden');
+                lectionaryPopup.classList.remove('hidden');
+                setTimeout(() => {
+                    lectionaryPopupOverlay.classList.add('opacity-100');
+                    lectionaryPopup.classList.add('scale-100');
+                }, 10);
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeLectionaryPopup() {
+                lectionaryPopupOverlay.classList.remove('opacity-100');
+                lectionaryPopup.classList.remove('scale-100');
+                setTimeout(() => {
+                    lectionaryPopupOverlay.classList.add('hidden');
+                    lectionaryPopup.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+
             // --- EVENT LISTENERS ---
             Object.keys(mainNavButtons).forEach(key => {
                 if(mainNavButtons[key]) {
@@ -802,6 +1085,17 @@
             theologyPopupClose.addEventListener('click', closeTheologyPopup);
             theologyPopupOverlay.addEventListener('click', closeTheologyPopup);
 
+            // --- LECTIONARY POPUP LISTENERS ---
+            lectionaryDayGridContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('.calendar-day');
+                if (card && card.dataset.date) {
+                    showLectionaryPopup(card.dataset.date);
+                }
+            });
+            lectionaryPopupClose.addEventListener('click', closeLectionaryPopup);
+            lectionaryPopupOverlay.addEventListener('click', closeLectionaryPopup);
+
+
             // --- LOGO UPLOAD LISTENERS ---
             uploadLogoBtn.addEventListener('click', () => logoUploader.click());
 
@@ -867,6 +1161,7 @@
                 loadLogoFromStorage();
                 switchView('home');
                 renderLiturgicalCards();
+                renderLectionaryInterface();
             }
             initializeApp();
         });
