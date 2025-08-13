@@ -305,7 +305,7 @@
         .print-only-header { display: none; }
         @media print {
             @page {
-                size: letter landscape;
+                size: letter portrait; /* Changed to portrait for better readability */
                 margin: 1cm;
             }
             body, html { background-color: white !important; }
@@ -318,7 +318,7 @@
             .print-title { font-size: 16pt; font-weight: bold; font-family: 'Times New Roman', Times, serif; }
             .print-subtitle { font-size: 12pt; font-style: italic; font-family: 'Times New Roman', Times, serif; }
             #full-liturgy-content { padding: 0; margin: 0; }
-            .print-liturgy-body { column-count: 2; column-gap: 1.5cm; }
+            .print-liturgy-body { column-count: 1; /* Changed to single column */ }
             .liturgy-section { break-inside: avoid; }
             .liturgy-section h2 { font-size: 14pt !important; color: black !important; border-bottom: 2px solid black; break-after: avoid; padding-top: 1em; }
             .liturgy-section:first-of-type h2 { padding-top: 0; }
@@ -469,947 +469,547 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- HELPER FUNCTIONS ---
-            const addDays = (d, days) => { const res = new Date(d); res.setDate(d.getDate() + days); return res; };
-
-            // --- THEOLOGICAL DATA & HELPERS (GLOBAL SCOPE) ---
-            const terms = {
-                // Terms for Liturgy
-                hypostasis: {original: "ὑπόσταις", transliteration: "hypóstasis", meaning: "Sustancia, fundamento, garantía. En este contexto, la fe es la realidad fundamental de lo que se espera."},
-                elenchos: {original: "ἔλεγχos", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
-                epangelia: {original: "ἐπαγγελία", transliteration: "epangelía", meaning: "Promesa. Un compromiso divino que es el objeto de la esperanza y la fe del creyente."},
-                poimnion: {original: "ποίμνιον", transliteration: "poímnion", meaning: "Rebaño pequeño. Término de cariño y ternura que Jesús usa para sus discípulos, destacando su vulnerabilidad y la protección de Dios."},
-                kardia: {original: "καρδία", transliteration: "kardía", meaning: "Corazón. En la Biblia, no es solo el asiento de las emociones, sino el centro del intelecto, la voluntad y toda la persona."},
-                gregoreō: {original: "γρηγορέω", transliteration: "grēgoreō", meaning: "Velar, estar despierto. Una actitud de alerta espiritual y preparación constante para la venida del Señor."},
-                doulos: {original: "δοῦλος", transliteration: "doûlos", meaning: "Siervo, esclavo. Describe la total devoción y obediencia a un amo; en el Nuevo Testamento, se usa para la relación del creyente con Cristo."}
-            };
-            const ref = (key, num) => `<span class="ref-link" data-term='${JSON.stringify(terms[key]).replace(/'/g, "&#39;")}'><sup>${num}</sup></span>`;
-
-            // --- DATA FOR DAILY OFFICE ---
-            const lectionaryData = {
-                '2025-01-01': { m: { p: '1, 148', r1: 'Génesis 1:1-19', r2: 'Mateo 1:1-17' }, e: { p: '2, 149', r1: 'Génesis 1:20-2:3', r2: 'Filipenses 2:1-11' } },
-                '2025-01-02': { m: { p: '3, 4', r1: 'Génesis 2:4-17', r2: 'Mateo 1:18-25' }, e: { p: '5, 6', r1: 'Génesis 2:18-25', r2: 'Filipenses 2:12-18' } },
-                '2025-01-03': { m: { p: '119:1-24', r1: 'Génesis 3:1-24', r2: 'Mateo 2:1-12' }, e: { p: '8, 9', r1: 'Génesis 4:1-16', r2: 'Filipenses 2:19-30' } },
-                '2025-01-04': { m: { p: '10, 11', r1: 'Génesis 4:17-26', r2: 'Mateo 2:13-23' }, e: { p: '12, 13, 14', r1: 'Génesis 6:1-8', r2: 'Filipenses 3:1-11' } },
-                '2025-01-05': { m: { p: '111, 112, 113', r1: 'Isaías 40:1-11', r2: 'Efesios 1:3-14' }, e: { p: '66, 67', r1: 'Isaías 52:7-15', r2: 'Juan 1:1-18' } },
-                '2025-01-06': { m: { p: '46, 47, 48', r1: 'Isaías 49:1-13', r2: 'Lucas 3:15-22' }, e: { p: '96, 97, 98', r1: 'Isaías 60:1-9', r2: 'Juan 2:1-11' } },
-                '2025-01-07': { m: { p: '18:1-20', r1: 'Génesis 6:9-22', r2: 'Mateo 3:1-12' }, e: { p: '18:21-50', r1: 'Génesis 7:1-10', r2: 'Filipenses 4:2-9' } },
-                '2025-01-08': { m: { p: '19, 20, 21', r1: 'Génesis 7:11-24', r2: 'Mateo 3:13-17' }, e: { p: '22', r1: 'Génesis 8:1-14', r2: 'Filipenses 4:10-20' } },
-                '2025-01-09': { m: { p: '23, 24', r1: 'Génesis 8:15-9:7', r2: 'Mateo 4:1-11' }, e: { p: '25, 26', r1: 'Génesis 9:8-19', r2: 'Colosenses 1:1-14' } },
-                '2025-01-10': { m: { p: '27, 28', r1: 'Génesis 9:20-29', r2: 'Mateo 4:12-17' }, e: { p: '29', r1: 'Génesis 11:1-9', r2: 'Colosenses 1:15-23' } },
-                '2025-01-11': { m: { p: '30, 31', r1: 'Génesis 11:27-12:9', r2: 'Mateo 4:18-25' }, e: { p: '32', r1: 'Génesis 12:10-20', r2: 'Colosenses 1:24-2:7' } },
-                '2025-01-12': { m: { p: '2, 110', r1: 'Isaías 42:1-9', r2: 'Hechos 10:34-43' }, e: { p: '29, 81', r1: 'Génesis 1:1-5', r2: 'Mateo 3:13-17' } },
-                '2025-01-13': { m: { p: '33', r1: 'Génesis 13:1-18', r2: 'Mateo 5:1-10' }, e: { p: '34', r1: 'Génesis 14:1-16', r2: 'Colosenses 2:8-23' } },
-                '2025-01-14': { m: { p: '119:25-48', r1: 'Génesis 14:17-24', r2: 'Mateo 5:11-16' }, e: { p: '36', r1: 'Génesis 15:1-11, 17-21', r2: 'Colosenses 3:1-11' } },
-                '2025-01-15': { m: { p: '37:1-18', r1: 'Génesis 16:1-16', r2: 'Mateo 5:17-20' }, e: { p: '37:19-40', r1: 'Génesis 17:1-14', r2: 'Colosenses 3:12-17' } },
-                '2025-01-16': { m: { p: '38', r1: 'Génesis 17:15-27', r2: 'Mateo 5:21-26' }, e: { p: '39, 40', r1: 'Génesis 18:1-15', r2: 'Colosenses 3:18-4:6' } },
-                '2025-01-17': { m: { p: '41, 42', r1: 'Génesis 18:16-33', r2: 'Mateo 5:27-32' }, e: { p: '43', r1: 'Génesis 19:1-17', r2: 'Colosenses 4:7-18' } },
-                '2025-01-18': { m: { p: '44', r1: 'Génesis 19:18-29', r2: 'Mateo 5:33-37' }, e: { p: '45, 46', r1: 'Génesis 20:1-18', r2: '1 Tesalonicenses 1:1-10' } },
-                '2025-01-19': { m: { p: '47, 48', r1: 'Génesis 21:1-21', r2: 'Mateo 5:38-48' }, e: { p: '49', r1: 'Génesis 21:22-34', r2: '1 Tesalonicenses 2:1-12' } },
-                '2025-01-20': { m: { p: '119:49-72', r1: 'Génesis 22:1-19', r2: 'Mateo 6:1-8' }, e: { p: '51, 52', r1: 'Génesis 23:1-20', r2: '1 Tesalonicenses 2:13-20' } },
-                '2025-01-21': { m: { p: '53, 54', r1: 'Génesis 24:1-27', r2: 'Mateo 6:9-15' }, e: { p: '55', r1: 'Génesis 24:28-51', r2: '1 Tesalonicenses 3:1-13' } },
-                '2025-01-22': { m: { p: '56, 57', r1: 'Génesis 24:52-67', r2: 'Mateo 6:16-24' }, e: { p: '58', r1: 'Génesis 25:1-11', r2: '1 Tesalonicenses 4:1-12' } },
-                '2025-01-23': { m: { p: '59, 60', r1: 'Génesis 25:19-34', r2: 'Mateo 6:25-34' }, e: { p: '61, 62', r1: 'Génesis 26:1-11', r2: '1 Tesalonicenses 4:13-18' } },
-                '2025-01-24': { m: { p: '63, 64', r1: 'Génesis 26:12-33', r2: 'Mateo 7:1-12' }, e: { p: '65', r1: 'Génesis 27:1-29', r2: '1 Tesalonicenses 5:1-11' } },
-                '2025-01-25': { m: { p: '33, 113', r1: 'Isaías 49:1-6', r2: 'Hechos 11:1-18' }, e: { p: '118', r1: 'Jeremías 1:4-10', r2: 'Gálatas 1:11-24' } },
-                '2025-01-26': { m: { p: '66, 67', r1: 'Génesis 27:30-45', r2: 'Mateo 7:13-21' }, e: { p: '68', r1: 'Génesis 27:46-28:9', r2: '1 Tesalonicenses 5:12-28' } },
-                '2025-01-27': { m: { p: '119:73-96', r1: 'Génesis 28:10-22', r2: 'Mateo 7:22-29' }, e: { p: '70', r1: 'Génesis 29:1-20', r2: '2 Tesalonicenses 1:1-12' } },
-                '2025-01-28': { m: { p: '71', r1: 'Génesis 29:21-35', r2: 'Mateo 8:1-13' }, e: { p: '72', r1: 'Génesis 30:1-24', r2: '2 Tesalonicenses 2:1-17' } },
-                '2025-01-29': { m: { p: '73', r1: 'Génesis 30:25-43', r2: 'Mateo 8:14-22' }, e: { p: '74', r1: 'Génesis 31:1-21', r2: '2 Tesalonicenses 3:1-18' } },
-                '2025-01-30': { m: { p: '75, 76', r1: 'Génesis 31:22-42', r2: 'Mateo 8:23-34' }, e: { p: '77', r1: 'Génesis 31:43-32:2', r2: 'Hebreos 1:1-14' } },
-                '2025-01-31': { m: { p: '78:1-18', r1: 'Génesis 32:3-21', r2: 'Mateo 9:1-8' }, e: { p: '78:19-37', r1: 'Génesis 32:22-32', r2: 'Hebreos 2:1-10' } },
-                '2025-02-01': { m: { p: '78:38-72', r1: 'Génesis 33:1-17', r2: 'Mateo 9:9-17' }, e: { p: '79', r1: 'Génesis 34:1-17', r2: 'Hebreos 2:11-18' } },
-                '2025-02-02': { m: { p: '84, 113', r1: 'Éxodo 13:1-3, 11-16', r2: 'Hebreos 2:11-18' }, e: { p: '87, 96', r1: 'Hageo 2:1-9', r2: 'Juan 2:13-22' } },
-                '2025-02-03': { m: { p: '80', r1: 'Génesis 34:18-31', r2: 'Mateo 9:18-26' }, e: { p: '81', r1: 'Génesis 35:1-20', r2: 'Hebreos 3:1-11' } },
-                '2025-02-04': { m: { p: '119:97-120', r1: 'Génesis 35:27-36:19', r2: 'Mateo 9:27-34' }, e: { p: '83', r1: 'Génesis 36:20-37:1', r2: 'Hebreos 3:12-19' } },
-                '2025-02-05': { m: { p: '84', r1: 'Génesis 37:2-11', r2: 'Mateo 9:35-10:4' }, e: { p: '85', r1: 'Génesis 37:12-24', r2: 'Hebreos 4:1-10' } },
-                '2025-02-06': { m: { p: '86', r1: 'Génesis 37:25-36', r2: 'Mateo 10:5-15' }, e: { p: '87', r1: 'Génesis 38:1-11', r2: 'Hebreos 4:11-16' } },
-                '2025-02-07': { m: { p: '88', r1: 'Génesis 38:12-26', r2: 'Mateo 10:16-23' }, e: { p: '89:1-18', r1: 'Génesis 39:1-23', r2: 'Hebreos 5:1-6' } },
-                '2025-02-08': { m: { p: '89:19-52', r1: 'Génesis 40:1-23', r2: 'Mateo 10:24-33' }, e: { p: '90', r1: 'Génesis 41:1-13', r2: 'Hebreos 5:7-14' } },
-                '2025-02-09': { m: { p: '91, 92', r1: 'Génesis 41:14-41', r2: 'Mateo 10:34-42' }, e: { p: '93', r1: 'Génesis 41:42-49', r2: 'Hebreos 6:1-12' } },
-                '2025-02-10': { m: { p: '119:121-144', r1: 'Génesis 41:50-57', r2: 'Mateo 11:1-6' }, e: { p: '95', r1: 'Génesis 42:1-17', r2: 'Hebreos 6:13-20' } },
-                '2025-02-11': { m: { p: '96, 97', r1: 'Génesis 42:18-28', r2: 'Mateo 11:7-15' }, e: { p: '98, 99', r1: 'Génesis 42:29-38', r2: 'Hebreos 7:1-10' } },
-                '2025-02-12': { m: { p: '100, 101', r1: 'Génesis 43:1-15', r2: 'Mateo 11:16-24' }, e: { p: '102', r1: 'Génesis 43:16-34', r2: 'Hebreos 7:11-28' } },
-                '2025-02-13': { m: { p: '103', r1: 'Génesis 44:1-17', r2: 'Mateo 11:25-30' }, e: { p: '104', r1: 'Génesis 44:18-34', r2: 'Hebreos 8:1-13' } },
-                '2025-02-14': { m: { p: '105:1-22', r1: 'Génesis 45:1-15', r2: 'Mateo 12:1-14' }, e: { p: '105:23-45', r1: 'Génesis 45:16-28', r2: 'Hebreos 9:1-10' } },
-                '2025-02-15': { m: { p: '106:1-18', r1: 'Génesis 46:1-7, 28-34', r2: 'Mateo 12:15-21' }, e: { p: '106:19-48', r1: 'Génesis 47:1-12', r2: 'Hebreos 9:11-22' } },
-                '2025-02-16': { m: { p: '107:1-32', r1: 'Génesis 47:13-26', r2: 'Mateo 12:22-32' }, e: { p: '107:33-43', r1: 'Génesis 47:27-48:7', r2: 'Hebreos 9:23-28' } },
-                '2025-02-17': { m: { p: '108, 109', r1: 'Génesis 48:8-22', r2: 'Mateo 12:33-42' }, e: { p: '110, 111', r1: 'Génesis 49:1-28', r2: 'Hebreos 10:1-10' } },
-                '2025-02-18': { m: { p: '119:145-176', r1: 'Génesis 49:29-50:14', r2: 'Mateo 12:43-50' }, e: { p: '113, 114', r1: 'Génesis 50:15-26', r2: 'Hebreos 10:11-18' } },
-                '2025-02-19': { m: { p: '115', r1: 'Éxodo 1:1-14', r2: 'Mateo 13:1-9' }, e: { p: '116, 117', r1: 'Éxodo 1:15-2:10', r2: 'Hebreos 10:19-31' } },
-                '2025-02-20': { m: { p: '118', r1: 'Éxodo 2:11-25', r2: 'Mateo 13:10-17' }, e: { p: '120, 121', r1: 'Éxodo 3:1-12', r2: 'Hebreos 10:32-39' } },
-                '2025-02-21': { m: { p: '122, 123', r1: 'Éxodo 3:13-22', r2: 'Mateo 13:18-23' }, e: { p: '124, 125', r1: 'Éxodo 4:1-17', r2: 'Hebreos 11:1-12' } },
-                '2025-02-22': { m: { p: '126, 127', r1: 'Éxodo 4:18-31', r2: 'Mateo 13:24-30' }, e: { p: '128, 129', r1: 'Éxodo 5:1-21', r2: 'Hebreos 11:13-22' } },
-                '2025-02-23': { m: { p: '130, 131', r1: 'Éxodo 5:22-6:13', r2: 'Mateo 13:31-35' }, e: { p: '132, 133', r1: 'Éxodo 6:28-7:13', r2: 'Hebreos 11:23-31' } },
-                '2025-02-24': { m: { p: '119:1-24', r1: 'Éxodo 7:14-25', r2: 'Mateo 13:36-43' }, e: { p: '135', r1: 'Éxodo 8:1-19', r2: 'Hebreos 11:32-12:2' } },
-                '2025-02-25': { m: { p: '136', r1: 'Éxodo 8:20-32', r2: 'Mateo 13:44-52' }, e: { p: '137', r1: 'Éxodo 9:1-12', r2: 'Hebreos 12:3-11' } },
-                '2025-02-26': { m: { p: '138', r1: 'Éxodo 9:13-35', r2: 'Mateo 13:53-58' }, e: { p: '139', r1: 'Éxodo 10:1-20', r2: 'Hebreos 12:12-29' } },
-                '2025-02-27': { m: { p: '140, 141', r1: 'Éxodo 10:21-11:8', r2: 'Mateo 14:1-12' }, e: { p: '142, 143', r1: 'Éxodo 12:1-14', r2: 'Hebreos 13:1-16' } },
-                '2025-02-28': { m: { p: '144', r1: 'Éxodo 12:15-28', r2: 'Mateo 14:13-21' }, e: { p: '145', r1: 'Éxodo 12:29-42', r2: 'Hebreos 13:17-25' } },
-                '2025-03-01': { m: { p: '146, 147', r1: 'Éxodo 13:1-16', r2: 'Mateo 14:22-36' }, e: { p: '148, 149', r1: 'Éxodo 13:17-14:4', r2: 'Romanos 1:1-15' } },
-                '2025-03-02': { m: { p: '99, 110', r1: 'Éxodo 24:12-18', r2: '2 Pedro 1:16-21' }, e: { p: '2, 67', r1: '1 Reyes 19:1-12', r2: 'Lucas 9:28-36' } },
-                '2025-03-03': { m: { p: '1, 2', r1: 'Éxodo 14:5-22', r2: 'Mateo 15:1-11' }, e: { p: '3, 4', r1: 'Éxodo 14:23-31', r2: 'Romanos 1:16-25' } },
-                '2025-03-04': { m: { p: '5, 6', r1: 'Éxodo 15:1-21', r2: 'Mateo 15:12-20' }, e: { p: '7, 8', r1: 'Éxodo 15:22-16:1', r2: 'Romanos 1:28-2:11' } },
-                '2025-03-05': { m: { p: '32, 38', r1: 'Jonás 3:1-10', r2: 'Hebreos 12:1-14' }, e: { p: '102, 130', r1: 'Isaías 58:1-12', r2: 'Mateo 6:1-6, 16-21' } },
-                '2025-03-06': { m: { p: '9, 10', r1: 'Éxodo 16:2-15', r2: 'Mateo 15:21-28' }, e: { p: '11', r1: 'Éxodo 16:16-36', r2: 'Romanos 2:12-24' } },
-                '2025-03-07': { m: { p: '12, 13', r1: 'Éxodo 17:1-16', r2: 'Mateo 15:29-39' }, e: { p: '14', r1: 'Éxodo 18:1-12', r2: 'Romanos 2:25-3:8' } },
-                '2025-03-08': { m: { p: '15, 16', r1: 'Éxodo 18:13-27', r2: 'Mateo 16:1-12' }, e: { p: '17', r1: 'Éxodo 19:1-16', r2: 'Romanos 3:9-20' } },
-                '2025-03-09': { m: { p: '18:1-20', r1: 'Éxodo 19:16-25', r2: 'Mateo 16:13-20' }, e: { p: '18:21-50', r1: 'Éxodo 20:1-21', r2: 'Romanos 3:21-31' } },
-                '2025-03-10': { m: { p: '19, 20', r1: 'Éxodo 20:22-21:11', r2: 'Mateo 16:21-28' }, e: { p: '21', r1: 'Éxodo 21:12-27', r2: 'Romanos 4:1-12' } },
-                '2025-03-11': { m: { p: '119:1-24', r1: 'Éxodo 21:28-22:4', r2: 'Mateo 17:1-13' }, e: { p: '23', r1: 'Éxodo 22:5-15', r2: 'Romanos 4:13-25' } },
-                '2025-03-12': { m: { p: '24, 25', r1: 'Éxodo 22:16-31', r2: 'Mateo 17:14-21' }, e: { p: '26', r1: 'Éxodo 23:1-13', r2: 'Romanos 5:1-11' } },
-                '2025-03-13': { m: { p: '27, 28', r1: 'Éxodo 23:14-23', r2: 'Mateo 17:22-27' }, e: { p: '29', r1: 'Éxodo 23:24-33', r2: 'Romanos 5:12-21' } },
-                '2025-03-14': { m: { p: '30', r1: 'Éxodo 24:1-18', r2: 'Mateo 18:1-14' }, e: { p: '31', r1: 'Éxodo 25:1-22', r2: 'Romanos 6:1-11' } },
-                '2025-03-15': { m: { p: '32', r1: 'Éxodo 25:23-40', r2: 'Mateo 18:15-20' }, e: { p: '33', r1: 'Éxodo 26:1-14', r2: 'Romanos 6:12-23' } },
-                '2025-03-16': { m: { p: '34', r1: 'Éxodo 26:15-37', r2: 'Mateo 18:21-35' }, e: { p: '119:25-48', r1: 'Éxodo 27:1-21', r2: 'Romanos 7:1-12' } },
-                '2025-03-17': { m: { p: '35', r1: 'Éxodo 28:1-14', r2: 'Mateo 19:1-12' }, e: { p: '36', r1: 'Éxodo 28:15-30', r2: 'Romanos 7:13-25' } },
-                '2025-03-18': { m: { p: '37:1-18', r1: 'Éxodo 28:31-43', r2: 'Mateo 19:13-22' }, e: { p: '37:19-40', r1: 'Éxodo 29:1-18', r2: 'Romanos 8:1-11' } },
-                '2025-03-19': { m: { p: '38', r1: 'Éxodo 29:19-30', r2: 'Mateo 19:23-30' }, e: { p: '39', r1: 'Éxodo 29:31-46', r2: 'Romanos 8:12-17' } },
-                '2025-03-20': { m: { p: '40', r1: 'Éxodo 30:1-10', r2: 'Mateo 20:1-16' }, e: { p: '41', r1: 'Éxodo 30:11-21', r2: 'Romanos 8:18-25' } },
-                '2025-03-21': { m: { p: '42, 43', r1: 'Éxodo 30:22-38', r2: 'Mateo 20:17-28' }, e: { p: '44', r1: 'Éxodo 31:1-18', r2: 'Romanos 8:26-30' } },
-                '2025-03-22': { m: { p: '45', r1: 'Éxodo 32:1-14', r2: 'Mateo 20:29-34' }, e: { p: '46', r1: 'Éxodo 32:15-35', r2: 'Romanos 8:31-39' } },
-                '2025-03-23': { m: { p: '47, 48', r1: 'Éxodo 33:1-11', r2: 'Mateo 21:1-11' }, e: { p: '49', r1: 'Éxodo 33:12-23', r2: 'Romanos 9:1-18' } },
-                '2025-03-24': { m: { p: '119:49-72', r1: 'Éxodo 34:1-10', r2: 'Mateo 21:12-22' }, e: { p: '51', r1: 'Éxodo 34:11-28', r2: 'Romanos 9:19-33' } },
-                '2025-03-25': { m: { p: '8, 85', r1: 'Isaías 7:10-14', r2: 'Lucas 1:26-38' }, e: { p: '87, 132', r1: 'Isaías 52:7-12', r2: 'Hebreos 2:5-10' } },
-                '2025-03-26': { m: { p: '52', r1: 'Éxodo 34:29-35', r2: 'Mateo 21:23-32' }, e: { p: '53', r1: 'Éxodo 35:1-29', r2: 'Romanos 10:1-13' } },
-                '2025-03-27': { m: { p: '54', r1: 'Éxodo 35:30-36:7', r2: 'Mateo 21:33-46' }, e: { p: '55', r1: 'Éxodo 36:8-19', r2: 'Romanos 10:14-21' } },
-                '2025-03-28': { m: { p: '56, 57', r1: 'Éxodo 36:20-38', r2: 'Mateo 22:1-14' }, e: { p: '58', r1: 'Éxodo 37:1-16', r2: 'Romanos 11:1-12' } },
-                '2025-03-29': { m: { p: '59, 60', r1: 'Éxodo 37:17-29', r2: 'Mateo 22:15-22' }, e: { p: '61, 62', r1: 'Éxodo 38:1-20', r2: 'Romanos 11:13-24' } },
-                '2025-03-30': { m: { p: '63, 64', r1: 'Éxodo 38:21-31', r2: 'Mateo 22:23-33' }, e: { p: '65', r1: 'Éxodo 39:1-19', r2: 'Romanos 11:25-36' } },
-                '2025-03-31': { m: { p: '66, 67', r1: 'Éxodo 39:22-43', r2: 'Mateo 22:34-46' }, e: { p: '68', r1: 'Éxodo 40:1-16', r2: 'Romanos 12:1-8' } },
-                '2025-04-01': { m: { p: '69', r1: 'Éxodo 40:17-38', r2: 'Mateo 23:1-12' }, e: { p: '70', r1: 'Levítico 1:1-17', r2: 'Romanos 12:9-21' } },
-                '2025-04-02': { m: { p: '71', r1: 'Levítico 2:1-16', r2: 'Mateo 23:13-22' }, e: { p: '72', r1: 'Levítico 3:1-17', r2: 'Romanos 13:1-7' } },
-                '2025-04-03': { m: { p: '73', r1: 'Levítico 4:1-12', r2: 'Mateo 23:23-28' }, e: { p: '74', r1: 'Levítico 4:13-26', r2: 'Romanos 13:8-14' } },
-                '2025-04-04': { m: { p: '75, 76', r1: 'Levítico 4:27-35', r2: 'Mateo 23:29-39' }, e: { p: '77', r1: 'Levítico 5:1-13', r2: 'Romanos 14:1-12' } },
-                '2025-04-05': { m: { p: '78:1-18', r1: 'Levítico 5:14-6:7', r2: 'Mateo 24:1-14' }, e: { p: '78:19-37', r1: 'Levítico 6:8-18', r2: 'Romanos 14:13-23' } },
-                '2025-04-06': { m: { p: '78:38-72', r1: 'Levítico 6:19-23', r2: 'Mateo 24:15-28' }, e: { p: '79', r1: 'Levítico 7:1-10', r2: 'Romanos 15:1-13' } },
-                '2025-04-07': { m: { p: '80', r1: 'Levítico 7:11-21', r2: 'Mateo 24:29-35' }, e: { p: '81', r1: 'Levítico 7:22-38', r2: 'Romanos 15:14-24' } },
-                '2025-04-08': { m: { p: '119:97-120', r1: 'Levítico 8:1-13', r2: 'Mateo 24:36-44' }, e: { p: '83', r1: 'Levítico 8:14-30', r2: 'Romanos 15:25-33' } },
-                '2025-04-09': { m: { p: '84', r1: 'Levítico 8:31-9:7', r2: 'Mateo 24:45-51' }, e: { p: '85', r1: 'Levítico 9:8-24', r2: 'Romanos 16:1-16' } },
-                '2025-04-10': { m: { p: '86', r1: 'Levítico 10:1-11', r2: 'Mateo 25:1-13' }, e: { p: '87', r1: 'Levítico 10:12-20', r2: 'Romanos 16:17-27' } },
-                '2025-04-11': { m: { p: '88', r1: 'Levítico 11:1-20', r2: 'Mateo 25:14-30' }, e: { p: '89:1-18', r1: 'Levítico 11:21-47', r2: '1 Corintios 1:1-17' } },
-                '2025-04-12': { m: { p: '89:19-52', r1: 'Levítico 12:1-8', r2: 'Mateo 25:31-46' }, e: { p: '90', r1: 'Levítico 13:1-17', r2: '1 Corintios 1:18-31' } },
-                '2025-04-13': { m: { p: '31, 34', r1: 'Zacarías 9:9-12', r2: 'Mateo 21:1-11' }, e: { p: '24, 40', r1: 'Isaías 50:4-9', r2: 'Filipenses 2:5-11' } },
-                '2025-04-14': { m: { p: '22', r1: 'Lamentaciones 1:1-12', r2: 'Juan 12:1-11' }, e: { p: '25', r1: 'Lamentaciones 1:13-22', r2: '1 Corintios 1:18-31' } },
-                '2025-04-15': { m: { p: '31', r1: 'Lamentaciones 2:1-12', r2: 'Juan 12:12-19' }, e: { p: '34', r1: 'Lamentaciones 2:13-22', r2: '1 Corintios 2:1-13' } },
-                '2025-04-16': { m: { p: '36', r1: 'Lamentaciones 3:1-18', r2: 'Juan 12:20-36' }, e: { p: '38', r1: 'Lamentaciones 3:19-33', r2: '1 Corintios 2:14-3:15' } },
-                '2025-04-17': { m: { p: '42, 43', r1: 'Lamentaciones 3:34-58', r2: 'Juan 12:37-50' }, e: { p: '102, 111', r1: 'Éxodo 12:1-14', r2: '1 Corintios 10:14-17, 11:27-32' } },
-                '2025-04-18': { m: { p: '22', r1: 'Génesis 22:1-18', r2: '1 Pedro 1:10-20' }, e: { p: '40, 54', r1: 'Isaías 52:13-53:12', r2: 'Hebreos 10:1-25' } },
-                '2025-04-19': { m: { p: '88', r1: 'Job 19:21-27', r2: '1 Pedro 4:1-8' }, e: { p: '27, 114', r1: 'Oseas 6:1-6', r2: 'Romanos 8:1-11' } },
-                '2025-04-20': { m: { p: '114, 118', r1: 'Éxodo 12:1-14', r2: 'Romanos 6:3-11' }, e: { p: '113, 117', r1: 'Éxodo 14:10-31', r2: '1 Corintios 5:6-8' } },
-                '2025-04-21': { m: { p: '93, 98', r1: 'Éxodo 15:1-21', r2: 'Lucas 24:1-12' }, e: { p: '66, 114', r1: 'Jonás 2:1-9', r2: '1 Corintios 15:1-11' } },
-                '2025-04-22': { m: { p: '97, 99', r1: 'Isaías 25:1-9', r2: 'Lucas 24:13-35' }, e: { p: '100, 113', r1: 'Isaías 26:1-9, 19', r2: '1 Corintios 15:12-28' } },
-                '2025-04-23': { m: { p: '103, 111', r1: 'Isaías 30:18-21', r2: 'Lucas 24:36-49' }, e: { p: '118, 149', r1: 'Ezequiel 37:1-14', r2: '1 Corintios 15:29-41' } },
-                '2025-04-24': { m: { p: '146, 147', r1: 'Daniel 12:1-3, 13', r2: 'Juan 21:1-14' }, e: { p: '148, 150', r1: 'Job 19:21-27', r2: '1 Corintios 15:41-50' } },
-                '2025-04-25': { m: { p: '19, 119:25-48', r1: 'Isaías 52:7-10', r2: 'Marcos 1:1-15' }, e: { p: '145', r1: 'Ezequiel 1:4-14', r2: 'Hechos 12:25-13:3' } },
-                '2025-04-26': { m: { p: '1, 2', r1: 'Sabiduría 1:1-15', r2: 'Juan 21:15-25' }, e: { p: '3, 4', r1: 'Sabiduría 3:1-9', r2: '1 Corintios 15:51-58' } },
-                '2025-04-27': { m: { p: '111, 112', r1: 'Sabiduría 5:1-16', r2: 'Juan 20:1-10' }, e: { p: '113, 114', r1: 'Sabiduría 7:1-14', r2: '1 Juan 1:1-10' } },
-                '2025-04-28': { m: { p: '119:1-24', r1: 'Sabiduría 7:15-30', r2: 'Juan 20:11-18' }, e: { p: '8, 9', r1: 'Sabiduría 8:1-18', r2: '1 Juan 2:1-6' } },
-                '2025-04-29': { m: { p: '10, 11', r1: 'Sabiduría 9:1-18', r2: 'Juan 20:19-31' }, e: { p: '12, 13', r1: 'Sabiduría 10:1-21', r2: '1 Juan 2:7-11' } },
-                '2025-04-30': { m: { p: '14', r1: 'Éxodo 12:1-14', r2: 'Juan 1:29-34' }, e: { p: '15, 16', r1: 'Éxodo 16:4-15', r2: '1 Juan 2:12-17' } },
-                '2025-05-01': { m: { p: '119:1-24', r1: 'Job 23:1-12', r2: 'Juan 1:43-51' }, e: { p: '139', r1: 'Zacarías 4:1-14', r2: 'Juan 12:20-26' } },
-                '2025-05-02': { m: { p: '18:1-20', r1: 'Sabiduría 11:21-12:2', r2: 'Juan 2:1-11' }, e: { p: '18:21-50', r1: 'Sabiduría 12:12-22', r2: '1 Juan 2:18-25' } },
-                '2025-05-03': { m: { p: '19, 20', r1: 'Sabiduría 13:1-9', r2: 'Juan 3:1-15' }, e: { p: '21', r1: 'Sabiduría 16:1-14', r2: '1 Juan 2:26-29' } },
-                '2025-05-04': { m: { p: '22', r1: 'Sabiduría 19:1-8, 13-22', r2: 'Juan 3:16-21' }, e: { p: '23', r1: 'Baruc 4:21-29', r2: '1 Juan 3:1-6' } },
-                '2025-05-05': { m: { p: '24, 25', r1: 'Baruc 4:30-5:9', r2: 'Juan 3:22-36' }, e: { p: '26, 27', r1: 'Isaías 12:1-6', r2: '1 Juan 3:7-10' } },
-                '2025-05-06': { m: { p: '119:25-48', r1: 'Isaías 25:1-9', r2: 'Juan 4:1-14' }, e: { p: '29', r1: 'Isaías 26:1-9, 19', r2: '1 Juan 3:11-17' } },
-                '2025-05-07': { m: { p: '30, 31', r1: 'Isaías 30:18-21', r2: 'Juan 4:15-26' }, e: { p: '32', r1: 'Isaías 35:1-10', r2: '1 Juan 3:18-24' } },
-                '2025-05-08': { m: { p: '33', r1: 'Isaías 40:1-11', r2: 'Juan 4:27-42' }, e: { p: '34', r1: 'Isaías 41:17-20', r2: '1 Juan 4:1-6' } },
-                '2025-05-09': { m: { p: '35', r1: 'Isaías 42:1-9', r2: 'Juan 4:43-54' }, e: { p: '36', r1: 'Isaías 43:1-12', r2: '1 Juan 4:7-12' } },
-                '2025-05-10': { m: { p: '37:1-18', r1: 'Isaías 43:14-21', r2: 'Juan 5:1-18' }, e: { p: '37:19-40', r1: 'Isaías 44:1-8', r2: '1 Juan 4:13-21' } },
-                '2025-05-11': { m: { p: '38', r1: 'Isaías 44:21-28', r2: 'Juan 5:19-23' }, e: { p: '39, 40', r1: 'Isaías 45:1-13', r2: '1 Juan 5:1-5' } },
-                '2025-05-12': { m: { p: '41, 42', r1: 'Isaías 45:14-25', r2: 'Juan 5:24-29' }, e: { p: '43', r1: 'Isaías 46:1-13', r2: '1 Juan 5:6-12' } },
-                '2025-05-13': { m: { p: '119:49-72', r1: 'Isaías 48:1-11', r2: 'Juan 5:30-47' }, e: { p: '45', r1: 'Isaías 48:12-22', r2: '1 Juan 5:13-21' } },
-                '2025-05-14': { m: { p: '46', r1: 'Isaías 49:1-13', r2: 'Juan 6:1-15' }, e: { p: '47', r1: 'Isaías 49:14-25', r2: '2 Juan 1-13' } },
-                '2025-05-15': { m: { p: '48', r1: 'Isaías 51:1-8', r2: 'Juan 6:16-27' }, e: { p: '49', r1: 'Isaías 51:9-16', r2: '3 Juan 1-15' } },
-                '2025-05-16': { m: { p: '50', r1: 'Isaías 51:17-23', r2: 'Juan 6:27-40' }, e: { p: '51', r1: 'Isaías 52:1-12', r2: 'Judas 1-16' } },
-                '2025-05-17': { m: { p: '52', r1: 'Isaías 54:1-17', r2: 'Juan 6:41-51' }, e: { p: '53', r1: 'Isaías 55:1-13', r2: 'Judas 17-25' } },
-                '2025-05-18': { m: { p: '54', r1: 'Isaías 60:1-9, 17-22', r2: 'Juan 6:52-59' }, e: { p: '55', r1: 'Isaías 61:1-11', r2: 'Apocalipsis 1:1-8' } },
-                '2025-05-19': { m: { p: '56, 57', r1: 'Isaías 62:1-12', r2: 'Juan 6:60-71' }, e: { p: '58', r1: 'Isaías 63:1-6', r2: 'Apocalipsis 1:9-20' } },
-                '2025-05-20': { m: { p: '119:73-96', r1: 'Isaías 63:7-14', r2: 'Juan 7:1-13' }, e: { p: '60', r1: 'Isaías 65:1-9', r2: 'Apocalipsis 2:1-7' } },
-                '2025-05-21': { m: { p: '61, 62', r1: 'Isaías 65:17-25', r2: 'Juan 7:14-31' }, e: { p: '63', r1: 'Isaías 66:1-9', r2: 'Apocalipsis 2:8-11' } },
-                '2025-05-22': { m: { p: '64', r1: 'Isaías 66:10-24', r2: 'Juan 7:32-39' }, e: { p: '65', r1: 'Jeremías 31:27-34', r2: 'Apocalipsis 2:12-17' } },
-                '2025-05-23': { m: { p: '66', r1: 'Ezequiel 36:22-28', r2: 'Juan 7:40-52' }, e: { p: '67', r1: 'Joel 2:18-29', r2: 'Apocalipsis 2:18-29' } },
-                '2025-05-24': { m: { p: '68', r1: 'Zacarías 8:1-8, 14-17', r2: 'Juan 8:12-20' }, e: { p: '69', r1: 'Malaquías 3:13-4:6', r2: 'Apocalipsis 3:1-6' } },
-                '2025-05-25': { m: { p: '70', r1: '1 Reyes 8:22-30', r2: 'Juan 8:21-32' }, e: { p: '71', r1: '1 Reyes 8:31-40', r2: 'Apocalipsis 3:7-13' } },
-                '2025-05-26': { m: { p: '72', r1: '1 Reyes 8:41-53', r2: 'Juan 8:33-47' }, e: { p: '119:97-120', r1: '1 Reyes 8:54-66', r2: 'Apocalipsis 3:14-22' } },
-                '2025-05-27': { m: { p: '73', r1: '1 Reyes 9:1-9', r2: 'Juan 8:47-59' }, e: { p: '74', r1: '1 Reyes 9:24-10:13', r2: 'Apocalipsis 4:1-11' } },
-                '2025-05-28': { m: { p: '75', r1: '1 Reyes 11:1-13', r2: 'Juan 9:1-17' }, e: { p: '76', r1: '1 Reyes 11:26-43', r2: 'Apocalipsis 5:1-14' } },
-                '2025-05-29': { m: { p: '8, 47', r1: '2 Reyes 2:1-15', r2: 'Lucas 24:44-53' }, e: { p: '24, 93', r1: 'Daniel 7:9-14', r2: 'Efesios 4:1-16' } },
-                '2025-05-30': { m: { p: '77', r1: '1 Reyes 12:1-20', r2: 'Juan 9:18-41' }, e: { p: '78:1-18', r1: '1 Reyes 12:21-33', r2: 'Apocalipsis 6:1-17' } },
-                '2025-05-31': { m: { p: '78:19-37', r1: '1 Reyes 13:1-10', r2: 'Juan 10:1-10' }, e: { p: '78:38-72', r1: '1 Reyes 13:11-25', r2: 'Apocalipsis 7:1-8' } },
-                '2025-06-01': { m: { p: '79, 80', r1: '1 Reyes 13:26-34', r2: 'Juan 10:11-21' }, e: { p: '81', r1: '1 Reyes 16:23-34', r2: 'Apocalipsis 7:9-17' } },
-                '2025-06-02': { m: { p: '82', r1: '1 Reyes 17:1-16', r2: 'Juan 10:22-42' }, e: { p: '119:121-144', r1: '1 Reyes 17:17-24', r2: 'Apocalipsis 8:1-13' } },
-                '2025-06-03': { m: { p: '83', r1: '1 Reyes 18:1-19', r2: 'Juan 11:1-16' }, e: { p: '84', r1: '1 Reyes 18:20-40', r2: 'Apocalipsis 9:1-12' } },
-                '2025-06-04': { m: { p: '85', r1: '1 Reyes 18:41-19:8', r2: 'Juan 11:17-27' }, e: { p: '86', r1: '1 Reyes 19:8-21', r2: 'Apocalipsis 9:13-21' } },
-                '2025-06-05': { m: { p: '87', r1: '1 Reyes 21:1-16', r2: 'Juan 11:28-37' }, e: { p: '88', r1: '1 Reyes 21:17-29', r2: 'Apocalipsis 10:1-11' } },
-                '2025-06-06': { m: { p: '89:1-18', r1: '1 Reyes 22:1-28', r2: 'Juan 11:38-44' }, e: { p: '89:19-52', r1: '1 Reyes 22:29-45', r2: 'Apocalipsis 11:1-14' } },
-                '2025-06-07': { m: { p: '90', r1: '2 Reyes 1:1-12', r2: 'Juan 11:45-57' }, e: { p: '91', r1: '2 Reyes 1:13-18, 2:1-5', r2: 'Apocalipsis 11:15-19' } },
-                '2025-06-08': { m: { p: '48, 67', r1: 'Joel 2:28-32', r2: '1 Corintios 12:4-13' }, e: { p: '104, 121', r1: 'Ezequiel 37:1-14', r2: 'Juan 14:8-17, 25-27' } },
-                '2025-06-09': { m: { p: '92, 93', r1: '2 Reyes 2:6-18', r2: 'Juan 12:1-11' }, e: { p: '94', r1: '2 Reyes 2:19-25', r2: 'Apocalipsis 12:1-6' } },
-                '2025-06-10': { m: { p: '119:145-176', r1: '2 Reyes 3:1-20', r2: 'Juan 12:12-19' }, e: { p: '96', r1: '2 Reyes 3:21-27', r2: 'Apocalipsis 12:7-17' } },
-                '2025-06-11': { m: { p: '112, 115', r1: 'Isaías 42:5-12', r2: 'Hechos 11:19-30, 13:1-3' }, e: { p: '116, 117', r1: 'Nahúm 1:1-3, 7-8, 12-13, 15', r2: 'Mateo 10:7-16' } },
-                '2025-06-12': { m: { p: '97, 98', r1: '2 Reyes 4:1-17', r2: 'Juan 12:20-26' }, e: { p: '99, 100', r1: '2 Reyes 4:18-37', r2: 'Apocalipsis 13:1-10' } },
-                '2025-06-13': { m: { p: '101', r1: '2 Reyes 5:1-14', r2: 'Juan 12:27-36' }, e: { p: '102', r1: '2 Reyes 5:15-27', r2: 'Apocalipsis 13:11-18' } },
-                '2025-06-14': { m: { p: '103', r1: '2 Reyes 6:1-19', r2: 'Juan 12:37-50' }, e: { p: '104', r1: '2 Reyes 6:20-7:2', r2: 'Apocalipsis 14:1-13' } },
-                '2025-06-15': { m: { p: '103, 113', r1: 'Isaías 6:1-8', r2: 'Apocalipsis 4:1-11' }, e: { p: '93, 148', r1: 'Génesis 1:1-2:3', r2: 'Juan 1:1-18' } },
-                '2025-06-16': { m: { p: '105:1-22', r1: '2 Reyes 7:3-20', r2: 'Juan 13:1-20' }, e: { p: '105:23-45', r1: '2 Reyes 8:1-15', r2: 'Apocalipsis 14:14-15:8' } },
-                '2025-06-17': { m: { p: '106:1-18', r1: '2 Reyes 9:1-16', r2: 'Juan 13:21-30' }, e: { p: '106:19-48', r1: '2 Reyes 9:17-37', r2: 'Apocalipsis 16:1-21' } },
-                '2025-06-18': { m: { p: '107:1-32', r1: '2 Reyes 10:1-17', r2: 'Juan 13:31-38' }, e: { p: '107:33-43', r1: '2 Reyes 10:18-31', r2: 'Apocalipsis 17:1-18' } },
-                '2025-06-19': { m: { p: '108, 109', r1: '2 Reyes 11:1-20', r2: 'Juan 14:1-14' }, e: { p: '110, 111', r1: '2 Reyes 12:1-16', r2: 'Apocalipsis 18:1-8' } },
-                '2025-06-20': { m: { p: '112, 113', r1: '2 Reyes 13:1-13', r2: 'Juan 14:15-31' }, e: { p: '114, 115', r1: '2 Reyes 13:14-25', r2: 'Apocalipsis 18:9-20' } },
-                '2025-06-21': { m: { p: '116, 117', r1: '2 Reyes 14:1-22', r2: 'Juan 15:1-11' }, e: { p: '118', r1: '2 Reyes 14:23-29', r2: 'Apocalipsis 18:21-24' } },
-                '2025-06-22': { m: { p: '119:1-24', r1: '2 Reyes 15:1-22', r2: 'Juan 15:12-16' }, e: { p: '119:25-48', r1: '2 Reyes 15:23-38', r2: 'Apocalipsis 19:1-10' } },
-                '2025-06-23': { m: { p: '119:49-72', r1: '2 Reyes 16:1-20', r2: 'Juan 15:17-25' }, e: { p: '119:73-96', r1: '2 Crónicas 28:1-15', r2: 'Apocalipsis 19:11-21' } },
-                '2025-06-24': { m: { p: '80, 148', r1: 'Isaías 40:1-11', r2: 'Mateo 3:1-12' }, e: { p: '82, 103', r1: 'Malaquías 3:1-5, 4:1-6', r2: 'Lucas 1:57-80' } },
-                '2025-06-25': { m: { p: '119:97-120', r1: '2 Crónicas 28:16-27', r2: 'Juan 15:26-16:4' }, e: { p: '119:121-144', r1: '2 Reyes 17:1-18', r2: 'Apocalipsis 20:1-10' } },
-                '2025-06-26': { m: { p: '119:145-176', r1: '2 Reyes 17:19-41', r2: 'Juan 16:5-15' }, e: { p: '120, 121', r1: '2 Reyes 18:1-8', r2: 'Apocalipsis 20:11-21:8' } },
-                '2025-06-27': { m: { p: '122, 123', r1: '2 Reyes 18:9-18', r2: 'Juan 16:16-22' }, e: { p: '124, 125', r1: '2 Reyes 18:19-27', r2: 'Apocalipsis 21:9-21' } },
-                '2025-06-28': { m: { p: '126, 127', r1: '2 Reyes 18:28-37', r2: 'Juan 16:23-33' }, e: { p: '128, 129', r1: '2 Reyes 19:1-7', r2: 'Apocalipsis 21:22-22:5' } },
-                '2025-06-29': { m: { p: '117, 121', r1: 'Ezequiel 34:11-16', r2: 'Hechos 20:17-35' }, e: { p: '124, 125', r1: 'Isaías 49:1-6', r2: 'Juan 21:15-22' } },
-                '2025-06-30': { m: { p: '130, 131', r1: '2 Reyes 19:8-19', r2: 'Juan 17:1-11' }, e: { p: '132, 133', r1: '2 Reyes 19:20-28', r2: 'Apocalipsis 22:6-11' } },
-                '2025-07-01': { m: { p: '134, 135', r1: '2 Reyes 19:29-37', r2: 'Juan 17:12-19' }, e: { p: '136', r1: '2 Reyes 20:1-11', r2: 'Apocalipsis 22:12-21' } },
-                '2025-07-02': { m: { p: '137', r1: '2 Reyes 20:12-21', r2: 'Juan 17:20-26' }, e: { p: '138', r1: '2 Reyes 21:1-18', r2: 'Hechos 1:1-11' } },
-                '2025-07-03': { m: { p: '139', r1: '2 Reyes 21:19-26', r2: 'Juan 18:1-14' }, e: { p: '140', r1: '2 Reyes 22:1-10', r2: 'Hechos 1:12-14' } },
-                '2025-07-04': { m: { p: '141', r1: '2 Reyes 22:11-20', r2: 'Juan 18:15-27' }, e: { p: '142', r1: '2 Reyes 23:1-10', r2: 'Hechos 1:15-26' } },
-                '2025-07-05': { m: { p: '143', r1: '2 Reyes 23:11-20', r2: 'Juan 18:28-38' }, e: { p: '144', r1: '2 Reyes 23:21-30', r2: 'Hechos 2:1-13' } },
-                '2025-07-06': { m: { p: '145', r1: '2 Reyes 23:31-24:7', r2: 'Juan 18:38-19:5' }, e: { p: '146', r1: '2 Reyes 24:8-20', r2: 'Hechos 2:14-21' } },
-                '2025-07-07': { m: { p: '147', r1: '2 Reyes 25:1-12', r2: 'Juan 19:6-16' }, e: { p: '148', r1: '2 Reyes 25:13-21', r2: 'Hechos 2:22-36' } },
-                '2025-07-08': { m: { p: '149', r1: '2 Reyes 25:22-30', r2: 'Juan 19:17-24' }, e: { p: '150', r1: '1 Crónicas 10:1-14', r2: 'Hechos 2:37-47' } },
-                '2025-07-09': { m: { p: '1, 2', r1: '1 Crónicas 11:1-9', r2: 'Juan 19:25-30' }, e: { p: '3, 4', r1: '1 Crónicas 11:10-25', r2: 'Hechos 3:1-10' } },
-                '2025-07-10': { m: { p: '5, 6', r1: '1 Crónicas 11:26-47', r2: 'Juan 19:31-37' }, e: { p: '7, 8', r1: '1 Crónicas 12:1-15', r2: 'Hechos 3:11-26' } },
-                '2025-07-11': { m: { p: '9, 10', r1: '1 Crónicas 12:16-22', r2: 'Juan 19:38-42' }, e: { p: '11', r1: '1 Crónicas 12:23-40', r2: 'Hechos 4:1-12' } },
-                '2025-07-12': { m: { p: '12, 13', r1: '1 Crónicas 13:1-14', r2: 'Juan 20:1-10' }, e: { p: '14', r1: '1 Crónicas 14:1-17', r2: 'Hechos 4:13-22' } },
-                '2025-07-13': { m: { p: '15, 16', r1: '1 Crónicas 15:1-15', r2: 'Juan 20:11-18' }, e: { p: '17', r1: '1 Crónicas 15:16-16:3', r2: 'Hechos 4:23-31' } },
-                '2025-07-14': { m: { p: '18:1-20', r1: '1 Crónicas 16:4-22', r2: 'Juan 20:19-31' }, e: { p: '18:21-50', r1: '1 Crónicas 16:23-36', r2: 'Hechos 4:32-37' } },
-                '2025-07-15': { m: { p: '19, 20', r1: '1 Crónicas 16:37-17:15', r2: 'Juan 21:1-14' }, e: { p: '21', r1: '1 Crónicas 17:16-27', r2: 'Hechos 5:1-11' } },
-                '2025-07-16': { m: { p: '22', r1: '1 Crónicas 19:1-19', r2: 'Juan 21:15-25' }, e: { p: '23', r1: '1 Crónicas 20:1-8', r2: 'Hechos 5:12-16' } },
-                '2025-07-17': { m: { p: '24, 25', r1: '1 Crónicas 21:1-17', r2: 'Marcos 1:1-8' }, e: { p: '26', r1: '1 Crónicas 21:18-22:1', r2: 'Hechos 5:17-26' } },
-                '2025-07-18': { m: { p: '27, 28', r1: '1 Crónicas 22:2-19', r2: 'Marcos 1:9-15' }, e: { p: '29', r1: '1 Crónicas 23:1-23', r2: 'Hechos 5:27-32' } },
-                '2025-07-19': { m: { p: '30', r1: '1 Crónicas 23:24-24:7', r2: 'Marcos 1:16-20' }, e: { p: '31', r1: '1 Crónicas 24:8-19', r2: 'Hechos 5:33-42' } },
-                '2025-07-20': { m: { p: '32', r1: '1 Crónicas 24:20-31', r2: 'Marcos 1:21-28' }, e: { p: '33', r1: '1 Crónicas 25:1-8', r2: 'Hechos 6:1-7' } },
-                '2025-07-21': { m: { p: '34', r1: '1 Crónicas 25:9-31', r2: 'Marcos 1:29-39' }, e: { p: '119:25-48', r1: '1 Crónicas 26:1-19', r2: 'Hechos 6:8-15' } },
-                '2025-07-22': { m: { p: '42, 146', r1: '2 Corintios 5:14-18', r2: 'Juan 20:1-2, 11-18' }, e: { p: '30, 147', r1: 'Oseas 2:14-20', r2: 'Marcos 15:40-16:1' } },
-                '2025-07-23': { m: { p: '35', r1: '1 Crónicas 26:20-32', r2: 'Marcos 1:40-45' }, e: { p: '36', r1: '1 Crónicas 27:1-15', r2: 'Hechos 7:1-16' } },
-                '2025-07-24': { m: { p: '37:1-18', r1: '1 Crónicas 27:16-34', r2: 'Marcos 2:1-12' }, e: { p: '37:19-40', r1: '1 Crónicas 28:1-10', r2: 'Hechos 7:17-29' } },
-                '2025-07-25': { m: { p: '7, 126', r1: 'Jeremías 45:1-5', r2: 'Hechos 11:27-12:3' }, e: { p: '97, 116', r1: 'Isaías 52:7-10', r2: 'Mateo 20:20-28' } },
-                '2025-07-26': { m: { p: '38', r1: '1 Crónicas 28:11-21', r2: 'Marcos 2:13-17' }, e: { p: '39', r1: '1 Crónicas 29:1-9', r2: 'Hechos 7:30-43' } },
-                '2025-07-27': { m: { p: '40', r1: '1 Crónicas 29:10-20', r2: 'Marcos 2:18-22' }, e: { p: '41', r1: '1 Crónicas 29:21-30', r2: 'Hechos 7:44-53' } },
-                '2025-07-28': { m: { p: '42, 43', r1: '2 Crónicas 1:1-17', r2: 'Marcos 2:23-28' }, e: { p: '44', r1: '2 Crónicas 2:1-18', r2: 'Hechos 7:54-8:3' } },
-                '2025-07-29': { m: { p: '119:49-72', r1: '2 Crónicas 3:1-17', r2: 'Marcos 3:1-6' }, e: { p: '46', r1: '2 Crónicas 4:1-18', r2: 'Hechos 8:4-13' } },
-                '2025-07-30': { m: { p: '47', r1: '2 Crónicas 4:19-5:14', r2: 'Marcos 3:7-12' }, e: { p: '48', r1: '2 Crónicas 6:1-11', r2: 'Hechos 8:14-25' } },
-                '2025-07-31': { m: { p: '49', r1: '2 Crónicas 6:12-21', r2: 'Marcos 3:13-19' }, e: { p: '50', r1: '2 Crónicas 6:22-31', r2: 'Hechos 8:26-40' } },
-                '2025-08-01': { m: { p: '51', r1: '2 Crónicas 6:32-42', r2: 'Marcos 3:20-30' }, e: { p: '52', r1: '2 Crónicas 7:1-11', r2: 'Hechos 9:1-9' } },
-                '2025-08-02': { m: { p: '53', r1: '2 Crónicas 7:12-22', r2: 'Marcos 3:31-35' }, e: { p: '54', r1: '2 Crónicas 8:1-18', r2: 'Hechos 9:10-19' } },
-                '2025-08-03': { m: { p: '55', r1: '2 Crónicas 9:1-12', r2: 'Marcos 4:1-9' }, e: { p: '56', r1: '2 Crónicas 9:13-31', r2: 'Hechos 9:19-25' } },
-                '2025-08-04': { m: { p: '57', r1: '2 Crónicas 10:1-19', r2: 'Marcos 4:10-20' }, e: { p: '58', r1: '2 Crónicas 11:1-17', r2: 'Hechos 9:26-31' } },
-                '2025-08-05': { m: { p: '119:73-96', r1: '2 Crónicas 12:1-16', r2: 'Marcos 4:21-25' }, e: { p: '60', r1: '2 Crónicas 13:1-22', r2: 'Hechos 9:32-43' } },
-                '2025-08-06': { m: { p: '99, 110', r1: 'Éxodo 24:12-18', r2: '2 Pedro 1:16-21' }, e: { p: '2, 67', r1: '1 Reyes 19:1-12', r2: 'Lucas 9:28-36' } },
-                '2025-08-07': { m: { p: '61, 62', r1: '2 Crónicas 14:1-15', r2: 'Marcos 4:26-29' }, e: { p: '63', r1: '2 Crónicas 15:1-19', r2: 'Hechos 10:1-8' } },
-                '2025-08-08': { m: { p: '64', r1: '2 Crónicas 16:1-14', r2: 'Marcos 4:30-34' }, e: { p: '65', r1: '2 Crónicas 17:1-19', r2: 'Hechos 10:9-23' } },
-                '2025-08-09': { m: { p: '66', r1: '2 Crónicas 18:1-22', r2: 'Marcos 4:35-41' }, e: { p: '67', r1: '2 Crónicas 18:23-34', r2: 'Hechos 10:24-33' } },
-                '2025-08-10': { m: { p: '68', r1: '2 Crónicas 19:1-11', r2: 'Marcos 5:1-13' }, e: { p: '69', r1: '2 Crónicas 20:1-13', r2: 'Hechos 10:34-48' } },
-                '2025-08-11': { m: { p: '70', r1: '2 Crónicas 20:14-30', r2: 'Marcos 5:14-20' }, e: { p: '71', r1: '2 Crónicas 20:31-21:1', r2: 'Hechos 11:1-18' } },
-                '2025-08-12': { m: { p: '72', r1: '2 Crónicas 21:2-20', r2: 'Marcos 5:21-34' }, e: { p: '119:97-120', r1: '2 Crónicas 22:1-12', r2: 'Hechos 11:19-30' } },
-                '2025-08-13': { m: { p: '73', r1: '2 Crónicas 23:1-15', r2: 'Marcos 5:35-43' }, e: { p: '74', r1: '2 Crónicas 23:16-24:6', r2: 'Hechos 12:1-11' } },
-                '2025-08-14': { m: { p: '75', r1: '2 Crónicas 24:7-16', r2: 'Marcos 6:1-6' }, e: { p: '76', r1: '2 Crónicas 24:17-27', r2: 'Hechos 12:12-17' } },
-                '2025-08-15': { m: { p: '97, 98', r1: 'Isaías 61:10-62:3', r2: 'Gálatas 4:4-7' }, e: { p: '113, 150', r1: 'Zacarías 2:10-13', r2: 'Juan 3:25-30' } },
-                '2025-08-16': { m: { p: '77', r1: '2 Crónicas 25:1-13', r2: 'Marcos 6:7-13' }, e: { p: '78:1-18', r1: '2 Crónicas 25:14-28', r2: 'Hechos 12:18-25' } },
-                '2025-08-17': { m: { p: '78:19-37', r1: '2 Crónicas 26:1-15', r2: 'Marcos 6:14-29' }, e: { p: '78:38-72', r1: '2 Crónicas 26:16-23', r2: 'Hechos 13:1-12' } },
-                '2025-08-18': { m: { p: '79', r1: '2 Crónicas 28:1-15', r2: 'Marcos 6:30-34' }, e: { p: '80', r1: '2 Crónicas 28:16-27', r2: 'Hechos 13:13-25' } },
-                '2025-08-19': { m: { p: '81', r1: '2 Crónicas 29:1-11, 20-36', r2: 'Marcos 6:35-44' }, e: { p: '82', r1: '2 Crónicas 30:1-12', r2: 'Hechos 13:26-43' } },
-                '2025-08-20': { m: { p: '83', r1: '2 Crónicas 30:13-31:1', r2: 'Marcos 6:45-56' }, e: { p: '84', r1: '2 Crónicas 31:2-10', r2: 'Hechos 13:44-52' } },
-                '2025-08-21': { m: { p: '85', r1: '2 Crónicas 31:11-32:5', r2: 'Marcos 7:1-8' }, e: { p: '86', r1: '2 Crónicas 32:6-23', r2: 'Hechos 14:1-7' } },
-                '2025-08-22': { m: { p: '87', r1: '2 Crónicas 32:24-33', r2: 'Marcos 7:9-13' }, e: { p: '88', r1: '2 Crónicas 33:1-17', r2: 'Hechos 14:8-18' } },
-                '2025-08-23': { m: { p: '89:1-18', r1: '2 Crónicas 33:18-25', r2: 'Marcos 7:14-23' }, e: { p: '89:19-52', r1: '2 Crónicas 34:1-7', r2: 'Hechos 14:19-28' } },
-                '2025-08-24': { m: { p: '117, 121', r1: 'Isaías 29:13-24', r2: '1 Corintios 1:18-31' }, e: { p: '124, 125', r1: 'Jeremías 1:11-19', r2: 'Juan 1:43-51' } },
-                '2025-08-25': { m: { p: '90', r1: '2 Crónicas 34:8-18', r2: 'Marcos 7:24-30' }, e: { p: '91', r1: '2 Crónicas 34:19-28', r2: 'Hechos 15:1-11' } },
-                '2025-08-26': { m: { p: '92', r1: '2 Crónicas 34:29-33', r2: 'Marcos 7:31-37' }, e: { p: '119:121-144', r1: '2 Crónicas 35:1-19', r2: 'Hechos 15:12-21' } },
-                '2025-08-27': { m: { p: '93', r1: '2 Crónicas 35:20-36:4', r2: 'Marcos 8:1-10' }, e: { p: '94', r1: '2 Crónicas 36:5-21', r2: 'Hechos 15:22-35' } },
-                '2025-08-28': { m: { p: '95', r1: 'Esdras 1:1-11', r2: 'Marcos 8:11-21' }, e: { p: '96', r1: 'Esdras 3:1-13', r2: 'Hechos 15:36-41' } },
-                '2025-08-29': { m: { p: '97', r1: 'Esdras 4:1-7, 23-24', r2: 'Marcos 8:22-26' }, e: { p: '98', r1: 'Esdras 4:24-5:6', r2: 'Hechos 16:1-8' } },
-                '2025-08-30': { m: { p: '99', r1: 'Esdras 5:7-17', r2: 'Marcos 8:27-33' }, e: { p: '100', r1: 'Esdras 6:1-12', r2: 'Hechos 16:9-15' } },
-                '2025-08-31': { m: { p: '101', r1: 'Esdras 6:13-22', r2: 'Marcos 8:34-9:1' }, e: { p: '102', r1: 'Esdras 7:1-10', r2: 'Hechos 16:16-24' } },
-            };
-
-            const collectsData = {
-                'ordinary_time': 'Señor de todo poder y majestad, cuyo servicio es perfecta libertad: Mantennos, te suplicamos, en tu servicio para que podamos crecer en tu amor y gracia; por Jesucristo nuestro Señor, que vive y reina contigo y el Espíritu Santo, un solo Dios, ahora y por siempre. Amén.',
-                'advent': 'Dios todopoderoso, danos gracia para que desechemos las obras de las tinieblas y nos vistamos con la armadura de la luz, ahora en el tiempo de esta vida mortal, en la cual tu Hijo Jesucristo vino a visitarnos en gran humildad; para que en el último día, cuando él vuelva en su gloriosa majestad a juzgar a vivos y muertos, resucitemos a la vida inmortal; por él, que vive y reina contigo y el Espíritu Santo, un solo Dios, ahora y por siempre. Amén.',
-                'christmas': 'Oh Dios, que nos alegras con la conmemoración anual del nacimiento de tu único Hijo Jesucristo: Concédenos que, así como lo recibimos con gozo como nuestro Redentor, podamos contemplarlo con seguridad cuando venga a ser nuestro Juez; que vive y reina contigo y el Espíritu Santo, un solo Dios, por los siglos de los siglos. Amén.',
-                'epiphany': 'Oh Dios, que por la guía de una estrella manifestaste a tu único Hijo a los gentiles: Guíanos, te suplicamos, a nosotros, que ahora te conocemos por la fe, a la visión de tu gloriosa divinidad; por Jesucristo nuestro Señor. Amén.',
-                'lent': 'Dios todopoderoso, cuyos bendito Hijo fue llevado por el Espíritu para ser tentado por Satanás: Ayúdanos, te suplicamos, a que en la confesión de nuestros pecados y en el ayuno, usemos tal abstinencia que, subyugada siempre nuestra carne al Espíritu, obedezcamos tus santas inspiraciones en verdadera justicia y santidad, para tu honra y gloria; por Jesucristo nuestro Señor. Amén.',
-                'easter': 'Dios todopoderoso, que por medio de tu unigénito Hijo Jesucristo has vencido a la muerte y nos has abierto la puerta de la vida eterna: Te suplicamos humildemente que, así como por tu gracia especial pones en nuestra mente buenos deseos, así por tu continua ayuda podamos llevarlos a buen efecto; por Jesucristo nuestro Señor, que vive y reina contigo y el Espíritu Santo, un solo Dios, por los siglos de los siglos. Amén.',
-            };
-
-            // --- COMPLETE LITURGICAL DATA GENERATOR ---
-            function getLiturgyForDate(date) {
-                const year = date.getFullYear();
-                if (year !== 2025) return null;
-
-                const toYYYYMMDD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                const dateString = toYYYYMMDD(date);
-                
-                // --- Key Liturgical Dates for 2025 (Cycle C) ---
-                const firstSundayOfAdvent2024 = new Date(2024, 11, 1);
-                const christmasDay = new Date(2025, 11, 25);
-                const epiphanySunday = new Date(2025, 0, 5);
-                const baptismOfTheLord = new Date(2025, 0, 12);
-                const ashWednesday = new Date(2025, 2, 5);
-                const easter = new Date(2025, 3, 20);
-                const pentecost = new Date(2025, 5, 8);
-                const trinitySunday = new Date(2025, 5, 15);
-                const christTheKing = new Date(2025, 10, 23);
-                const firstSundayOfAdvent2025 = new Date(2025, 10, 30);
-
-                // Helper to count Sundays between two dates (inclusive of start)
-                const countSundays = (start, end) => {
-                    let count = 0;
-                    let current = new Date(start);
-                    while (current <= end) {
-                        if (current.getDay() === 0) {
-                            count++;
-                        }
-                        current.setDate(current.getDate() + 1);
+        document.addEventListener('DOMContentLoaded', () => {
+            /**
+             * =================================================================
+             * IBCG APP MODULE
+             * =================================================================
+             * This script is organized into a single App object to encapsulate
+             * all functionality, improving clarity and maintainability.
+             *
+             * - App.data:      Stores all static data (liturgical info, terms).
+             * - App.ui:        Handles all DOM element selection and manipulation.
+             * - App.services:  Contains the core logic for data processing.
+             * - App.events:    Manages all event listeners for user interaction.
+             * - App.init():    Starts the application.
+             * =================================================================
+             */
+            const App = {
+                // -----------------------------------------------------------------
+                // DATA: Static application data
+                // -----------------------------------------------------------------
+                data: {
+                    terms: {
+                        hypostasis: {original: "ὑπόσταις", transliteration: "hypóstasis", meaning: "Sustancia, fundamento, garantía. En este contexto, la fe es la realidad fundamental de lo que se espera."},
+                        elenchos: {original: "ἔλεγχos", transliteration: "élenchos", meaning: "Prueba, convicción. La fe proporciona una certeza interior sobre realidades que no se ven."},
+                        epangelia: {original: "ἐπαγγελία", transliteration: "epangelía", meaning: "Promesa. Un compromiso divino que es el objeto de la esperanza y la fe del creyente."},
+                        poimnion: {original: "ποίμνιον", transliteration: "poímnion", meaning: "Rebaño pequeño. Término de cariño y ternura que Jesús usa para sus discípulos, destacando su vulnerabilidad y la protección de Dios."},
+                        kardia: {original: "καρδία", transliteration: "kardía", meaning: "Corazón. En la Biblia, no es solo el asiento de las emociones, sino el centro del intelecto, la voluntad y toda la persona."},
+                        gregoreō: {original: "γρηγορέω", transliteration: "grēgoreō", meaning: "Velar, estar despierto. Una actitud de alerta espiritual y preparación constante para la venida del Señor."},
+                        doulos: {original: "δοῦλος", transliteration: "doûlos", meaning: "Siervo, esclavo. Describe la total devoción y obediencia a un amo; en el Nuevo Testamento, se usa para la relación del creyente con Cristo."}
+                    },
+                    lectionaryData: {'2025-01-01':{m:{p:'1, 148',r1:'Génesis 1:1-19',r2:'Mateo 1:1-17'},e:{p:'2, 149',r1:'Génesis 1:20-2:3',r2:'Filipenses 2:1-11'}},'2025-01-02':{m:{p:'3, 4',r1:'Génesis 2:4-17',r2:'Mateo 1:18-25'},e:{p:'5, 6',r1:'Génesis 2:18-25',r2:'Filipenses 2:12-18'}},'2025-01-03':{m:{p:'119:1-24',r1:'Génesis 3:1-24',r2:'Mateo 2:1-12'},e:{p:'8, 9',r1:'Génesis 4:1-16',r2:'Filipenses 2:19-30'}},'2025-01-04':{m:{p:'10, 11',r1:'Génesis 4:17-26',r2:'Mateo 2:13-23'},e:{p:'12, 13, 14',r1:'Génesis 6:1-8',r2:'Filipenses 3:1-11'}},'2025-01-05':{m:{p:'111, 112, 113',r1:'Isaías 40:1-11',r2:'Efesios 1:3-14'},e:{p:'66, 67',r1:'Isaías 52:7-15',r2:'Juan 1:1-18'}},'2025-01-06':{m:{p:'46, 47, 48',r1:'Isaías 49:1-13',r2:'Lucas 3:15-22'},e:{p:'96, 97, 98',r1:'Isaías 60:1-9',r2:'Juan 2:1-11'}},'2025-01-07':{m:{p:'18:1-20',r1:'Génesis 6:9-22',r2:'Mateo 3:1-12'},e:{p:'18:21-50',r1:'Génesis 7:1-10',r2:'Filipenses 4:2-9'}},'2025-01-08':{m:{p:'19, 20, 21',r1:'Génesis 7:11-24',r2:'Mateo 3:13-17'},e:{p:'22',r1:'Génesis 8:1-14',r2:'Filipenses 4:10-20'}},'2025-01-09':{m:{p:'23, 24',r1:'Génesis 8:15-9:7',r2:'Mateo 4:1-11'},e:{p:'25, 26',r1:'Génesis 9:8-19',r2:'Colosenses 1:1-14'}},'2025-01-10':{m:{p:'27, 28',r1:'Génesis 9:20-29',r2:'Mateo 4:12-17'},e:{p:'29',r1:'Génesis 11:1-9',r2:'Colosenses 1:15-23'}},'2025-01-11':{m:{p:'30, 31',r1:'Génesis 11:27-12:9',r2:'Mateo 4:18-25'},e:{p:'32',r1:'Génesis 12:10-20',r2:'Colosenses 1:24-2:7'}},'2025-01-12':{m:{p:'2, 110',r1:'Isaías 42:1-9',r2:'Hechos 10:34-43'},e:{p:'29, 81',r1:'Génesis 1:1-5',r2:'Mateo 3:13-17'}},'2025-01-13':{m:{p:'33',r1:'Génesis 13:1-18',r2:'Mateo 5:1-10'},e:{p:'34',r1:'Génesis 14:1-16',r2:'Colosenses 2:8-23'}},'2025-01-14':{m:{p:'119:25-48',r1:'Génesis 14:17-24',r2:'Mateo 5:11-16'},e:{p:'36',r1:'Génesis 15:1-11, 17-21',r2:'Colosenses 3:1-11'}},'2025-01-15':{m:{p:'37:1-18',r1:'Génesis 16:1-16',r2:'Mateo 5:17-20'},e:{p:'37:19-40',r1:'Génesis 17:1-14',r2:'Colosenses 3:12-17'}},'2025-01-16':{m:{p:'38',r1:'Génesis 17:15-27',r2:'Mateo 5:21-26'},e:{p:'39, 40',r1:'Génesis 18:1-15',r2:'Colosenses 3:18-4:6'}},'2025-01-17':{m:{p:'41, 42',r1:'Génesis 18:16-33',r2:'Mateo 5:27-32'},e:{p:'43',r1:'Génesis 19:1-17',r2:'Colosenses 4:7-18'}},'2025-01-18':{m:{p:'44',r1:'Génesis 19:18-29',r2:'Mateo 5:33-37'},e:{p:'45, 46',r1:'Génesis 20:1-18',r2:'1 Tesalonicenses 1:1-10'}},'2025-01-19':{m:{p:'47, 48',r1:'Génesis 21:1-21',r2:'Mateo 5:38-48'},e:{p:'49',r1:'Génesis 21:22-34',r2:'1 Tesalonicenses 2:1-12'}},'2025-01-20':{m:{p:'119:49-72',r1:'Génesis 22:1-19',r2:'Mateo 6:1-8'},e:{p:'51, 52',r1:'Génesis 23:1-20',r2:'1 Tesalonicenses 2:13-20'}},'2025-01-21':{m:{p:'53, 54',r1:'Génesis 24:1-27',r2:'Mateo 6:9-15'},e:{p:'55',r1:'Génesis 24:28-51',r2:'1 Tesalonicenses 3:1-13'}},'2025-01-22':{m:{p:'56, 57',r1:'Génesis 24:52-67',r2:'Mateo 6:16-24'},e:{p:'58',r1:'Génesis 25:1-11',r2:'1 Tesalonicenses 4:1-12'}},'2025-01-23':{m:{p:'59, 60',r1:'Génesis 25:19-34',r2:'Mateo 6:25-34'},e:{p:'61, 62',r1:'Génesis 26:1-11',r2:'1 Tesalonicenses 4:13-18'}},'2025-01-24':{m:{p:'63, 64',r1:'Génesis 26:12-33',r2:'Mateo 7:1-12'},e:{p:'65',r1:'Génesis 27:1-29',r2:'1 Tesalonicenses 5:1-11'}},'2025-01-25':{m:{p:'33, 113',r1:'Isaías 49:1-6',r2:'Hechos 11:1-18'},e:{p:'118',r1:'Jeremías 1:4-10',r2:'Gálatas 1:11-24'}},'2025-01-26':{m:{p:'66, 67',r1:'Génesis 27:30-45',r2:'Mateo 7:13-21'},e:{p:'68',r1:'Génesis 27:46-28:9',r2:'1 Tesalonicenses 5:12-28'}},'2025-01-27':{m:{p:'119:73-96',r1:'Génesis 28:10-22',r2:'Mateo 7:22-29'},e:{p:'70',r1:'Génesis 29:1-20',r2:'2 Tesalonicenses 1:1-12'}},'2025-01-28':{m:{p:'71',r1:'Génesis 29:21-35',r2:'Mateo 8:1-13'},e:{p:'72',r1:'Génesis 30:1-24',r2:'2 Tesalonicenses 2:1-17'}},'2025-01-29':{m:{p:'73',r1:'Génesis 30:25-43',r2:'Mateo 8:14-22'},e:{p:'74',r1:'Génesis 31:1-21',r2:'2 Tesalonicenses 3:1-18'}},'2025-01-30':{m:{p:'75, 76',r1:'Génesis 31:22-42',r2:'Mateo 8:23-34'},e:{p:'77',r1:'Génesis 31:43-32:2',r2:'Hebreos 1:1-14'}},'2025-01-31':{m:{p:'78:1-18',r1:'Génesis 32:3-21',r2:'Mateo 9:1-8'},e:{p:'78:19-37',r1:'Génesis 32:22-32',r2:'Hebreos 2:1-10'}},'2025-02-01':{m:{p:'78:38-72',r1:'Génesis 33:1-17',r2:'Mateo 9:9-17'},e:{p:'79',r1:'Génesis 34:1-17',r2:'Hebreos 2:11-18'}},'2025-02-02':{m:{p:'84, 113',r1:'Éxodo 13:1-3, 11-16',r2:'Hebreos 2:11-18'},e:{p:'87, 96',r1:'Hageo 2:1-9',r2:'Juan 2:13-22'}},'2025-02-03':{m:{p:'80',r1:'Génesis 34:18-31',r2:'Mateo 9:18-26'},e:{p:'81',r1:'Génesis 35:1-20',r2:'Hebreos 3:1-11'}},'2025-02-04':{m:{p:'119:97-120',r1:'Génesis 35:27-36:19',r2:'Mateo 9:27-34'},e:{p:'83',r1:'Génesis 36:20-37:1',r2:'Hebreos 3:12-19'}},'2025-02-05':{m:{p:'84',r1:'Génesis 37:2-11',r2:'Mateo 9:35-10:4'},e:{p:'85',r1:'Génesis 37:12-24',r2:'Hebreos 4:1-10'}},'2025-02-06':{m:{p:'86',r1:'Génesis 37:25-36',r2:'Mateo 10:5-15'},e:{p:'87',r1:'Génesis 38:1-11',r2:'Hebreos 4:11-16'}},'2025-02-07':{m:{p:'88',r1:'Génesis 38:12-26',r2:'Mateo 10:16-23'},e:{p:'89:1-18',r1:'Génesis 39:1-23',r2:'Hebreos 5:1-6'}},'2025-02-08':{m:{p:'89:19-52',r1:'Génesis 40:1-23',r2:'Mateo 10:24-33'},e:{p:'90',r1:'Génesis 41:1-13',r2:'Hebreos 5:7-14'}},'2025-02-09':{m:{p:'91, 92',r1:'Génesis 41:14-41',r2:'Mateo 10:34-42'},e:{p:'93',r1:'Génesis 41:42-49',r2:'Hebreos 6:1-12'}},'2025-02-10':{m:{p:'119:121-144',r1:'Génesis 41:50-57',r2:'Mateo 11:1-6'},e:{p:'95',r1:'Génesis 42:1-17',r2:'Hebreos 6:13-20'}},'2025-02-11':{m:{p:'96, 97',r1:'Génesis 42:18-28',r2:'Mateo 11:7-15'},e:{p:'98, 99',r1:'Génesis 42:29-38',r2:'Hebreos 7:1-10'}},'2025-02-12':{m:{p:'100, 101',r1:'Génesis 43:1-15',r2:'Mateo 11:16-24'},e:{p:'102',r1:'Génesis 43:16-34',r2:'Hebreos 7:11-28'}},'2025-02-13':{m:{p:'103',r1:'Génesis 44:1-17',r2:'Mateo 11:25-30'},e:{p:'104',r1:'Génesis 44:18-34',r2:'Hebreos 8:1-13'}},'2025-02-14':{m:{p:'105:1-22',r1:'Génesis 45:1-15',r2:'Mateo 12:1-14'},e:{p:'105:23-45',r1:'Génesis 45:16-28',r2:'Hebreos 9:1-10'}},'2025-02-15':{m:{p:'106:1-18',r1:'Génesis 46:1-7, 28-34',r2:'Mateo 12:15-21'},e:{p:'106:19-48',r1:'Génesis 47:1-12',r2:'Hebreos 9:11-22'}},'2025-02-16':{m:{p:'107:1-32',r1:'Génesis 47:13-26',r2:'Mateo 12:22-32'},e:{p:'107:33-43',r1:'Génesis 47:27-48:7',r2:'Hebreos 9:23-28'}},'2025-02-17':{m:{p:'108, 109',r1:'Génesis 48:8-22',r2:'Mateo 12:33-42'},e:{p:'110, 111',r1:'Génesis 49:1-28',r2:'Hebreos 10:1-10'}},'2025-02-18':{m:{p:'119:145-176',r1:'Génesis 49:29-50:14',r2:'Mateo 12:43-50'},e:{p:'113, 114',r1:'Génesis 50:15-26',r2:'Hebreos 10:11-18'}},'2025-02-19':{m:{p:'115',r1:'Éxodo 1:1-14',r2:'Mateo 13:1-9'},e:{p:'116, 117',r1:'Éxodo 1:15-2:10',r2:'Hebreos 10:19-31'}},'2025-02-20':{m:{p:'118',r1:'Éxodo 2:11-25',r2:'Mateo 13:10-17'},e:{p:'120, 121',r1:'Éxodo 3:1-12',r2:'Hebreos 10:32-39'}},'2025-02-21':{m:{p:'122, 123',r1:'Éxodo 3:13-22',r2:'Mateo 13:18-23'},e:{p:'124, 125',r1:'Éxodo 4:1-17',r2:'Hebreos 11:1-12'}},'2025-02-22':{m:{p:'126, 127',r1:'Éxodo 4:18-31',r2:'Mateo 13:24-30'},e:{p:'128, 129',r1:'Éxodo 5:1-21',r2:'Hebreos 11:13-22'}},'2025-02-23':{m:{p:'130, 131',r1:'Éxodo 5:22-6:13',r2:'Mateo 13:31-35'},e:{p:'132, 133',r1:'Éxodo 6:28-7:13',r2:'Hebreos 11:23-31'}},'2025-02-24':{m:{p:'119:1-24',r1:'Éxodo 7:14-25',r2:'Mateo 13:36-43'},e:{p:'135',r1:'Éxodo 8:1-19',r2:'Hebreos 11:32-12:2'}},'2025-02-25':{m:{p:'136',r1:'Éxodo 8:20-32',r2:'Mateo 13:44-52'},e:{p:'137',r1:'Éxodo 9:1-12',r2:'Hebreos 12:3-11'}},'2025-02-26':{m:{p:'138',r1:'Éxodo 9:13-35',r2:'Mateo 13:53-58'},e:{p:'139',r1:'Éxodo 10:1-20',r2:'Hebreos 12:12-29'}},'2025-02-27':{m:{p:'140, 141',r1:'Éxodo 10:21-11:8',r2:'Mateo 14:1-12'},e:{p:'142, 143',r1:'Éxodo 12:1-14',r2:'Hebreos 13:1-16'}},'2025-02-28':{m:{p:'144',r1:'Éxodo 12:15-28',r2:'Mateo 14:13-21'},e:{p:'145',r1:'Éxodo 12:29-42',r2:'Hebreos 13:17-25'}},'2025-03-01':{m:{p:'146, 147',r1:'Éxodo 13:1-16',r2:'Mateo 14:22-36'},e:{p:'148, 149',r1:'Éxodo 13:17-14:4',r2:'Romanos 1:1-15'}},'2025-03-02':{m:{p:'99, 110',r1:'Éxodo 24:12-18',r2:'2 Pedro 1:16-21'},e:{p:'2, 67',r1:'1 Reyes 19:1-12',r2:'Lucas 9:28-36'}},'2025-03-03':{m:{p:'1, 2',r1:'Éxodo 14:5-22',r2:'Mateo 15:1-11'},e:{p:'3, 4',r1:'Éxodo 14:23-31',r2:'Romanos 1:16-25'}},'2025-03-04':{m:{p:'5, 6',r1:'Éxodo 15:1-21',r2:'Mateo 15:12-20'},e:{p:'7, 8',r1:'Éxodo 15:22-16:1',r2:'Romanos 1:28-2:11'}},'2025-03-05':{m:{p:'32, 38',r1:'Jonás 3:1-10',r2:'Hebreos 12:1-14'},e:{p:'102, 130',r1:'Isaías 58:1-12',r2:'Mateo 6:1-6, 16-21'}},'2025-03-06':{m:{p:'9, 10',r1:'Éxodo 16:2-15',r2:'Mateo 15:21-28'},e:{p:'11',r1:'Éxodo 16:16-36',r2:'Romanos 2:12-24'}},'2025-03-07':{m:{p:'12, 13',r1:'Éxodo 17:1-16',r2:'Mateo 15:29-39'},e:{p:'14',r1:'Éxodo 18:1-12',r2:'Romanos 2:25-3:8'}},'2025-03-08':{m:{p:'15, 16',r1:'Éxodo 18:13-27',r2:'Mateo 16:1-12'},e:{p:'17',r1:'Éxodo 19:1-16',r2:'Romanos 3:9-20'}},'2025-03-09':{m:{p:'18:1-20',r1:'Éxodo 19:16-25',r2:'Mateo 16:13-20'},e:{p:'18:21-50',r1:'Éxodo 20:1-21',r2:'Romanos 3:21-31'}},'2025-03-10':{m:{p:'19, 20',r1:'Éxodo 20:22-21:11',r2:'Mateo 16:21-28'},e:{p:'21',r1:'Éxodo 21:12-27',r2:'Romanos 4:1-12'}},'2025-03-11':{m:{p:'119:1-24',r1:'Éxodo 21:28-22:4',r2:'Mateo 17:1-13'},e:{p:'23',r1:'Éxodo 22:5-15',r2:'Romanos 4:13-25'}},'2025-03-12':{m:{p:'24, 25',r1:'Éxodo 22:16-31',r2:'Mateo 17:14-21'},e:{p:'26',r1:'Éxodo 23:1-13',r2:'Romanos 5:1-11'}},'2025-03-13':{m:{p:'27, 28',r1:'Éxodo 23:14-23',r2:'Mateo 17:22-27'},e:{p:'29',r1:'Éxodo 23:24-33',r2:'Romanos 5:12-21'}},'2025-03-14':{m:{p:'30',r1:'Éxodo 24:1-18',r2:'Mateo 18:1-14'},e:{p:'31',r1:'Éxodo 25:1-22',r2:'Romanos 6:1-11'}},'2025-03-15':{m:{p:'32',r1:'Éxodo 25:23-40',r2:'Mateo 18:15-20'},e:{p:'33',r1:'Éxodo 26:1-14',r2:'Romanos 6:12-23'}},'2025-03-16':{m:{p:'34',r1:'Éxodo 26:15-37',r2:'Mateo 18:21-35'},e:{p:'119:25-48',r1:'Éxodo 27:1-21',r2:'Romanos 7:1-12'}},'2025-03-17':{m:{p:'35',r1:'Éxodo 28:1-14',r2:'Mateo 19:1-12'},e:{p:'36',r1:'Éxodo 28:15-30',r2:'Romanos 7:13-25'}},'2025-03-18':{m:{p:'37:1-18',r1:'Éxodo 28:31-43',r2:'Mateo 19:13-22'},e:{p:'37:19-40',r1:'Éxodo 29:1-18',r2:'Romanos 8:1-11'}},'2025-03-19':{m:{p:'38',r1:'Éxodo 29:19-30',r2:'Mateo 19:23-30'},e:{p:'39',r1:'Éxodo 29:31-46',r2:'Romanos 8:12-17'}},'2025-03-20':{m:{p:'40',r1:'Éxodo 30:1-10',r2:'Mateo 20:1-16'},e:{p:'41',r1:'Éxodo 30:11-21',r2:'Romanos 8:18-25'}},'2025-03-21':{m:{p:'42, 43',r1:'Éxodo 30:22-38',r2:'Mateo 20:17-28'},e:{p:'44',r1:'Éxodo 31:1-18',r2:'Romanos 8:26-30'}},'2025-03-22':{m:{p:'45',r1:'Éxodo 32:1-14',r2:'Mateo 20:29-34'},e:{p:'46',r1:'Éxodo 32:15-35',r2:'Romanos 8:31-39'}},'2025-03-23':{m:{p:'47, 48',r1:'Éxodo 33:1-11',r2:'Mateo 21:1-11'},e:{p:'49',r1:'Éxodo 33:12-23',r2:'Romanos 9:1-18'}},'2025-03-24':{m:{p:'119:49-72',r1:'Éxodo 34:1-10',r2:'Mateo 21:12-22'},e:{p:'51',r1:'Éxodo 34:11-28',r2:'Romanos 9:19-33'}},'2025-03-25':{m:{p:'8, 85',r1:'Isaías 7:10-14',r2:'Lucas 1:26-38'},e:{p:'87, 132',r1:'Isaías 52:7-12',r2:'Hebreos 2:5-10'}},'2025-03-26':{m:{p:'52',r1:'Éxodo 34:29-35',r2:'Mateo 21:23-32'},e:{p:'53',r1:'Éxodo 35:1-29',r2:'Romanos 10:1-13'}},'2025-03-27':{m:{p:'54',r1:'Éxodo 35:30-36:7',r2:'Mateo 21:33-46'},e:{p:'55',r1:'Éxodo 36:8-19',r2:'Romanos 10:14-21'}},'2025-03-28':{m:{p:'56, 57',r1:'Éxodo 36:20-38',r2:'Mateo 22:1-14'},e:{p:'58',r1:'Éxodo 37:1-16',r2:'Romanos 11:1-12'}},'2025-03-29':{m:{p:'59, 60',r1:'Éxodo 37:17-29',r2:'Mateo 22:15-22'},e:{p:'61, 62',r1:'Éxodo 38:1-20',r2:'Romanos 11:13-24'}},'2025-03-30':{m:{p:'63, 64',r1:'Éxodo 38:21-31',r2:'Mateo 22:23-33'},e:{p:'65',r1:'Éxodo 39:1-19',r2:'Romanos 11:25-36'}},'2025-03-31':{m:{p:'66, 67',r1:'Éxodo 39:22-43',r2:'Mateo 22:34-46'},e:{p:'68',r1:'Éxodo 40:1-16',r2:'Romanos 12:1-8'}},'2025-04-01':{m:{p:'69',r1:'Éxodo 40:17-38',r2:'Mateo 23:1-12'},e:{p:'70',r1:'Levítico 1:1-17',r2:'Romanos 12:9-21'}},'2025-04-02':{m:{p:'71',r1:'Levítico 2:1-16',r2:'Mateo 23:13-22'},e:{p:'72',r1:'Levítico 3:1-17',r2:'Romanos 13:1-7'}},'2025-04-03':{m:{p:'73',r1:'Levítico 4:1-12',r2:'Mateo 23:23-28'},e:{p:'74',r1:'Levítico 4:13-26',r2:'Romanos 13:8-14'}},'2025-04-04':{m:{p:'75, 76',r1:'Levítico 4:27-35',r2:'Mateo 23:29-39'},e:{p:'77',r1:'Levítico 5:1-13',r2:'Romanos 14:1-12'}},'2025-04-05':{m:{p:'78:1-18',r1:'Levítico 5:14-6:7',r2:'Mateo 24:1-14'},e:{p:'78:19-37',r1:'Levítico 6:8-18',r2:'Romanos 14:13-23'}},'2025-04-06':{m:{p:'78:38-72',r1:'Levítico 6:19-23',r2:'Mateo 24:15-28'},e:{p:'79',r1:'Levítico 7:1-10',r2:'Romanos 15:1-13'}},'2025-04-07':{m:{p:'80',r1:'Levítico 7:11-21',r2:'Mateo 24:29-35'},e:{p:'81',r1:'Levítico 7:22-38',r2:'Romanos 15:14-24'}},'2025-04-08':{m:{p:'119:97-120',r1:'Levítico 8:1-13',r2:'Mateo 24:36-44'},e:{p:'83',r1:'Levítico 8:14-30',r2:'Romanos 15:25-33'}},'2025-04-09':{m:{p:'84',r1:'Levítico 8:31-9:7',r2:'Mateo 24:45-51'},e:{p:'85',r1:'Levítico 9:8-24',r2:'Romanos 16:1-16'}},'2025-04-10':{m:{p:'86',r1:'Levítico 10:1-11',r2:'Mateo 25:1-13'},e:{p:'87',r1:'Levítico 10:12-20',r2:'Romanos 16:17-27'}},'2025-04-11':{m:{p:'88',r1:'Levítico 11:1-20',r2:'Mateo 25:14-30'},e:{p:'89:1-18',r1:'Levítico 11:21-47',r2:'1 Corintios 1:1-17'}},'2025-04-12':{m:{p:'89:19-52',r1:'Levítico 12:1-8',r2:'Mateo 25:31-46'},e:{p:'90',r1:'Levítico 13:1-17',r2:'1 Corintios 1:18-31'}},'2025-04-13':{m:{p:'31, 34',r1:'Zacarías 9:9-12',r2:'Mateo 21:1-11'},e:{p:'24, 40',r1:'Isaías 50:4-9',r2:'Filipenses 2:5-11'}},'2025-04-14':{m:{p:'22',r1:'Lamentaciones 1:1-12',r2:'Juan 12:1-11'},e:{p:'25',r1:'Lamentaciones 1:13-22',r2:'1 Corintios 1:18-31'}},'2025-04-15':{m:{p:'31',r1:'Lamentaciones 2:1-12',r2:'Juan 12:12-19'},e:{p:'34',r1:'Lamentaciones 2:13-22',r2:'1 Corintios 2:1-13'}},'2025-04-16':{m:{p:'36',r1:'Lamentaciones 3:1-18',r2:'Juan 12:20-36'},e:{p:'38',r1:'Lamentaciones 3:19-33',r2:'1 Corintios 2:14-3:15'}},'2025-04-17':{m:{p:'42, 43',r1:'Lamentaciones 3:34-58',r2:'Juan 12:37-50'},e:{p:'102, 111',r1:'Éxodo 12:1-14',r2:'1 Corintios 10:14-17, 11:27-32'}},'2025-04-18':{m:{p:'22',r1:'Génesis 22:1-18',r2:'1 Pedro 1:10-20'},e:{p:'40, 54',r1:'Isaías 52:13-53:12',r2:'Hebreos 10:1-25'}},'2025-04-19':{m:{p:'88',r1:'Job 19:21-27',r2:'1 Pedro 4:1-8'},e:{p:'27, 114',r1:'Oseas 6:1-6',r2:'Romanos 8:1-11'}},'2025-04-20':{m:{p:'114, 118',r1:'Éxodo 12:1-14',r2:'Romanos 6:3-11'},e:{p:'113, 117',r1:'Éxodo 14:10-31',r2:'1 Corintios 5:6-8'}},'2025-04-21':{m:{p:'93, 98',r1:'Éxodo 15:1-21',r2:'Lucas 24:1-12'},e:{p:'66, 114',r1:'Jonás 2:1-9',r2:'1 Corintios 15:1-11'}},'2025-04-22':{m:{p:'97, 99',r1:'Isaías 25:1-9',r2:'Lucas 24:13-35'},e:{p:'100, 113',r1:'Isaías 26:1-9, 19',r2:'1 Corintios 15:12-28'}},'2025-04-23':{m:{p:'103, 111',r1:'Isaías 30:18-21',r2:'Lucas 24:36-49'},e:{p:'118, 149',r1:'Ezequiel 37:1-14',r2:'1 Corintios 15:29-41'}},'2025-04-24':{m:{p:'146, 147',r1:'Daniel 12:1-3, 13',r2:'Juan 21:1-14'},e:{p:'148, 150',r1:'Job 19:21-27',r2:'1 Corintios 15:41-50'}},'2025-04-25':{m:{p:'19, 119:25-48',r1:'Isaías 52:7-10',r2:'Marcos 1:1-15'},e:{p:'145',r1:'Ezequiel 1:4-14',r2:'Hechos 12:25-13:3'}},'2025-04-26':{m:{p:'1, 2',r1:'Sabiduría 1:1-15',r2:'Juan 21:15-25'},e:{p:'3, 4',r1:'Sabiduría 3:1-9',r2:'1 Corintios 15:51-58'}},'2025-04-27':{m:{p:'111, 112',r1:'Sabiduría 5:1-16',r2:'Juan 20:1-10'},e:{p:'113, 114',r1:'Sabiduría 7:1-14',r2:'1 Juan 1:1-10'}},'2025-04-28':{m:{p:'119:1-24',r1:'Sabiduría 7:15-30',r2:'Juan 20:11-18'},e:{p:'8, 9',r1:'Sabiduría 8:1-18',r2:'1 Juan 2:1-6'}},'2025-04-29':{m:{p:'10, 11',r1:'Sabiduría 9:1-18',r2:'Juan 20:19-31'},e:{p:'12, 13',r1:'Sabiduría 10:1-21',r2:'1 Juan 2:7-11'}},'2025-04-30':{m:{p:'14',r1:'Éxodo 12:1-14',r2:'Juan 1:29-34'},e:{p:'15, 16',r1:'Éxodo 16:4-15',r2:'1 Juan 2:12-17'}},'2025-05-01':{m:{p:'119:1-24',r1:'Job 23:1-12',r2:'Juan 1:43-51'},e:{p:'139',r1:'Zacarías 4:1-14',r2:'Juan 12:20-26'}},'2025-05-02':{m:{p:'18:1-20',r1:'Sabiduría 11:21-12:2',r2:'Juan 2:1-11'},e:{p:'18:21-50',r1:'Sabiduría 12:12-22',r2:'1 Juan 2:18-25'}},'2025-05-03':{m:{p:'19, 20',r1:'Sabiduría 13:1-9',r2:'Juan 3:1-15'},e:{p:'21',r1:'Sabiduría 16:1-14',r2:'1 Juan 2:26-29'}},'2025-05-04':{m:{p:'22',r1:'Sabiduría 19:1-8, 13-22',r2:'Juan 3:16-21'},e:{p:'23',r1:'Baruc 4:21-29',r2:'1 Juan 3:1-6'}},'2025-05-05':{m:{p:'24, 25',r1:'Baruc 4:30-5:9',r2:'Juan 3:22-36'},e:{p:'26, 27',r1:'Isaías 12:1-6',r2:'1 Juan 3:7-10'}},'2025-05-06':{m:{p:'119:25-48',r1:'Isaías 25:1-9',r2:'Juan 4:1-14'},e:{p:'29',r1:'Isaías 26:1-9, 19',r2:'1 Juan 3:11-17'}},'2025-05-07':{m:{p:'30, 31',r1:'Isaías 30:18-21',r2:'Juan 4:15-26'},e:{p:'32',r1:'Isaías 35:1-10',r2:'1 Juan 3:18-24'}},'2025-05-08':{m:{p:'33',r1:'Isaías 40:1-11',r2:'Juan 4:27-42'},e:{p:'34',r1:'Isaías 41:17-20',r2:'1 Juan 4:1-6'}},'2025-05-09':{m:{p:'35',r1:'Isaías 42:1-9',r2:'Juan 4:43-54'},e:{p:'36',r1:'Isaías 43:1-12',r2:'1 Juan 4:7-12'}},'2025-05-10':{m:{p:'37:1-18',r1:'Isaías 43:14-21',r2:'Juan 5:1-18'},e:{p:'37:19-40',r1:'Isaías 44:1-8',r2:'1 Juan 4:13-21'}},'2025-05-11':{m:{p:'38',r1:'Isaías 44:21-28',r2:'Juan 5:19-23'},e:{p:'39, 40',r1:'Isaías 45:1-13',r2:'1 Juan 5:1-5'}},'2025-05-12':{m:{p:'41, 42',r1:'Isaías 45:14-25',r2:'Juan 5:24-29'},e:{p:'43',r1:'Isaías 46:1-13',r2:'1 Juan 5:6-12'}},'2025-05-13':{m:{p:'119:49-72',r1:'Isaías 48:1-11',r2:'Juan 5:30-47'},e:{p:'45',r1:'Isaías 48:12-22',r2:'1 Juan 5:13-21'}},'2025-05-14':{m:{p:'46',r1:'Isaías 49:1-13',r2:'Juan 6:1-15'},e:{p:'47',r1:'Isaías 49:14-25',r2:'2 Juan 1-13'}},'2025-05-15':{m:{p:'48',r1:'Isaías 51:1-8',r2:'Juan 6:16-27'},e:{p:'49',r1:'Isaías 51:9-16',r2:'3 Juan 1-15'}},'2025-05-16':{m:{p:'50',r1:'Isaías 51:17-23',r2:'Juan 6:27-40'},e:{p:'51',r1:'Isaías 52:1-12',r2:'Judas 1-16'}},'2025-05-17':{m:{p:'52',r1:'Isaías 54:1-17',r2:'Juan 6:41-51'},e:{p:'53',r1:'Isaías 55:1-13',r2:'Judas 17-25'}},'2025-05-18':{m:{p:'54',r1:'Isaías 60:1-9, 17-22',r2:'Juan 6:52-59'},e:{p:'55',r1:'Isaías 61:1-11',r2:'Apocalipsis 1:1-8'}},'2025-05-19':{m:{p:'56, 57',r1:'Isaías 62:1-12',r2:'Juan 6:60-71'},e:{p:'58',r1:'Isaías 63:1-6',r2:'Apocalipsis 1:9-20'}},'2025-05-20':{m:{p:'119:73-96',r1:'Isaías 63:7-14',r2:'Juan 7:1-13'},e:{p:'60',r1:'Isaías 65:1-9',r2:'Apocalipsis 2:1-7'}},'2025-05-21':{m:{p:'61, 62',r1:'Isaías 65:17-25',r2:'Juan 7:14-31'},e:{p:'63',r1:'Isaías 66:1-9',r2:'Apocalipsis 2:8-11'}},'2025-05-22':{m:{p:'64',r1:'Isaías 66:10-24',r2:'Juan 7:32-39'},e:{p:'65',r1:'Jeremías 31:27-34',r2:'Apocalipsis 2:12-17'}},'2025-05-23':{m:{p:'66',r1:'Ezequiel 36:22-28',r2:'Juan 7:40-52'},e:{p:'67',r1:'Joel 2:18-29',r2:'Apocalipsis 2:18-29'}},'2025-05-24':{m:{p:'68',r1:'Zacarías 8:1-8, 14-17',r2:'Juan 8:12-20'},e:{p:'69',r1:'Malaquías 3:13-4:6',r2:'Apocalipsis 3:1-6'}},'2025-05-25':{m:{p:'70',r1:'1 Reyes 8:22-30',r2:'Juan 8:21-32'},e:{p:'71',r1:'1 Reyes 8:31-40',r2:'Apocalipsis 3:7-13'}},'2025-05-26':{m:{p:'72',r1:'1 Reyes 8:41-53',r2:'Juan 8:33-47'},e:{p:'119:97-120',r1:'1 Reyes 8:54-66',r2:'Apocalipsis 3:14-22'}},'2025-05-27':{m:{p:'73',r1:'1 Reyes 9:1-9',r2:'Juan 8:47-59'},e:{p:'74',r1:'1 Reyes 9:24-10:13',r2:'Apocalipsis 4:1-11'}},'2025-05-28':{m:{p:'75',r1:'1 Reyes 11:1-13',r2:'Juan 9:1-17'},e:{p:'76',r1:'1 Reyes 11:26-43',r2:'Apocalipsis 5:1-14'}},'2025-05-29':{m:{p:'8, 47',r1:'2 Reyes 2:1-15',r2:'Lucas 24:44-53'},e:{p:'24, 93',r1:'Daniel 7:9-14',r2:'Efesios 4:1-16'}},'2025-05-30':{m:{p:'77',r1:'1 Reyes 12:1-20',r2:'Juan 9:18-41'},e:{p:'78:1-18',r1:'1 Reyes 12:21-33',r2:'Apocalipsis 6:1-17'}},'2025-05-31':{m:{p:'78:19-37',r1:'1 Reyes 13:1-10',r2:'Juan 10:1-10'},e:{p:'78:38-72',r1:'1 Reyes 13:11-25',r2:'Apocalipsis 7:1-8'}},'2025-06-01':{m:{p:'79, 80',r1:'1 Reyes 13:26-34',r2:'Juan 10:11-21'},e:{p:'81',r1:'1 Reyes 16:23-34',r2:'Apocalipsis 7:9-17'}},'2025-06-02':{m:{p:'82',r1:'1 Reyes 17:1-16',r2:'Juan 10:22-42'},e:{p:'119:121-144',r1:'1 Reyes 17:17-24',r2:'Apocalipsis 8:1-13'}},'2025-06-03':{m:{p:'83',r1:'1 Reyes 18:1-19',r2:'Juan 11:1-16'},e:{p:'84',r1:'1 Reyes 18:20-40',r2:'Apocalipsis 9:1-12'}},'2025-06-04':{m:{p:'85',r1:'1 Reyes 18:41-19:8',r2:'Juan 11:17-27'},e:{p:'86',r1:'1 Reyes 19:8-21',r2:'Apocalipsis 9:13-21'}},'2025-06-05':{m:{p:'87',r1:'1 Reyes 21:1-16',r2:'Juan 11:28-37'},e:{p:'88',r1:'1 Reyes 21:17-29',r2:'Apocalipsis 10:1-11'}},'2025-06-06':{m:{p:'89:1-18',r1:'1 Reyes 22:1-28',r2:'Juan 11:38-44'},e:{p:'89:19-52',r1:'1 Reyes 22:29-45',r2:'Apocalipsis 11:1-14'}},'2025-06-07':{m:{p:'90',r1:'2 Reyes 1:1-12',r2:'Juan 11:45-57'},e:{p:'91',r1:'2 Reyes 1:13-18, 2:1-5',r2:'Apocalipsis 11:15-19'}},'2025-06-08':{m:{p:'48, 67',r1:'Joel 2:28-32',r2:'1 Corintios 12:4-13'},e:{p:'104, 121',r1:'Ezequiel 37:1-14',r2:'Juan 14:8-17, 25-27'}},'2025-06-09':{m:{p:'92, 93',r1:'2 Reyes 2:6-18',r2:'Juan 12:1-11'},e:{p:'94',r1:'2 Reyes 2:19-25',r2:'Apocalipsis 12:1-6'}},'2025-06-10':{m:{p:'119:145-176',r1:'2 Reyes 3:1-20',r2:'Juan 12:12-19'},e:{p:'96',r1:'2 Reyes 3:21-27',r2:'Apocalipsis 12:7-17'}},'2025-06-11':{m:{p:'112, 115',r1:'Isaías 42:5-12',r2:'Hechos 11:19-30, 13:1-3'},e:{p:'116, 117',r1:'Nahúm 1:1-3, 7-8, 12-13, 15',r2:'Mateo 10:7-16'}},'2025-06-12':{m:{p:'97, 98',r1:'2 Reyes 4:1-17',r2:'Juan 12:20-26'},e:{p:'99, 100',r1:'2 Reyes 4:18-37',r2:'Apocalipsis 13:1-10'}},'2025-06-13':{m:{p:'101',r1:'2 Reyes 5:1-14',r2:'Juan 12:27-36'},e:{p:'102',r1:'2 Reyes 5:15-27',r2:'Apocalipsis 13:11-18'}},'2025-06-14':{m:{p:'103',r1:'2 Reyes 6:1-19',r2:'Juan 12:37-50'},e:{p:'104',r1:'2 Reyes 6:20-7:2',r2:'Apocalipsis 14:1-13'}},'2025-06-15':{m:{p:'103, 113',r1:'Isaías 6:1-8',r2:'Apocalipsis 4:1-11'},e:{p:'93, 148',r1:'Génesis 1:1-2:3',r2:'Juan 1:1-18'}},'2025-06-16':{m:{p:'105:1-22',r1:'2 Reyes 7:3-20',r2:'Juan 13:1-20'},e:{p:'105:23-45',r1:'2 Reyes 8:1-15',r2:'Apocalipsis 14:14-15:8'}},'2025-06-17':{m:{p:'106:1-18',r1:'2 Reyes 9:1-16',r2:'Juan 13:21-30'},e:{p:'106:19-48',r1:'2 Reyes 9:17-37',r2:'Apocalipsis 16:1-21'}},'2025-06-18':{m:{p:'107:1-32',r1:'2 Reyes 10:1-17',r2:'Juan 13:31-38'},e:{p:'107:33-43',r1:'2 Reyes 10:18-31',r2:'Apocalipsis 17:1-18'}},'2025-06-19':{m:{p:'108, 109',r1:'2 Reyes 11:1-20',r2:'Juan 14:1-14'},e:{p:'110, 111',r1:'2 Reyes 12:1-16',r2:'Apocalipsis 18:1-8'}},'2025-06-20':{m:{p:'112, 113',r1:'2 Reyes 13:1-13',r2:'Juan 14:15-31'},e:{p:'114, 115',r1:'2 Reyes 13:14-25',r2:'Apocalipsis 18:9-20'}},'2025-06-21':{m:{p:'116, 117',r1:'2 Reyes 14:1-22',r2:'Juan 15:1-11'},e:{p:'118',r1:'2 Reyes 14:23-29',r2:'Apocalipsis 18:21-24'}},'2025-06-22':{m:{p:'119:1-24',r1:'2 Reyes 15:1-22',r2:'Juan 15:12-16'},e:{p:'119:25-48',r1:'2 Reyes 15:23-38',r2:'Apocalipsis 19:1-10'}},'2025-06-23':{m:{p:'119:49-72',r1:'2 Reyes 16:1-20',r2:'Juan 15:17-25'},e:{p:'119:73-96',r1:'2 Crónicas 28:1-15',r2:'Apocalipsis 19:11-21'}},'2025-06-24':{m:{p:'80, 148',r1:'Isaías 40:1-11',r2:'Mateo 3:1-12'},e:{p:'82, 103',r1:'Malaquías 3:1-5, 4:1-6',r2:'Lucas 1:57-80'}},'2025-06-25':{m:{p:'119:97-120',r1:'2 Crónicas 28:16-27',r2:'Juan 15:26-16:4'},e:{p:'119:121-144',r1:'2 Reyes 17:1-18',r2:'Apocalipsis 20:1-10'}},'2025-06-26':{m:{p:'119:145-176',r1:'2 Reyes 17:19-41',r2:'Juan 16:5-15'},e:{p:'120, 121',r1:'2 Reyes 18:1-8',r2:'Apocalipsis 20:11-21:8'}},'2025-06-27':{m:{p:'122, 123',r1:'2 Reyes 18:9-18',r2:'Juan 16:16-22'},e:{p:'124, 125',r1:'2 Reyes 18:19-27',r2:'Apocalipsis 21:9-21'}},'2025-06-28':{m:{p:'126, 127',r1:'2 Reyes 18:28-37',r2:'Juan 16:23-33'},e:{p:'128, 129',r1:'2 Reyes 19:1-7',r2:'Apocalipsis 21:22-22:5'}},'2025-06-29':{m:{p:'117, 121',r1:'Ezequiel 34:11-16',r2:'Hechos 20:17-35'},e:{p:'124, 125',r1:'Isaías 49:1-6',r2:'Juan 21:15-22'}},'2025-06-30':{m:{p:'130, 131',r1:'2 Reyes 19:8-19',r2:'Juan 17:1-11'},e:{p:'132, 133',r1:'2 Reyes 19:20-28',r2:'Apocalipsis 22:6-11'}},'2025-07-01':{m:{p:'134, 135',r1:'2 Reyes 19:29-37',r2:'Juan 17:12-19'},e:{p:'136',r1:'2 Reyes 20:1-11',r2:'Apocalipsis 22:12-21'}},'2025-07-02':{m:{p:'137',r1:'2 Reyes 20:12-21',r2:'Juan 17:20-26'},e:{p:'138',r1:'2 Reyes 21:1-18',r2:'Hechos 1:1-11'}},'2025-07-03':{m:{p:'139',r1:'2 Reyes 21:19-26',r2:'Juan 18:1-14'},e:{p:'140',r1:'2 Reyes 22:1-10',r2:'Hechos 1:12-14'}},'2025-07-04':{m:{p:'141',r1:'2 Reyes 22:11-20',r2:'Juan 18:15-27'},e:{p:'142',r1:'2 Reyes 23:1-10',r2:'Hechos 1:15-26'}},'2025-07-05':{m:{p:'143',r1:'2 Reyes 23:11-20',r2:'Juan 18:28-38'},e:{p:'144',r1:'2 Reyes 23:21-30',r2:'Hechos 2:1-13'}},'2025-07-06':{m:{p:'145',r1:'2 Reyes 23:31-24:7',r2:'Juan 18:38-19:5'},e:{p:'146',r1:'2 Reyes 24:8-20',r2:'Hechos 2:14-21'}},'2025-07-07':{m:{p:'147',r1:'2 Reyes 25:1-12',r2:'Juan 19:6-16'},e:{p:'148',r1:'2 Reyes 25:13-21',r2:'Hechos 2:22-36'}},'2025-07-08':{m:{p:'149',r1:'2 Reyes 25:22-30',r2:'Juan 19:17-24'},e:{p:'150',r1:'1 Crónicas 10:1-14',r2:'Hechos 2:37-47'}},'2025-07-09':{m:{p:'1, 2',r1:'1 Crónicas 11:1-9',r2:'Juan 19:25-30'},e:{p:'3, 4',r1:'1 Crónicas 11:10-25',r2:'Hechos 3:1-10'}},'2025-07-10':{m:{p:'5, 6',r1:'1 Crónicas 11:26-47',r2:'Juan 19:31-37'},e:{p:'7, 8',r1:'1 Crónicas 12:1-15',r2:'Hechos 3:11-26'}},'2025-07-11':{m:{p:'9, 10',r1:'1 Crónicas 12:16-22',r2:'Juan 19:38-42'},e:{p:'11',r1:'1 Crónicas 12:23-40',r2:'Hechos 4:1-12'}},'2025-07-12':{m:{p:'12, 13',r1:'1 Crónicas 13:1-14',r2:'Juan 20:1-10'},e:{p:'14',r1:'1 Crónicas 14:1-17',r2:'Hechos 4:13-22'}},'2025-07-13':{m:{p:'15, 16',r1:'1 Crónicas 15:1-15',r2:'Juan 20:11-18'},e:{p:'17',r1:'1 Crónicas 15:16-16:3',r2:'Hechos 4:23-31'}},'2025-07-14':{m:{p:'18:1-20',r1:'1 Crónicas 16:4-22',r2:'Juan 20:19-31'},e:{p:'18:21-50',r1:'1 Crónicas 16:23-36',r2:'Hechos 4:32-37'}},'2025-07-15':{m:{p:'19, 20',r1:'1 Crónicas 16:37-17:15',r2:'Juan 21:1-14'},e:{p:'21',r1:'1 Crónicas 17:16-27',r2:'Hechos 5:1-11'}},'2025-07-16':{m:{p:'22',r1:'1 Crónicas 19:1-19',r2:'Juan 21:15-25'},e:{p:'23',r1:'1 Crónicas 20:1-8',r2:'Hechos 5:12-16'}},'2025-07-17':{m:{p:'24, 25',r1:'1 Crónicas 21:1-17',r2:'Marcos 1:1-8'},e:{p:'26',r1:'1 Crónicas 21:18-22:1',r2:'Hechos 5:17-26'}},'2025-07-18':{m:{p:'27, 28',r1:'1 Crónicas 22:2-19',r2:'Marcos 1:9-15'},e:{p:'29',r1:'1 Crónicas 23:1-23',r2:'Hechos 5:27-32'}},'2025-07-19':{m:{p:'30',r1:'1 Crónicas 23:24-24:7',r2:'Marcos 1:16-20'},e:{p:'31',r1:'1 Crónicas 24:8-19',r2:'Hechos 5:33-42'}},'2025-07-20':{m:{p:'32',r1:'1 Crónicas 24:20-31',r2:'Marcos 1:21-28'},e:{p:'33',r1:'1 Crónicas 25:1-8',r2:'Hechos 6:1-7'}},'2025-07-21':{m:{p:'34',r1:'1 Crónicas 25:9-31',r2:'Marcos 1:29-39'},e:{p:'119:25-48',r1:'1 Crónicas 26:1-19',r2:'Hechos 6:8-15'}},'2025-07-22':{m:{p:'42, 146',r1:'2 Corintios 5:14-18',r2:'Juan 20:1-2, 11-18'},e:{p:'30, 147',r1:'Oseas 2:14-20',r2:'Marcos 15:40-16:1'}},'2025-07-23':{m:{p:'35',r1:'1 Crónicas 26:20-32',r2:'Marcos 1:40-45'},e:{p:'36',r1:'1 Crónicas 27:1-15',r2:'Hechos 7:1-16'}},'2025-07-24':{m:{p:'37:1-18',r1:'1 Crónicas 27:16-34',r2:'Marcos 2:1-12'},e:{p:'37:19-40',r1:'1 Crónicas 28:1-10',r2:'Hechos 7:17-29'}},'2025-07-25':{m:{p:'7, 126',r1:'Jeremías 45:1-5',r2:'Hechos 11:27-12:3'},e:{p:'97, 116',r1:'Isaías 52:7-10',r2:'Mateo 20:20-28'}},'2025-07-26':{m:{p:'38',r1:'1 Crónicas 28:11-21',r2:'Marcos 2:13-17'},e:{p:'39',r1:'1 Crónicas 29:1-9',r2:'Hechos 7:30-43'}},'2025-07-27':{m:{p:'40',r1:'1 Crónicas 29:10-20',r2:'Marcos 2:18-22'},e:{p:'41',r1:'1 Crónicas 29:21-30',r2:'Hechos 7:44-53'}},'2025-07-28':{m:{p:'42, 43',r1:'2 Crónicas 1:1-17',r2:'Marcos 2:23-28'},e:{p:'44',r1:'2 Crónicas 2:1-18',r2:'Hechos 7:54-8:3'}},'2025-07-29':{m:{p:'119:49-72',r1:'2 Crónicas 3:1-17',r2:'Marcos 3:1-6'},e:{p:'46',r1:'2 Crónicas 4:1-18',r2:'Hechos 8:4-13'}},'2025-07-30':{m:{p:'47',r1:'2 Crónicas 4:19-5:14',r2:'Marcos 3:7-12'},e:{p:'48',r1:'2 Crónicas 6:1-11',r2:'Hechos 8:14-25'}},'2025-07-31':{m:{p:'49',r1:'2 Crónicas 6:12-21',r2:'Marcos 3:13-19'},e:{p:'50',r1:'2 Crónicas 6:22-31',r2:'Hechos 8:26-40'}},'2025-08-01':{m:{p:'51',r1:'2 Crónicas 7:1-11',r2:'Marcos 3:20-30'},e:{p:'52, 53',r1:'2 Crónicas 7:12-22',r2:'Hechos 9:1-9'}},'2025-08-02':{m:{p:'54',r1:'2 Crónicas 8:1-18',r2:'Marcos 3:31-35'},e:{p:'55',r1:'2 Crónicas 9:1-12',r2:'Hechos 9:10-19a'}},'2025-08-03':{m:{p:'63:1-8, 98',r1:'2 Crónicas 9:13-31',r2:'Marcos 4:1-9'},e:{p:'103',r1:'2 Crónicas 10:1-19',r2:'Hechos 9:19b-31'}},'2025-08-04':{m:{p:'61, 62',r1:'2 Crónicas 11:1-17',r2:'Marcos 4:10-20'},e:{p:'68',r1:'2 Crónicas 12:1-16',r2:'Hechos 10:1-8'}},'2025-08-05':{m:{p:'72',r1:'2 Crónicas 13:1-22',r2:'Marcos 4:21-25'},e:{p:'119:73-96',r1:'2 Crónicas 14:1-15',r2:'Hechos 10:9-23'}},'2025-08-06':{m:{p:'27, 67',r1:'Éxodo 34:29-35',r2:'Lucas 9:28-36'},e:{p:'99, 150',r1:'2 Pedro 1:13-21',r2:'1 Juan 3:1-3'}},'2025-08-07':{m:{p:'71',r1:'2 Crónicas 15:1-19',r2:'Marcos 4:26-29'},e:{p:'74',r1:'2 Crónicas 16:1-14',r2:'Hechos 10:24-33'}},'2025-08-08':{m:{p:'69',r1:'2 Crónicas 17:1-19',r2:'Marcos 4:30-34'},e:{p:'73',r1:'2 Crónicas 18:1-27',r2:'Hechos 10:34-48'}},'2025-08-09':{m:{p:'75, 76',r1:'2 Crónicas 18:28-19:11',r2:'Marcos 4:35-41'},e:{p:'23, 27',r1:'2 Crónicas 20:1-23',r2:'Hechos 11:1-18'}},'2025-08-10':{m:{p:'1, 15',r1:'2 Crónicas 20:24-37',r2:'Marcos 5:1-20'},e:{p:'112',r1:'2 Crónicas 21:1-20',r2:'Hechos 11:19-30'}},'2025-08-11':{m:{p:'78:1-39',r1:'2 Crónicas 22:1-12',r2:'Marcos 5:21-34'},e:{p:'78:40-72',r1:'2 Crónicas 23:1-21',r2:'Hechos 12:1-11'}},'2025-08-12':{m:{p:'80',r1:'2 Crónicas 24:1-16',r2:'Marcos 5:35-43'},e:{p:'77, 79',r1:'2 Crónicas 24:17-27',r2:'Hechos 12:12-25'}},'2025-08-13':{m:{p:'119:97-120',r1:'2 Crónicas 25:1-13',r2:'Marcos 6:1-6a'},e:{p:'81, 82',r1:'2 Crónicas 25:14-28',r2:'Hechos 13:1-12'}},'2025-08-14':{m:{p:'83',r1:'2 Crónicas 26:1-23',r2:'Marcos 6:6b-13'},e:{p:'86, 87',r1:'2 Crónicas 28:1-15',r2:'Hechos 13:13-25'}},'2025-08-15':{m:{p:'45, 46',r1:'Isaías 61:10-62:3',r2:'Lucas 1:46-55'},e:{p:'131, 132, 138',r1:'Gálatas 4:1-7',r2:'Juan 2:1-11'}},'2025-08-16':{m:{p:'88',r1:'2 Crónicas 28:16-27',r2:'Marcos 6:14-29'},e:{p:'91, 92',r1:'2 Crónicas 29:1-19',r2:'Hechos 13:26-43'}},'2025-08-17':{m:{p:'107:1-32',r1:'2 Crónicas 29:20-36',r2:'Marcos 6:30-44'},e:{p:'107:33-43, 108:1-6',r1:'2 Crónicas 30:1-27',r2:'Hechos 13:44-52'}},'2025-08-18':{m:{p:'89:1-18',r1:'2 Crónicas 31:1-21',r2:'Marcos 6:45-56'},e:{p:'89:19-52',r1:'2 Crónicas 32:1-19',r2:'Hechos 14:1-7'}},'2025-08-19':{m:{p:'94',r1:'2 Crónicas 32:20-33',r2:'Marcos 7:1-13'},e:{p:'96, 97',r1:'2 Crónicas 33:1-20',r2:'Hechos 14:8-18'}},'2025-08-20':{m:{p:'119:121-144',r1:'2 Crónicas 33:21-34:7',r2:'Marcos 7:14-23'},e:{p:'99, 100, 101',r1:'2 Crónicas 34:8-28',r2:'Hechos 14:19-28'}},'2025-08-21':{m:{p:'102',r1:'2 Crónicas 34:29-35:19',r2:'Marcos 7:24-30'},e:{p:'104',r1:'2 Crónicas 35:20-36:10',r2:'Hechos 15:1-11'}},'2025-08-22':{m:{p:'106:1-18',r1:'2 Crónicas 36:11-23',r2:'Marcos 7:31-37'},e:{p:'106:19-48',r1:'Esdras 1:1-11',r2:'Hechos 15:12-21'}},'2025-08-23':{m:{p:'105:1-22',r1:'Esdras 3:1-13',r2:'Marcos 8:1-10'},e:{p:'105:23-45',r1:'Esdras 4:1-24',r2:'Hechos 15:22-35'}},'2025-08-24':{m:{p:'86, 96',r1:'Génesis 28:10-17',r2:'Juan 1:43-51'},e:{p:'91',r1:'Deuteronomio 18:15-19',r2:'1 Corintios 4:9-15'}},'2025-08-25':{m:{p:'108, 109',r1:'Esdras 5:1-17',r2:'Marcos 8:11-21'},e:{p:'110, 111, 112',r1:'Esdras 6:1-22',r2:'Hechos 15:36-16:5'}},'2025-08-26':{m:{p:'113, 114',r1:'Esdras 7:1-28',r2:'Marcos 8:22-26'},e:{p:'115',r1:'Esdras 8:15-36',r2:'Hechos 16:6-15'}},'2025-08-27':{m:{p:'119:145-176',r1:'Esdras 9:1-15',r2:'Marcos 8:27-33'},e:{p:'116, 117',r1:'Esdras 10:1-17',r2:'Hechos 16:16-24'}},'2025-08-28':{m:{p:'120, 121, 122',r1:'Nehemías 1:1-11',r2:'Marcos 8:34-9:1'},e:{p:'123, 124, 125',r1:'Nehemías 2:1-8',r2:'Hechos 16:25-40'}},'2025-08-29':{m:{p:'126, 127, 128',r1:'Nehemías 2:9-20',r2:'Marcos 9:2-13'},e:{p:'129, 130, 131',r1:'Nehemías 4:1-15',r2:'Hechos 17:1-9'}},'2025-08-30':{m:{p:'132, 133',r1:'Nehemías 4:16-23',r2:'Marcos 9:14-29'},e:{p:'134, 135',r1:'Nehemías 5:1-19',r2:'Hechos 17:10-15'}},'2025-08-31':{m:{p:'119:1-32',r1:'Nehemías 6:1-19',r2:'Marcos 9:30-37'},e:{p:'136',r1:'Nehemías 7:73b-8:12',r2:'Hechos 17:16-34'}},'2025-09-01':{m:{p:'137, 138',r1:'Nehemías 8:13-18',r2:'Marcos 9:38-41'},e:{p:'119:145-176',r1:'Nehemías 9:1-15',r2:'Hechos 18:1-11'}},'2025-09-02':{m:{p:'140, 141',r1:'Nehemías 9:16-25',r2:'Marcos 9:42-50'},e:{p:'142, 143',r1:'Nehemías 9:26-38',r2:'Hechos 18:12-23'}},'2025-09-03':{m:{p:'144',r1:'Nehemías 11:1-2, 15-24',r2:'Marcos 10:1-12'},e:{p:'145',r1:'Nehemías 12:27-43',r2:'Hechos 18:24-28'}},'2025-09-04':{m:{p:'146, 147',r1:'Nehemías 13:1-14',r2:'Marcos 10:13-16'},e:{p:'148, 149',r1:'Nehemías 13:15-31',r2:'Hechos 19:1-10'}},'2025-09-05':{m:{p:'1, 2',r1:'Ester 1:1-22',r2:'Marcos 10:17-22'},e:{p:'3, 4',r1:'Ester 2:1-18',r2:'Hechos 19:11-20'}},'2025-09-06':{m:{p:'5, 6',r1:'Ester 2:19-3:6',r2:'Marcos 10:23-31'},e:{p:'7, 8',r1:'Ester 3:7-4:17',r2:'Hechos 19:21-31'}},'2025-09-07':{m:{p:'11, 12',r1:'Ester 5:1-14',r2:'Marcos 10:32-34'},e:{p:'9, 13',r1:'Ester 6:1-14',r2:'Hechos 19:32-41'}},'2025-09-08':{m:{p:'10, 14',r1:'Ester 7:1-10',r2:'Marcos 10:35-45'},e:{p:'15, 16',r1:'Ester 8:1-17',r2:'Hechos 20:1-16'}},'2025-09-09':{m:{p:'17',r1:'Ester 9:1-19',r2:'Marcos 10:46-52'},e:{p:'18:1-20',r1:'Ester 9:20-32',r2:'Hechos 20:17-38'}},'2025-09-10':{m:{p:'18:21-50',r1:'Job 1:1-22',r2:'Marcos 11:1-11'},e:{p:'19',r1:'Job 2:1-13',r2:'Hechos 21:1-14'}},'2025-09-11':{m:{p:'20, 21',r1:'Job 3:1-26',r2:'Marcos 11:12-26'},e:{p:'22',r1:'Job 4:1-21',r2:'Hechos 21:15-26'}},'2025-09-12':{m:{p:'23, 24',r1:'Job 5:1-27',r2:'Marcos 11:27-33'},e:{p:'25',r1:'Job 6:1-13',r2:'Hechos 21:27-36'}},'2025-09-13':{m:{p:'26, 28',r1:'Job 6:14-30',r2:'Marcos 12:1-12'},e:{p:'27, 29',r1:'Job 7:1-21',r2:'Hechos 21:37-22:5'}},'2025-09-14':{m:{p:'40, 54',r1:'Génesis 3:1-15',r2:'Juan 12:27-33'},e:{p:'110, 111',r1:'Números 21:4-9',r2:'1 Corintios 1:18-25'}},'2025-09-15':{m:{p:'30, 32',r1:'Job 8:1-22',r2:'Marcos 12:13-17'},e:{p:'31, 33',r1:'Job 9:1-15, 32-35',r2:'Hechos 22:6-21'}},'2025-09-16':{m:{p:'34',r1:'Job 10:1-22',r2:'Marcos 12:18-27'},e:{p:'119:25-48',r1:'Job 11:1-20',r2:'Hechos 22:22-29'}},'2025-09-17':{m:{p:'35',r1:'Job 12:1-6, 12-25',r2:'Marcos 12:28-34'},e:{p:'36',r1:'Job 13:1-19',r2:'Hechos 22:30-23:11'}},'2025-09-18':{m:{p:'37:1-18',r1:'Job 13:20-14:6',r2:'Marcos 12:35-37'},e:{p:'37:19-40',r1:'Job 14:7-22',r2:'Hechos 23:12-24'}},'2025-09-19':{m:{p:'38',r1:'Job 15:1-23, 30-35',r2:'Marcos 12:38-44'},e:{p:'39',r1:'Job 16:1-22',r2:'Hechos 23:23-35'}},'2025-09-20':{m:{p:'40, 41',r1:'Job 17:1-16',r2:'Marcos 13:1-13'},e:{p:'42, 43',r1:'Job 18:1-21',r2:'Hechos 24:1-9'}},'2025-09-21':{m:{p:'119:41-48',r1:'Isaías 55:1-5',r2:'Mateo 9:9-13'},e:{p:'112',r1:'Ezequiel 1:1-3, 2:8-3:3',r2:'2 Corintios 4:1-6'}},'2025-09-22':{m:{p:'44',r1:'Job 19:1-27',r2:'Marcos 13:14-23'},e:{p:'45, 46',r1:'Job 20:1-29',r2:'Hechos 24:10-23'}},'2025-09-23':{m:{p:'47, 48',r1:'Job 21:1-21',r2:'Marcos 13:24-31'},e:{p:'49',r1:'Job 21:22-34',r2:'Hechos 24:24-25:12'}},'2025-09-24':{m:{p:'119:49-72',r1:'Job 22:1-20',r2:'Marcos 13:32-37'},e:{p:'51',r1:'Job 22:21-30',r2:'Hechos 25:13-27'}},'2025-09-25':{m:{p:'52',r1:'Job 23:1-17',r2:'Marcos 14:1-11'},e:{p:'53, 54',r1:'Job 24:1-17',r2:'Hechos 26:1-18'}},'2025-09-26':{m:{p:'55',r1:'Job 24:18-25',r2:'Marcos 14:12-21'},e:{p:'56, 57',r1:'Job 25:1-6, 26:5-14',r2:'Hechos 26:19-32'}},'2025-09-27':{m:{p:'58',r1:'Job 27:1-23',r2:'Marcos 14:22-31'},e:{p:'59, 60',r1:'Job 28:1-28',r2:'Hechos 27:1-12'}},'2025-09-28':{m:{p:'61, 62',r1:'Job 29:1-25',r2:'Marcos 14:32-42'},e:{p:'63, 64',r1:'Job 30:1-15',r2:'Hechos 27:13-32'}},'2025-09-29':{m:{p:'91, 103',r1:'Génesis 28:10-17',r2:'Juan 1:47-51'},e:{p:'138',r1:'Daniel 12:1-3',r2:'Apocalipsis 5:1-14'}},'2025-09-30':{m:{p:'65',r1:'Job 30:16-31',r2:'Marcos 14:43-52'},e:{p:'66, 67',r1:'Job 31:1-23',r2:'Hechos 27:33-44'}},'2025-10-01':{m:{p:'68',r1:'Job 31:24-40',r2:'Marcos 14:53-65'},e:{p:'69, 70',r1:'Job 32:1-12, 21-22',r2:'Hechos 28:1-16'}},'2025-10-02':{m:{p:'71',r1:'Job 33:1-18',r2:'Marcos 14:66-72'},e:{p:'72',r1:'Job 33:19-33',r2:'Hechos 28:17-31'}},'2025-10-03':{m:{p:'73',r1:'Job 34:1-20',r2:'Marcos 15:1-11'},e:{p:'74',r1:'Job 34:21-37',r2:'Gálatas 1:1-10'}},'2025-10-04':{m:{p:'75, 76',r1:'Job 35:1-16',r2:'Marcos 15:12-19'},e:{p:'77',r1:'Job 36:1-16',r2:'Gálatas 1:11-24'}},'2025-10-05':{m:{p:'78:1-39',r1:'Job 36:17-33',r2:'Marcos 15:20-32'},e:{p:'78:40-72',r1:'Job 37:1-24',r2:'Gálatas 2:1-10'}},'2025-10-06':{m:{p:'80',r1:'Job 38:1-17',r2:'Marcos 15:33-39'},e:{p:'81, 82',r1:'Job 38:18-41',r2:'Gálatas 2:11-21'}},'2025-10-07':{m:{p:'83, 84',r1:'Job 39:1-30',r2:'Marcos 15:40-47'},e:{p:'85',r1:'Job 40:1-24',r2:'Gálatas 3:1-9'}},'2025-10-08':{m:{p:'119:97-120',r1:'Job 41:1-11',r2:'Marcos 16:1-8'},e:{p:'87',r1:'Job 41:12-34',r2:'Gálatas 3:10-14'}},'2025-10-09':{m:{p:'88',r1:'Job 42:1-17',r2:'Lucas 1:1-4'},e:{p:'89:1-18',r1:'Proverbios 1:1-19',r2:'Gálatas 3:15-22'}},'2025-10-10':{m:{p:'89:19-52',r1:'Proverbios 1:20-33',r2:'Lucas 1:5-17'},e:{p:'90',r1:'Proverbios 2:1-15',r2:'Gálatas 3:23-29'}},'2025-10-11':{m:{p:'91, 92',r1:'Proverbios 3:1-12',r2:'Lucas 1:18-25'},e:{p:'93, 94',r1:'Proverbios 3:13-26',r2:'Gálatas 4:1-7'}},'2025-10-12':{m:{p:'96, 97',r1:'Proverbios 4:1-19',r2:'Lucas 1:26-38'},e:{p:'98, 99',r1:'Proverbios 4:20-5:6',r2:'Gálatas 4:8-20'}},'2025-10-13':{m:{p:'100, 101',r1:'Proverbios 5:7-23',r2:'Lucas 1:39-45'},e:{p:'102, 103',r1:'Proverbios 6:1-19',r2:'Gálatas 4:21-31'}},'2025-10-14':{m:{p:'104',r1:'Proverbios 6:20-35',r2:'Lucas 1:46-56'},e:{p:'105:1-22',r1:'Proverbios 7:1-27',r2:'Gálatas 5:1-12'}},'2025-10-15':{m:{p:'105:23-45',r1:'Proverbios 8:1-21',r2:'Lucas 1:57-66'},e:{p:'106:1-18',r1:'Proverbios 8:22-35',r2:'Gálatas 5:13-26'}},'2025-10-16':{m:{p:'106:19-48',r1:'Proverbios 9:1-18',r2:'Lucas 1:67-80'},e:{p:'107:1-32',r1:'Proverbios 10:1-12',r2:'Gálatas 6:1-10'}},'2025-10-17':{m:{p:'107:33-43, 108:1-6',r1:'Proverbios 11:1-13',r2:'Lucas 2:1-7'},e:{p:'109, 110',r1:'Proverbios 12:1-12',r2:'Gálatas 6:11-18'}},'2025-10-18':{m:{p:'103',r1:'Isaías 52:7-10',r2:'Lucas 1:1-4'},e:{p:'119:89-104',r1:'Ezequiel 1:4-14',r2:'2 Timoteo 4:5-11'}},'2025-10-19':{m:{p:'111, 112',r1:'Proverbios 13:1-12',r2:'Lucas 2:8-20'},e:{p:'113, 114',r1:'Proverbios 14:1-12',r2:'Efesios 1:1-10'}},'2025-10-20':{m:{p:'115',r1:'Proverbios 15:1-17',r2:'Lucas 2:21-32'},e:{p:'116, 117',r1:'Proverbios 15:18-33',r2:'Efesios 1:11-23'}},'2025-10-21':{m:{p:'118',r1:'Proverbios 16:1-15',r2:'Lucas 2:33-40'},e:{p:'119:1-24',r1:'Proverbios 16:16-33',r2:'Efesios 2:1-10'}},'2025-10-22':{m:{p:'120, 121, 122',r1:'Proverbios 17:1-17',r2:'Lucas 2:41-52'},e:{p:'123, 124, 125',r1:'Proverbios 19:1-12',r2:'Efesios 2:11-22'}},'2025-10-23':{m:{p:'121, 122',r1:'Isaías 61:1-4',r2:'Hechos 15:12-22a'},e:{p:'124, 125',r1:'Isaías 65:17-25',r2:'1 Corintios 15:1-11'}},'2025-10-24':{m:{p:'126, 127, 128',r1:'Proverbios 20:1-15',r2:'Lucas 3:1-14'},e:{p:'129, 130, 131',r1:'Proverbios 20:16-30',r2:'Efesios 3:1-13'}},'2025-10-25':{m:{p:'132, 133',r1:'Proverbios 21:1-16',r2:'Lucas 3:15-22'},e:{p:'134, 135',r1:'Proverbios 21:17-31',r2:'Efesios 3:14-21'}},'2025-10-26':{m:{p:'136, 137',r1:'Proverbios 22:1-16',r2:'Lucas 4:1-13'},e:{p:'138',r1:'Proverbios 22:17-29',r2:'Efesios 4:1-16'}},'2025-10-27':{m:{p:'139',r1:'Proverbios 23:1-18',r2:'Lucas 4:14-21'},e:{p:'140, 141',r1:'Proverbios 23:19-35',r2:'Efesios 4:17-32'}},'2025-10-28':{m:{p:'119:1-16',r1:'Isaías 28:9-16',r2:'Efesios 2:19-22'},e:{p:'116, 117',r1:'Jeremías 3:11-18',r2:'Juan 14:15-31'}},'2025-10-29':{m:{p:'142, 143',r1:'Proverbios 24:1-12',r2:'Lucas 4:22-30'},e:{p:'144',r1:'Proverbios 24:13-22',r2:'Efesios 5:1-20'}},'2025-10-30':{m:{p:'145',r1:'Proverbios 24:23-34',r2:'Lucas 4:31-37'},e:{p:'146, 147',r1:'Proverbios 25:1-14',r2:'Efesios 5:21-33'}},'2025-10-31':{m:{p:'148, 149',r1:'Proverbios 25:15-28',r2:'Lucas 4:38-44'},e:{p:'150',r1:'Proverbios 26:1-12',r2:'Efesios 6:1-9'}},'2025-11-01':{m:{p:'111, 112',r1:'Sabiduría 3:1-9',r2:'Hebreos 11:32-12:2'},e:{p:'148, 149',r1:'Sabiduría 5:1-16',r2:'Apocalipsis 21:1-4, 22-22:5'}},'2025-11-02':{m:{p:'1, 2, 3',r1:'Proverbios 27:1-14',r2:'Lucas 5:1-11'},e:{p:'4, 7',r1:'Proverbios 27:15-27',r2:'Efesios 6:10-24'}},'2025-11-03':{m:{p:'5, 6',r1:'Proverbios 30:1-14',r2:'Lucas 5:12-16'},e:{p:'10, 11',r1:'Proverbios 30:15-33',r2:'Filipenses 1:1-11'}},'2025-11-04':{m:{p:'119:1-24',r1:'Proverbios 31:1-9',r2:'Lucas 5:17-26'},e:{p:'12, 13, 14',r1:'Proverbios 31:10-31',r2:'Filipenses 1:12-30'}},'2025-11-05':{m:{p:'15, 16',r1:'Eclesiastés 1:1-18',r2:'Lucas 5:27-32'},e:{p:'17',r1:'Eclesiastés 2:1-15',r2:'Filipenses 2:1-11'}},'2025-11-06':{m:{p:'18',r1:'Eclesiastés 2:16-26',r2:'Lucas 5:33-39'},e:{p:'19, 20',r1:'Eclesiastés 3:1-15',r2:'Filipenses 2:12-30'}},'2025-11-07':{m:{p:'21, 22',r1:'Eclesiastés 3:16-4:8',r2:'Lucas 6:1-5'},e:{p:'23',r1:'Eclesiastés 4:9-16',r2:'Filipenses 3:1-11'}},'2025-11-08':{m:{p:'24, 25',r1:'Eclesiastés 5:1-7',r2:'Lucas 6:6-11'},e:{p:'26, 28',r1:'Eclesiastés 5:8-20',r2:'Filipenses 3:12-21'}},'2025-11-09':{m:{p:'27, 29',r1:'Eclesiastés 6:1-12',r2:'Lucas 6:12-19'},e:{p:'30, 31',r1:'Eclesiastés 7:1-14',r2:'Filipenses 4:1-9'}},'2025-11-10':{m:{p:'34',r1:'Eclesiastés 7:15-29',r2:'Lucas 6:20-26'},e:{p:'32',r1:'Eclesiastés 8:1-9',r2:'Filipenses 4:10-20'}},'2025-11-11':{m:{p:'119:25-48',r1:'Eclesiastés 8:10-17',r2:'Lucas 6:27-38'},e:{p:'35',r1:'Eclesiastés 9:1-10',r2:'Colosenses 1:1-14'}},'2025-11-12':{m:{p:'36',r1:'Eclesiastés 9:11-18',r2:'Lucas 6:39-49'},e:{p:'37:1-18',r1:'Eclesiastés 10:1-20',r2:'Colosenses 1:15-23'}},'2025-11-13':{m:{p:'37:19-40',r1:'Eclesiastés 11:1-8',r2:'Lucas 7:1-10'},e:{p:'39, 40',r1:'Eclesiastés 11:9-12:14',r2:'Colosenses 1:24-2:7'}},'2025-11-14':{m:{p:'38',r1:'Baruc 1:1-14',r2:'Lucas 7:11-17'},e:{p:'41',r1:'Baruc 1:15-2:10',r2:'Colosenses 2:8-23'}},'2025-11-15':{m:{p:'42, 43',r1:'Baruc 2:11-19',r2:'Lucas 7:18-35'},e:{p:'44, 45',r1:'Baruc 2:20-35',r2:'Colosenses 3:1-11'}},'2025-11-16':{m:{p:'46',r1:'Baruc 3:1-8',r2:'Lucas 7:36-50'},e:{p:'47, 48',r1:'Baruc 3:9-37',r2:'Colosenses 3:12-17'}},'2025-11-17':{m:{p:'49, 119:49-72',r1:'Baruc 4:5-20',r2:'Lucas 8:1-15'},e:{p:'50',r1:'Baruc 4:21-29',r2:'Colosenses 3:18-4:6'}},'2025-11-18':{m:{p:'51',r1:'Baruc 4:30-5:9',r2:'Lucas 8:16-25'},e:{p:'52',r1:'Lamentaciones 1:1-12',r2:'Colosenses 4:7-18'}},'2025-11-19':{m:{p:'53, 54',r1:'Lamentaciones 1:13-22',r2:'Lucas 8:26-39'},e:{p:'55',r1:'Lamentaciones 2:1-9',r2:'1 Tesalonicenses 1:1-10'}},'2025-11-20':{m:{p:'56, 57',r1:'Lamentaciones 2:10-19',r2:'Lucas 8:40-56'},e:{p:'58, 59',r1:'Lamentaciones 2:20-3:18',r2:'1 Tesalonicenses 2:1-12'}},'2025-11-21':{m:{p:'60, 61',r1:'Lamentaciones 3:19-33',r2:'Lucas 9:1-9'},e:{p:'62',r1:'Lamentaciones 3:34-58',r2:'1 Tesalonicenses 2:13-20'}},'2025-11-22':{m:{p:'63, 64',r1:'Lamentaciones 3:59-4:11',r2:'Lucas 9:10-17'},e:{p:'65, 66',r1:'Lamentaciones 4:12-22',r2:'1 Tesalonicenses 3:1-13'}},'2025-11-23':{m:{p:'67, 68',r1:'Lamentaciones 5:1-22',r2:'Lucas 9:18-27'},e:{p:'69, 70',r1:'Ezequiel 1:1-14',r2:'1 Tesalonicenses 4:1-12'}},'2025-11-24':{m:{p:'71',r1:'Ezequiel 1:15-28',r2:'Lucas 9:28-36'},e:{p:'72',r1:'Ezequiel 2:1-10',r2:'1 Tesalonicenses 4:13-18'}},'2025-11-25':{m:{p:'119:73-96',r1:'Ezequiel 3:1-11',r2:'Lucas 9:37-45'},e:{p:'74',r1:'Ezequiel 3:12-21',r2:'1 Tesalonicenses 5:1-11'}},'2025-11-26':{m:{p:'75',r1:'Ezequiel 3:22-27',r2:'Lucas 9:46-50'},e:{p:'76, 77',r1:'Ezequiel 4:1-17',r2:'1 Tesalonicenses 5:12-28'}},'2025-11-27':{m:{p:'78:1-18',r1:'Ezequiel 5:1-17',r2:'Lucas 9:51-56'},e:{p:'78:19-37',r1:'Ezequiel 6:1-14',r2:'2 Tesalonicenses 1:1-12'}},'2025-11-28':{m:{p:'78:38-72',r1:'Ezequiel 7:1-15',r2:'Lucas 9:57-62'},e:{p:'79',r1:'Ezequiel 7:16-27',r2:'2 Tesalonicenses 2:1-17'}},'2025-11-29':{m:{p:'80',r1:'Ezequiel 8:1-18',r2:'Lucas 10:1-12'},e:{p:'81, 82',r1:'Ezequiel 9:1-11',r2:'2 Tesalonicenses 3:1-18'}},'2025-11-30':{m:{p:'60, 61, 62',r1:'Deuteronomio 30:1-10',r2:'Juan 1:29-42'},e:{p:'63, 64',r1:'Isaías 62:1-7',r2:'Juan 12:20-32'}},
+                    },
+                    collectsData: {
+                        'ordinary_time': 'Señor de todo poder y majestad, cuyo servicio es perfecta libertad: Mantennos, te suplicamos, en tu servicio para que podamos crecer en tu amor y gracia; por Jesucristo nuestro Señor, que vive y reina contigo y el Espíritu Santo, un solo Dios, ahora y por siempre. Amén.',
+                        'advent': 'Dios todopoderoso, danos gracia para que desechemos las obras de las tinieblas y nos vistamos con la armadura de la luz, ahora en el tiempo de esta vida mortal, en la cual tu Hijo Jesucristo vino a visitarnos en gran humildad; para que en el último día, cuando él vuelva en su gloriosa majestad a juzgar a vivos y muertos, resucitemos a la vida inmortal; por él, que vive y reina contigo y el Espíritu Santo, un solo Dios, ahora y por siempre. Amén.',
+                        'christmas': 'Oh Dios, que nos alegras con la conmemoración anual del nacimiento de tu único Hijo Jesucristo: Concédenos que, así como lo recibimos con gozo como nuestro Redentor, podamos contemplarlo con seguridad cuando venga a ser nuestro Juez; que vive y reina contigo y el Espíritu Santo, un solo Dios, por los siglos de los siglos. Amén.',
+                        'epiphany': 'Oh Dios, que por la guía de una estrella manifestaste a tu único Hijo a los gentiles: Guíanos, te suplicamos, a nosotros, que ahora te conocemos por la fe, a la visión de tu gloriosa divinidad; por Jesucristo nuestro Señor. Amén.',
+                        'lent': 'Dios todopoderoso, cuyos bendito Hijo fue llevado por el Espíritu para ser tentado por Satanás: Ayúdanos, te suplicamos, a que en la confesión de nuestros pecados y en el ayuno, usemos tal abstinencia que, subyugada siempre nuestra carne al Espíritu, obedezcamos tus santas inspiraciones en verdadera justicia y santidad, para tu honra y gloria; por Jesucristo nuestro Señor. Amén.',
+                        'easter': 'Dios todopoderoso, que por medio de tu unigénito Hijo Jesucristo has vencido a la muerte y nos has abierto la puerta de la vida eterna: Te suplicamos humildemente que, así como por tu gracia especial pones en nuestra mente buenos deseos, así por tu continua ayuda podamos llevarlos a buen efecto; por Jesucristo nuestro Señor, que vive y reina contigo y el Espíritu Santo, un solo Dios, por los siglos de los siglos. Amén.',
                     }
-                    return count;
-                };
+                },
 
-                let season = '';
-                let seasonColor = '#16a34a'; // Default green
-                let title = '';
-                let cycle = 'Ciclo C';
-
-                // Determine Season
-                if (date >= firstSundayOfAdvent2025) {
-                    season = 'Advent'; seasonColor = '#6d28d9';
-                } else if (date >= pentecost) {
-                    season = 'Season after Pentecost'; seasonColor = '#16a34a';
-                } else if (date >= easter) {
-                    season = 'Easter'; seasonColor = '#f59e0b';
-                } else if (date >= ashWednesday) {
-                    season = 'Lent'; seasonColor = '#9333ea';
-                } else if (date > baptismOfTheLord) {
-                    season = 'Season after Epiphany'; seasonColor = '#16a34a';
-                } else if (date >= epiphanySunday) {
-                    season = 'Epiphany'; seasonColor = '#ca8a04';
-                } else if (date >= new Date(2024, 11, 25)) {
-                    season = 'Christmas'; seasonColor = '#ca8a04';
-                } else {
-                    season = 'Advent'; seasonColor = '#6d28d9';
-                }
-
-                const placeholderReadings = {
-                    firstReading: { ref: 'Lectura I', text: 'Texto de la primera lectura no disponible.' },
-                    psalm: { ref: 'Salmo Responsorial', response: 'Respuesta del salmo.', stanzas: ['Estrofa del salmo no disponible.'] },
-                    secondReading: { ref: 'Lectura II', text: 'Texto de la segunda lectura no disponible.' },
-                    alleluiaVerse: 'Versículo del Aleluya no disponible.',
-                    gospel: { ref: 'Evangelio', text: 'Texto del Evangelio no disponible.' }
-                };
-
-                // --- SOLEMNITIES AND FEASTS (OVERRIDE SUNDAY LOGIC) ---
-                const solemnities = {
-                    '2025-01-01': { title: 'La Circuncisión y Santo Nombre de Nuestro Señor Jesucristo', color: '#f1f5f9' },
-                    '2025-01-06': { title: 'La Epifanía de Nuestro Señor Jesucristo', color: '#f1f5f9' },
-                    '2025-01-25': { title: 'La Conversión de San Pablo Apóstol', color: '#f1f5f9' },
-                    '2025-02-02': { title: 'La Presentación de Nuestro Señor Jesucristo en el Templo', color: '#f1f5f9' },
-                    '2025-03-05': { title: 'Miércoles de Ceniza', color: '#9333ea' },
-                    '2025-03-25': { title: 'La Anunciación de Nuestro Señor Jesucristo a la Santísima Virgen María', color: '#f1f5f9' },
-                    '2025-04-17': { title: 'Jueves Santo', color: '#f1f5f9' },
-                    '2025-04-18': { title: 'Viernes Santo', color: '#dc2626' },
-                    '2025-04-19': { title: 'Sábado Santo', color: '#f1f5f9' },
-                    '2025-04-25': { title: 'San Marcos Evangelista', color: '#dc2626' },
-                    '2025-05-01': { title: 'San Felipe y San Santiago, Apóstoles', color: '#dc2626' },
-                    '2025-05-29': { title: 'La Ascensión de Nuestro Señor Jesucristo', color: '#f1f5f9' },
-                    '2025-06-11': { title: 'San Bernabé Apóstol', color: '#dc2626' },
-                    '2025-06-24': { title: 'Natividad de San Juan Bautista', color: '#f1f5f9' },
-                    '2025-06-29': { title: 'San Pedro y San Pablo, Apóstoles', color: '#dc2626' },
-                    '2025-07-22': { title: 'Santa María Magdalena', color: '#f1f5f9' },
-                    '2025-07-25': { title: 'Santiago Apóstol', color: '#dc2626' },
-                    '2025-08-06': { title: 'La Transfiguración de Nuestro Señor Jesucristo', color: '#f1f5f9' },
-                    '2025-08-15': { title: 'Santa María Virgen, Madre de Nuestro Señor Jesucristo', color: '#f1f5f9' },
-                    '2025-08-24': { title: 'San Bartolomé Apóstol', color: '#dc2626' },
-                    '2025-11-01': { title: 'Día de Todos los Santos', color: '#f1f5f9' },
-                    '2025-12-25': { title: 'El Día de Navidad', color: '#f59e0b' },
-                };
-
-                if (solemnities[dateString]) {
-                    title = solemnities[dateString].title;
-                    seasonColor = solemnities[dateString].color;
-                    cycle = 'Día Santo';
-                }
-
-                // --- SUNDAY TITLES (LOC 2019) ---
-                if (date.getDay() === 0 && !title) {
-                    const ordinals = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "Séptimo", "Octavo", "Noveno", "Décimo"];
-
-                    if (date >= firstSundayOfAdvent2025) {
-                        const sundayIndex = countSundays(firstSundayOfAdvent2025, date);
-                        title = `El ${ordinals[sundayIndex - 1]} Domingo de Adviento`;
-                    } else if (date.getTime() === christTheKing.getTime()) {
-                        title = 'El Último Domingo después de Pentecostés: Cristo Rey';
-                    } else if (date.getTime() === trinitySunday.getTime()) {
-                        title = "El Domingo de la Santísima Trinidad";
-                    } else if (date > trinitySunday) {
-                        const sundayIndex = countSundays(trinitySunday, date);
-                        title = `El ${ordinals[sundayIndex] || (sundayIndex + 1) + 'º'} Domingo después de Pentecostés`;
-                    } else if (date.getTime() === pentecost.getTime()) {
-                        title = 'El Día de Pentecostés';
-                    } else if (date.getTime() === easter.getTime()) {
-                        title = 'Domingo de Pascua';
-                    } else if (date > easter) {
-                        const sundayIndex = countSundays(easter, date);
-                        title = `El ${ordinals[sundayIndex - 1]} Domingo de Pascua`;
-                    } else if (date.getTime() === addDays(ashWednesday, 46).getTime()) { // Palm Sunday
-                        title = 'Domingo de Ramos: La Pasión del Señor';
-                        seasonColor = '#dc2626';
-                    } else if (date > ashWednesday) {
-                        const sundayIndex = countSundays(addDays(ashWednesday, 4), date);
-                        if (sundayIndex === 4) {
-                            title = 'Domingo de Laetare ("Alegraos")';
-                        } else {
-                            title = `El ${ordinals[sundayIndex - 1]} Domingo de Cuaresma`;
-                        }
-                    } else if (date.getTime() === baptismOfTheLord.getTime()) {
-                        title = 'El Bautismo de Nuestro Señor Jesucristo';
-                    } else if (date > epiphanySunday) {
-                        const sundayIndex = countSundays(epiphanySunday, date);
-                        title = `El ${ordinals[sundayIndex - 1]} Domingo después de la Epifanía`;
-                    } else if (date > new Date(2024, 11, 25)) {
-                        title = 'El Primer Domingo después de Navidad';
-                    } else if (date >= firstSundayOfAdvent2024) {
-                        const sundayIndex = countSundays(firstSundayOfAdvent2024, date);
-                        title = `El ${ordinals[sundayIndex - 1]} Domingo de Adviento`;
-                    }
-                }
-                
-                if (!title && date.getDay() !== 0) {
-                    const dayOfWeek = date.toLocaleDateString('es-ES', { weekday: 'long' });
-                    title = `El ${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} de la semana`;
-                }
-
-
-                if (!title) return null;
-
-                let liturgy = {
-                    title: title,
-                    cycle: cycle,
-                    omitGloria: (season === 'Advent' || season === 'Lent'),
-                    omitAlleluia: (season === 'Lent'),
-                    seasonColor: seasonColor,
-                    season: season,
-                    prayers: {},
-                    readings: placeholderReadings
-                };
-
-                // Specific data for the example date
-                if (dateString === '2025-08-10') {
-                    liturgy.prayers = {
-                        collect: 'Dios todopoderoso y eterno, a quien podemos llamar Padre, aumenta en nuestros corações el espíritu de hijos adoptivos, para que merezcamos entrar un día en la herencia prometida. Por nuestro Señor Jesucristo.',
-                        offerings: 'Sé propicio, Señor, a tu pueblo y acepta con bondad estas ofrendas, para que, con la ayuda de tu piedad, a cada uno le aproveche para su salvación lo que ofrece en honor de tu nombre. Por Jesucristo, nuestro Señor.',
-                        postCommunion: 'Que la comunión en tus sacramentos nos salve, Señor, y nos afiance en la luz de tu verdad. Por Jesucristo, nuestro Señor.',
-                        preface: 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:'
-                    };
-                    liturgy.readings = {
-                        firstReading: { ref: 'Sabiduría 18, 6-9', text: `La noche de la liberación fue anunciada de antemano a nuestros padres, para que tuvieran ánimo al conocer con certeza la promesa de la que se fiaban. Tu pueblo esperaba, a la vez, la salvación de los justos y la perdición de los enemigos. Porque con la misma acción que castigaste a los adversarios, nos glorificaste a nosotros, llamándonos a ti. Los santos hijos de los buenos ofrecían sacrificios a escondidas y establecieron de común acuerdo esta ley divina: que los santos compartirían por igual los mismos bienes y peligros; y entonaron los himnos de los padres.` },
-                        psalm: { ref: 'Salmo 32', response: 'Dichoso el pueblo que el Señor se escogió como heredad.', stanzas: [ `Aclamad, justos, al Señor,<br>que merece la alabanza de los buenos.<br>Dichosa la nación cuyo Dios es el Señor,<br>el pueblo que él se escogió como heredad.`, `El Señor mira desde el cielo,<br>se fija en todos los hombres.<br>Desde su morada observa<br>a todos los habitantes de la tierra.`, `Los ojos del Señor están puestos en quien lo teme,<br>en los que esperan en su misericordia,<br>para librar sus vidas de la muerte<br>y reanimarlos en tiempo de hambre.`, `Nosotros aguardamos al Señor:<br>él es nuestro auxilio y escudo;<br>que tu misericordia, Señor, venga sobre nosotros,<br>como lo esperamos de ti.` ] },
-                        secondReading: { ref: 'Hebreos 11, 1-2. 8-19', text: `Hermanos: La fe es garantía${ref('hypostasis', 1)} de lo que se espera, la prueba${ref('elenchos', 2)} de las realidades que no se ven. Por ella fueron alabados nuestros mayores. Por la fe, Abrahán, al ser llamado por Dios, obedeció y salió para el lugar que había de recibir en herencia, y salió sin saber a dónde iba. Por la fe, se estableció en la tierra prometida como en tierra extraña, viviendo en tiendas, y lo mismo Isaac y Jacob, herederos de la misma promesa${ref('epangelia', 3)}, pues esperaba la ciudad de sólidos cimientos, cuyo arquitecto y constructor es Dios. Por la fe, también Sara, siendo estéril, obtuvo vigor para concebir, a pesar de su edad avanzada, porque creyó que era fiel el que se lo prometía. Y así, de un solo hombre, y ya marcado por la muerte, nacieron hijos, numerosos como las estrellas del cielo e incontables como la arena de las playas. Con fe murieron todos estos, sin haber recibido las promesas; las vieron y las saludaron de lejos, confesando que eran extraños y peregrinos en la terra. Los que así hablan, dan a entender que buscan una patria; pues si hubieran pensado en la que habían abandonado, tenían ocasión de volver. Pero ellos ansiaban una patria mejor, la celestial. Por eso Dios no se avergenza de llamarse su Dios, pues les tenía preparada una ciudad. Por la fe, Abrahán, puesto a prueba, ofreció a Isaac; y el que había recibido las promesas, ofrecía a su unigénito, a quien se le había dicho: «La descendencia que lleve tu nombre será la de Isaac». Pero Abrahán pensaba que Dios tiene poder hasta para resucitar de entre los muertos, de donde en cierto sentido lo recobró.` },
-                        alleluiaVerse: 'Estad en vela y preparados, porque a la hora que menos penséis viene el Hijo del hombre. (cf. Mt 24, 42a. 44)',
-                        gospel: { ref: 'Lucas 12, 32-48', text: `En aquel tiempo, dijo Jesús a sus discípulos: «No temas, pequeño rebaño${ref('poimnion', 4)}, porque vuestro Padre ha tenido a bien daros el reino. Vended vuestros bienes y dad limosna. Haceos bolsas que no se estropeen, un tesoro inagotable en el cielo, adonde no se acercan los ladrones ni roe la polilla. Porque donde está vuestro tesoro, allí estará también vuestro corazón${ref('kardia', 5)}. Tened ceñida la cintura y encendidas las lámparas. Vosotros estad como los hombres que aguardan a que su señor vuelva de la boda, para abrirle apenas venga y llame. Bienaventurados aquellos criados a quienes el señor, al llegar, los encuentre en vela${ref('gregoreō', 6)}; en verdad os digo que se ceñirá, los hará sentar a la mesa y, acercándose, les irá sirviendo. Y, si llega a la segunda vigilia o a la tercera y los encuentra así, ¡bienaventurados ellos! Comprended que si supiera el dueño de casa a qué hora viene el ladrón, no le dejaría abrir un boquete en su casa. Lo mismo vosotros, estad preparados, porque a la hora que menos penséis viene el Hijo del hombre». Pedro le dijo: «Señor, ¿dices esta parábola por nosotros o por todos?». Y el Señor dijo: «¿Quién es el administrador fiel y prudente a quien el señor pondrá al frente de su servidumbre para que reparta la ración de alimento a sus horas? Bienaventurado aquel siervo${ref('doulos', 7)} a quien su señor, al llegar, lo encuentre portándose así. En verdad os digo que lo pondrá al frente de todos sus bienes. Pero si aquel siervo dijere para sus adentros: “Mi señor tarda en llegar”, y empieza a pegarles a los criados y a las criadas, a comer y beber y emborracharse, vendrá el señor de ese siervo el día que menos lo espera y a la hora que no sabe y lo castigará con rigor, y le asignará la suerte de los infieles. El siervo que, conociendo la voluntad de su señor, no se prepara ni obra de acuerdo con su voluntad, recibirá muchos azotes; pero el que, sin conocerla, ha hecho algo digno de azotes, recibirá menos. A quien mucho se le dio, mucho se le reclamará; a quien mucho se le confió, más aún se le pedirá».` }
-                    };
-                }
-
-                return liturgy;
-            }
-            
-            // --- DOM ELEMENTS & STATE ---
-            const splashScreen = document.getElementById('splash-screen');
-            const mainContent = document.getElementById('main-content');
-            const fullLiturgyView = document.getElementById('full-liturgy-view');
-            const backToCalendarBtn = document.getElementById('back-to-calendar-btn');
-            const printBtn = document.getElementById('print-btn');
-            const downloadDocxBtn = document.getElementById('download-docx-btn');
-            const hamburgerBtn = document.getElementById('hamburger-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const closeMenuBtn = document.getElementById('close-menu-btn');
-            const mobileNavLinks = document.getElementById('mobile-nav-links');
-            
-            const mainNavButtons = { 
-                home: document.getElementById('btn-home'),
-                liturgy: document.getElementById('btn-liturgy'), 
-                glossary: document.getElementById('btn-glossary'),
-                lectionary: document.getElementById('btn-lectionary')
-            };
-            const views = { 
-                home: document.getElementById('home-view'),
-                liturgy: document.getElementById('liturgy-view'), 
-                glossary: document.getElementById('glossary-view'),
-                lectionary: document.getElementById('lectionary-view')
-            };
-            
-            const fullLiturgyUI = { title: document.getElementById('full-liturgy-title'), subtitle: document.getElementById('full-liturgy-subtitle'), content: document.getElementById('full-liturgy-content') };
-            const uploadLogoBtn = document.getElementById('btn-upload-logo');
-            const logoUploader = document.getElementById('logo-uploader');
-            const logoImage = document.getElementById('logo-image');
-            
-            const theologyPopup = document.getElementById('theology-popup');
-            const theologyPopupOverlay = document.getElementById('theology-popup-overlay');
-            const theologyPopupContent = document.getElementById('popup-content-theology');
-            const theologyPopupClose = document.getElementById('popup-close');
-            
-            const cardsContainer = document.getElementById('liturgical-cards-container');
-            const lectionaryListContainer = document.getElementById('lectionary-list-container');
-            const lectionaryMonthSelector = document.getElementById('lectionary-month-selector');
-
-            // --- FUNCTIONS ---
-            function switchView(viewName) {
-                Object.values(views).forEach(v => v.classList.add('hidden'));
-                Object.values(mainNavButtons).forEach(b => b.classList.remove('active-nav'));
-                if (views[viewName]) {
-                    views[viewName].classList.remove('hidden');
-                    views[viewName].classList.add('fade-in');
-                }
-                if (mainNavButtons[viewName]) {
-                    mainNavButtons[viewName].classList.add('active-nav');
-                }
-                if (viewName === 'lectionary') {
-                    renderMonthSelector();
-                    renderLectionaryList(0); // Default to January
-                }
-            }
-            
-            function renderLiturgicalCards() {
-                cardsContainer.innerHTML = '';
-                const startDate = new Date(2025, 0, 1);
-                const endDate = new Date(2025, 11, 31);
-
-                for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                    const liturgyData = getLiturgyForDate(new Date(d));
-                    if (liturgyData) {
-                        const card = document.createElement('div');
-                        card.className = 'liturgical-card flex items-center p-4 rounded-lg shadow-md cursor-pointer';
-                        card.style.borderColor = liturgyData.seasonColor;
-                        card.dataset.date = d.toISOString().split('T')[0];
+                // -----------------------------------------------------------------
+                // UI: DOM element selection and manipulation
+                // -----------------------------------------------------------------
+                ui: {
+                    elements: {},
+                    
+                    selectElements() {
+                        const els = this.elements;
+                        els.splashScreen = document.getElementById('splash-screen');
+                        els.mainContent = document.getElementById('main-content');
+                        els.fullLiturgyView = document.getElementById('full-liturgy-view');
+                        els.backToCalendarBtn = document.getElementById('back-to-calendar-btn');
+                        els.printBtn = document.getElementById('print-btn');
+                        els.downloadDocxBtn = document.getElementById('download-docx-btn');
+                        els.hamburgerBtn = document.getElementById('hamburger-btn');
+                        els.mobileMenu = document.getElementById('mobile-menu');
+                        els.closeMenuBtn = document.getElementById('close-menu-btn');
+                        els.mobileNavLinks = document.getElementById('mobile-nav-links');
+                        els.mainHeader = document.getElementById('main-header');
                         
-                        card.innerHTML = `
-                            <div class="flex-shrink-0 w-20 text-center">
-                                <p class="text-gray-500 text-sm">${d.toLocaleDateString('es-ES', { weekday: 'short' }).replace('.', '')}</p>
-                                <p class="text-2xl font-bold text-gray-800">${d.getDate()}</p>
-                                <p class="text-gray-500 text-sm">${d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '')}</p>
-                            </div>
-                            <div class="flex-grow pl-4">
-                                <h3 class="font-bold text-lg text-gray-900">${liturgyData.title}</h3>
-                                <p class="text-sm text-gray-600">${liturgyData.cycle}</p>
-                            </div>
-                            <div class="flex-shrink-0">
-                               <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </div>
+                        els.mainNavButtons = { 
+                            home: document.getElementById('btn-home'),
+                            liturgy: document.getElementById('btn-liturgy'), 
+                            glossary: document.getElementById('btn-glossary'),
+                            lectionary: document.getElementById('btn-lectionary')
+                        };
+                        els.views = { 
+                            home: document.getElementById('home-view'),
+                            liturgy: document.getElementById('liturgy-view'), 
+                            glossary: document.getElementById('glossary-view'),
+                            lectionary: document.getElementById('lectionary-view')
+                        };
+                        
+                        els.fullLiturgyUI = { 
+                            title: document.getElementById('full-liturgy-title'), 
+                            subtitle: document.getElementById('full-liturgy-subtitle'), 
+                            content: document.getElementById('full-liturgy-content') 
+                        };
+                        els.uploadLogoBtn = document.getElementById('btn-upload-logo');
+                        els.logoUploader = document.getElementById('logo-uploader');
+                        els.logoImage = document.getElementById('logo-image');
+                        
+                        els.theologyPopup = document.getElementById('theology-popup');
+                        els.theologyPopupOverlay = document.getElementById('theology-popup-overlay');
+                        els.theologyPopupContent = document.getElementById('popup-content-theology');
+                        els.theologyPopupClose = document.getElementById('popup-close');
+                        
+                        els.cardsContainer = document.getElementById('liturgical-cards-container');
+                        els.lectionaryListContainer = document.getElementById('lectionary-list-container');
+                        els.lectionaryMonthSelector = document.getElementById('lectionary-month-selector');
+                    },
+
+                    switchView(viewName) {
+                        Object.values(this.elements.views).forEach(v => v.classList.add('hidden'));
+                        Object.values(this.elements.mainNavButtons).forEach(b => b.classList.remove('active-nav'));
+                        
+                        if (this.elements.views[viewName]) {
+                            this.elements.views[viewName].classList.remove('hidden');
+                            this.elements.views[viewName].classList.add('fade-in');
+                        }
+                        if (this.elements.mainNavButtons[viewName]) {
+                            this.elements.mainNavButtons[viewName].classList.add('active-nav');
+                        }
+                        if (viewName === 'lectionary') {
+                            this.renderMonthSelector();
+                            this.renderLectionaryList(new Date().getMonth());
+                        }
+                    },
+
+                    renderLiturgicalCards() {
+                        this.elements.cardsContainer.innerHTML = '';
+                        const startDate = new Date(2025, 0, 1);
+                        const endDate = new Date(2025, 11, 31);
+
+                        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                            const liturgyData = App.services.getLiturgyForDate(new Date(d));
+                            if (liturgyData) {
+                                const card = document.createElement('div');
+                                card.className = 'liturgical-card flex items-center p-4 rounded-lg shadow-md cursor-pointer';
+                                card.style.borderColor = liturgyData.seasonColor;
+                                card.dataset.date = d.toISOString().split('T')[0];
+                                
+                                card.innerHTML = `
+                                    <div class="flex-shrink-0 w-20 text-center">
+                                        <p class="text-gray-500 text-sm">${d.toLocaleDateString('es-ES', { weekday: 'short' }).replace('.', '')}</p>
+                                        <p class="text-2xl font-bold text-gray-800">${d.getDate()}</p>
+                                        <p class="text-gray-500 text-sm">${d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '')}</p>
+                                    </div>
+                                    <div class="flex-grow pl-4">
+                                        <h3 class="font-bold text-lg text-gray-900">${liturgyData.title}</h3>
+                                        <p class="text-sm text-gray-600">${liturgyData.cycle}</p>
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                       <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    </div>
+                                `;
+                                this.elements.cardsContainer.appendChild(card);
+                            }
+                        }
+                    },
+                    
+                    renderFullLiturgyView(date) {
+                        const liturgy = App.services.getLiturgyForDate(date);
+                        const { title, subtitle, content } = this.elements.fullLiturgyUI;
+
+                        if (liturgy && liturgy.readings && liturgy.readings.firstReading.text !== 'Texto de la primera lectura no disponible.') {
+                            title.textContent = liturgy.title;
+                            subtitle.textContent = `${date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} | ${liturgy.cycle}`;
+                            
+                            const ref = (key, num) => `<span class="ref-link" data-term='${JSON.stringify(App.data.terms[key]).replace(/'/g, "&#39;")}'><sup>${num}</sup></span>`;
+                            const templates = App.services.getLiturgyTemplates(liturgy, ref);
+                            
+                            const entranceProcession = `<h3>Procesión de Entrada</h3><p class="liturgy-text italic">(Se canta un himno o antífona de entrada apropiado)</p>`;
+                            const introductoryRites = entranceProcession + templates.initialGreeting + templates.penitentialAct + (liturgy.omitGloria ? '' : templates.gloria) + `<h3>Oración Colecta</h3><p class="liturgy-text">${liturgy.prayers.collect}</p>`;
+                            
+                            let psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>` + liturgy.readings.psalm.stanzas.join(`<br><br><strong>R. ${liturgy.readings.psalm.response}</strong><br><br>`);
+                            const verseForAcclamation = liturgy.readings.alleluiaVerse || '';
+                            let gospelAcclamationHtml = liturgy.omitAlleluia ? templates.gospelAcclamation(verseForAcclamation) : templates.alleluia(verseForAcclamation);
+
+                            const liturgyOfTheWord = `<h3>Primera Lectura: ${liturgy.readings.firstReading.ref}</h3><p class="liturgy-text">${liturgy.readings.firstReading.text}</p><h3>Salmo Responsorial: ${liturgy.readings.psalm.ref}</h3><p class="liturgy-text">${psalmContentHtml}</p>${liturgy.readings.secondReading ? `<h3>Segunda Lectura: ${liturgy.readings.secondReading.ref}</h3><p class="liturgy-text">${liturgy.readings.secondReading.text}</p>` : ''}${gospelAcclamationHtml}${templates.gospel(liturgy.readings.gospel)}<h3>Homilía</h3><p class="liturgy-text italic">(Reflexión sobre las lecturas)</p>${templates.credo}${templates.prayerOfTheFaithful}`;
+                            const liturgyOfTheEucharist = `<h3>Presentación de las Ofrendas</h3><p class="liturgy-text">Oren, hermanos, para que este sacrificio, mío y de ustedes, sea agradable a Dios, Padre todopoderoso.<br><strong>El Señor reciba de tus manos este sacrificio, para alabanza y gloria de su nombre, para nuestro bien y el de toda su santa Iglesia.</strong></p><h3>Oración sobre las Ofrendas</h3><p class="liturgy-text">${liturgy.prayers.offerings}</p>${templates.eucharisticPrayerII(liturgy.prayers.preface)}${templates.communionRite}`;
+                            const concludingRites = `<h3>Oración después de la Comunión</h3><p class="liturgy-text">${liturgy.prayers.postCommunion}</p>${templates.acnaPostCommunion}${templates.concludingRites}`;
+
+                            content.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-md">
+                                <div class="liturgy-section"><h2>Ritos Iniciales</h2>${introductoryRites}</div>
+                                <div class="liturgy-section"><h2>Liturgia de la Palabra</h2>${liturgyOfTheWord}</div>
+                                <div class="liturgy-section"><h2>Liturgia Eucarística</h2>${liturgyOfTheEucharist}</div>
+                                <div class="liturgy-section"><h2>Ritos de Conclusión</h2>${concludingRites}</div>
+                            </div>`;
+                        } else {
+                            title.textContent = 'Liturgia no Disponible';
+                            subtitle.textContent = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                            content.innerHTML = `<div class="bg-white p-8 rounded-lg shadow-md text-center"><p class="text-gray-600 py-16">Lo sentimos, la liturgia completa para este día aún no ha sido implementada.</p></div>`;
+                        }
+                    },
+
+                    showFullLiturgy(date) {
+                        this.renderFullLiturgyView(date); 
+                        this.elements.mainContent.classList.add('hidden');
+                        this.elements.fullLiturgyView.classList.remove('hidden');
+                        this.elements.fullLiturgyView.scrollTop = 0;
+                    },
+
+                    hideFullLiturgy() {
+                        this.elements.mainContent.classList.remove('hidden');
+                        this.elements.fullLiturgyView.classList.add('hidden');
+                    },
+                    
+                    showTheologyPopup(data) {
+                        let commentaryHtml = data.commentary ? `<hr class="my-3 border-gray-200"><h5 class="text-teal-700 font-bold mt-2">Comentario Teológico</h5><p class="text-sm text-gray-600">${data.commentary}</p>` : '';
+                        this.elements.theologyPopupContent.innerHTML = `
+                            <h5 class="text-teal-700 font-bold">${data.transliteration}</h5>
+                            <p class="original-term text-gray-700 mb-2">${data.original}</p>
+                            <p class="text-gray-800">${data.meaning}</p>
+                            ${commentaryHtml}
                         `;
-                        cardsContainer.appendChild(card);
-                    }
-                }
-            }
-
-            function showFullLiturgy(date) {
-                renderFullLiturgyView(date); 
-                mainContent.classList.add('hidden');
-                fullLiturgyView.classList.remove('hidden');
-                fullLiturgyView.scrollTop = 0;
-            }
-
-            function renderFullLiturgyView(date) {
-                const liturgy = getLiturgyForDate(date);
-                if (liturgy && liturgy.readings && liturgy.readings.firstReading.text !== 'Texto de la primera lectura no disponible.') {
-                    fullLiturgyUI.title.textContent = liturgy.title;
-                    const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    fullLiturgyUI.subtitle.textContent = `${formattedDate} | ${liturgy.cycle}`;
-                    
-                    const templates = {
-                        initialGreeting: `<h3>Saludo Inicial</h3><p class="liturgy-text">En el nombre del Padre, y del Hijo, y del Espíritu Santo.<br><strong>Amén.</strong><br>La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo esté con todos ustedes.<br><strong>Y con tu espíritu.</strong></p>`,
-                        penitentialAct: `<h3>Acto Penitencial (Libro de Oración Común ACNA)</h3><p class="liturgy-text">Amados en el Señor, acerquémonos con un corazón penitente y obediente a la Palabra de Dios, confesando nuestros pecados para que podamos recibir el perdón por su infinita bondad y misericordia.<br><em>Se guarda un momento de silencio.</em><br><strong>Misericordiosísimo Dios, confesamos que hemos pecado contra ti en pensamiento, palabra y obra, por lo que hemos hecho y por lo que hemos dejado de hacer. No te hemos amado con todo nuestro corazón; no hemos amado a nuestro prójimo como a nosotros mismos. Lo sentimos de veras y nos arrepentimos humildemente. Por tu Hijo Jesucristo, ten misericordia de nosotros y perdónanos, para que nos deleitemos en tu voluntad y andemos en tus caminos, para la gloria de tu Nombre. Amén.</strong><br>Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.<br><strong>Amén.</strong></p>`,
-                        gloria: `<h3>Gloria</h3><p class="liturgy-text"><strong>Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo. Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.</strong></p>`,
-                        alleluia: (verse) => `<h3>Aleluya</h3><p class="liturgy-text"><strong>Aleluya, aleluya.</strong><br>${verse}<br><strong>Aleluya.</strong></p>`,
-                        gospelAcclamation: (verse) => `<h3>Aclamación antes del Evangelio</h3><p class="liturgy-text">${verse}</p>`,
-                        gospel: (gospelData) => `<h3>Evangelio: ${gospelData.ref}</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Lectura del santo Evangelio según san ${gospelData.ref.split(' ')[0]}.<br><strong>Gloria a ti, Señor.</strong></p><p class="liturgy-text">${gospelData.text}</p><p class="liturgy-text">Palabra del Señor.<br><strong>Gloria a ti, Señor Jesús.</strong></p>`,
-                        credo: `<h3>Profesión de Fe - Credo Niceno</h3><p class="liturgy-text"><strong>Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvation bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato; padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos, y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y del Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica и apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.</strong></p>`,
-                        prayerOfTheFaithful: `<h3>Oración de los Fieles</h3><p class="liturgy-text">Hermanos, oremos a Dios Padre todopoderoso, que escucha siempre la oración de sus hijos. Digamos con fe:<br><strong>Te rogamos, óyenos.</strong><br><em>(Se presentan las intenciones)</em><br>Escucha, Padre, nuestra oración y concédenos aquellos dones que con fe te pedimos. Por Jesucristo, nuestro Señor.<br><strong>Amén.</strong></p>`,
-                        eucharisticPrayerII: (preface) => `<h3>Plegaria Eucarística II</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Levantemos el corazón.<br><strong>Lo tenemos levantado hacia el Señor.</strong><br>Demos gracias al Señor, nuestro Dios.<br><strong>Es justo y necesario.</strong></p><p class="liturgy-text">${preface}</p><p class="liturgy-text"><strong>Santo, Santo, Santo es el Señor, Dios del Universo. Llenos están el cielo y la tierra de tu gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.</strong></p><p class="liturgy-text">Santo eres en verdad, Señor, fuente de toda santidad; por eso te pedimos que santifiques estos dones con la efusión de tu Espíritu, de manera que se conviertan para nosotros en el Cuerpo y la Sangre de Jesucristo, nuestro Señor. El cual, cuando iba a ser entregado a su Pasión, voluntariamente aceptada, tomó pan, dándote gracias, lo partió y lo dio a sus discípulos, diciendo: <strong>«TOMEN Y COMAN TODOS DE ÉL, PORQUE ESTO ES MI CUERPO, QUE SERÁ ENTREGADO POR USTEDES».</strong> Del mismo modo, acabada la cena, tomó el cáliz, y, dándote gracias de nuevo, lo pasó a sus discípulos, diciendo: <strong>«TOMEN Y BEBAN TODOS DE ÉL, PORQUE ESTE ES EL CÁLIZ DE MI SANGRE, SANGRE DE LA ALIANZA NUEVA Y ETERNA, QUE SERÁ DERRAMADA POR USTEDES Y POR MUCHOS PARA EL PERDÓN DE LOS PECADOS. HAGAN ESTO EN CONMEMORACIÓN MÍA».</strong> Este es el Misterio de la fe.<br><strong>Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!</strong></p><p class="liturgy-text">Así, pues, Padre, al celebrar ahora el memorial de la muerte y resurrección de tu Hijo, te ofrecemos el pan de vida y el cáliz de salvación, y te damos gracias porque nos haces dignos de servirte en tu presencia. Te pedimos humildemente que el Espíritu Santo congregue en la unidad a cuantos participamos del Cuerpo y la Sangre de Cristo. Por Cristo, con él y en él, a ti, Dios Padre omnipotente, en la unidad del Espíritu Santo, todo honor y toda gloria por los siglos de los siglos.<br><strong>Amén.</strong></p>`,
-                        communionRite: `<h3>Rito de la Comunión</h3><p class="liturgy-text">Fieles a la recomendación del Salvador y siguiendo su divina enseñanza, nos atrevemos a decir:<br><strong>Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.</strong><br>Líbranos de todos los males, Señor, y concédenos la paz en nuestros días, para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.<br><strong>Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.</strong><br>Señor Jesucristo, que dijiste a tus apóstoles: «La paz les dejo, mi paz les doy», no tengas en cuenta nossos pecados, sino la fe de tu Iglesia y, conforme a tu palabra, concédele la paz y la unidad. Tú que vives y reinas por los siglos de los siglos.<br><strong>Amén.</strong><br>La paz del Señor esté siempre con ustedes.<br><strong>Y con tu espíritu.</strong></p><p class="liturgy-text"><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, danos la paz.</strong></p><p class="liturgy-text">Este es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.<br><strong>Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.</strong></p>`,
-                        acnaPostCommunion: `<h3>Oración después de la Comunión (ACNA)</h3><p class="liturgy-text"><strong>Padre Celestial, te damos gracias por alimentarnos con el alimento espiritual del preciosísimo Cuerpo y Sangre de tu Hijo nuestro Salvador Jesucristo; y por asegurarnos en estos santos misterios que somos miembros vivos de tu Hijo y herederos de tu reino eterno. Y te suplicamos, oh Señor, que nos asistas con tu gracia, para que continuemos en esa santa confraternidad, y hagamos todas las buenas obras que has preparado para que andemos en ellas; por Jesucristo nuestro Señor, a quien, contigo y el Espíritu Santo, sea todo honor y gloria, por los siglos de los siglos. Amén.</strong></p>`,
-                        concludingRites: `<h3>Rito de Conclusión</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>La bendición de Dios todopoderoso, Padre, Hijo, y Espíritu Santo, descienda sobre ustedes y permaneza para siempre.<br><strong>Amén.</strong><br>Pueden ir en paz.<br><strong>Demos gracias a Dios.</strong></p>`
-                    };
-
-                    const entranceProcession = `<h3>Procesión de Entrada</h3><p class="liturgy-text italic">(Se canta un himno o antífona de entrada apropiado)</p>`;
-                    const introductoryRites = entranceProcession + templates.initialGreeting + templates.penitentialAct + (liturgy.omitGloria ? '' : templates.gloria) + `<h3>Oración Colecta</h3><p class="liturgy-text">${liturgy.prayers.collect}</p>`;
-                    
-                    let psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>` + liturgy.readings.psalm.stanzas.join(`<br><br><strong>R. ${liturgy.readings.psalm.response}</strong><br><br>`);
-
-                    let gospelAcclamationHtml = liturgy.omitAlleluia ? templates.gospelAcclamation(liturgy.readings.gospelAcclamationVerse) : templates.alleluia(liturgy.readings.alleluiaVerse);
-
-                    const liturgyOfTheWord = `<h3>Primera Lectura: ${liturgy.readings.firstReading.ref}</h3><p class="liturgy-text">${liturgy.readings.firstReading.text}</p><h3>Salmo Responsorial: ${liturgy.readings.psalm.ref}</h3><p class="liturgy-text">${psalmContentHtml}</p>${liturgy.readings.secondReading ? `<h3>Segunda Lectura: ${liturgy.readings.secondReading.ref}</h3><p class="liturgy-text">${liturgy.readings.secondReading.text}</p>` : ''}${gospelAcclamationHtml}${templates.gospel(liturgy.readings.gospel)}<h3>Homilía</h3><p class="liturgy-text italic">(Reflexión sobre las lecturas)</p>${templates.credo}${templates.prayerOfTheFaithful}`;
-                    
-                    const liturgyOfTheEucharist = `<h3>Presentación de las Ofrendas</h3><p class="liturgy-text">Oren, hermanos, para que este sacrificio, mío y de ustedes, sea agradable a Dios, Padre todopoderoso.<br><strong>El Señor reciba de tus manos este sacrificio, para alabanza y gloria de su nombre, para nuestro bien y el de toda su santa Iglesia.</strong></p><h3>Oración sobre las Ofrendas</h3><p class="liturgy-text">${liturgy.prayers.offerings}</p>${templates.eucharisticPrayerII(liturgy.prayers.preface)}${templates.communionRite}`;
-                    
-                    const concludingRites = `<h3>Oración después de la Comunión</h3><p class="liturgy-text">${liturgy.prayers.postCommunion}</p>${templates.acnaPostCommunion}${templates.concludingRites}`;
-
-                    const finalHtml = `<div class="bg-white p-6 rounded-lg shadow-md">
-                                        <div class="liturgy-section"><h2>Ritos Iniciales</h2>${introductoryRites}</div>
-                                        <div class="liturgy-section"><h2>Liturgia de la Palabra</h2>${liturgyOfTheWord}</div>
-                                        <div class="liturgy-section"><h2>Liturgia Eucarística</h2>${liturgyOfTheEucharist}</div>
-                                        <div class="liturgy-section"><h2>Ritos de Conclusión</h2>${concludingRites}</div>
-                                    </div>`;
-
-                    fullLiturgyUI.content.innerHTML = finalHtml;
-
-                } else {
-                    fullLiturgyUI.title.textContent = 'Liturgia no Disponible';
-                    fullLiturgyUI.subtitle.textContent = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    fullLiturgyUI.content.innerHTML = `<div class="bg-white p-8 rounded-lg shadow-md text-center"><p class="text-gray-600 py-16">Lo sentimos, la liturgia completa para este día aún no ha sido implementada.</p></div>`;
-                }
-            }
-
-
-            function hideFullLiturgy() {
-                mainContent.classList.remove('hidden');
-                fullLiturgyView.classList.add('hidden');
-            }
-
-            function loadLogoFromStorage() {
-                const savedLogo = localStorage.getItem('userLogo');
-                if (savedLogo) {
-                    logoImage.src = savedLogo;
-                }
-            }
-
-            // --- THEOLOGY POPUP LOGIC ---
-            function showTheologyPopup(event) {
-                const refLink = event.target.closest('.ref-link');
-                if (refLink) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const data = JSON.parse(refLink.dataset.term);
-                    
-                    let commentaryHtml = data.commentary ? `<hr class="my-3 border-gray-200"><h5 class="text-teal-700 font-bold mt-2">Comentario Teológico</h5><p class="text-sm text-gray-600">${data.commentary}</p>` : '';
-
-                    theologyPopupContent.innerHTML = `
-                        <h5 class="text-teal-700 font-bold">${data.transliteration}</h5>
-                        <p class="original-term text-gray-700 mb-2">${data.original}</p>
-                        <p class="text-gray-800">${data.meaning}</p>
-                        ${commentaryHtml}
-                    `;
-                    
-                    theologyPopupOverlay.style.display = 'block';
-                    theologyPopup.style.display = 'block';
-                    document.body.style.overflow = 'hidden'; 
-                }
-            }
+                        this.elements.theologyPopupOverlay.style.display = 'block';
+                        this.elements.theologyPopup.style.display = 'block';
+                        document.body.style.overflow = 'hidden'; 
+                    },
             
-            function closeTheologyPopup() {
-                theologyPopup.style.display = 'none';
-                theologyPopupOverlay.style.display = 'none';
-                document.body.style.overflow = ''; 
-            }
+                    closeTheologyPopup() {
+                        this.elements.theologyPopup.style.display = 'none';
+                        this.elements.theologyPopupOverlay.style.display = 'none';
+                        document.body.style.overflow = ''; 
+                    },
+                    
+                    renderMonthSelector() {
+                        const selector = this.elements.lectionaryMonthSelector;
+                        if (!selector) return;
+                        selector.innerHTML = '';
+                        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                        months.forEach((month, index) => {
+                            const btn = document.createElement('button');
+                            btn.className = 'month-selector-btn';
+                            btn.textContent = month;
+                            btn.dataset.month = index;
+                            if (index === new Date().getMonth()) { btn.classList.add('active'); }
+                            btn.addEventListener('click', () => {
+                                this.renderLectionaryList(index);
+                                document.querySelectorAll('.month-selector-btn').forEach(b => b.classList.remove('active'));
+                                btn.classList.add('active');
+                            });
+                            selector.appendChild(btn);
+                        });
+                    },
 
-            // --- LECTIONARY LIST LOGIC ---
-            function getDailyOfficeData(date) {
-                const toYYYYMMDD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                const dateString = toYYYYMMDD(date);
-                const readings = lectionaryData[dateString];
-                if (!readings) return null;
+                    renderLectionaryList(month) {
+                        const container = this.elements.lectionaryListContainer;
+                        if (!container) return;
+                        container.innerHTML = '';
+                        const year = 2025;
+                        const startDate = new Date(year, month, 1);
+                        const endDate = new Date(year, month + 1, 0);
 
-                const liturgyInfo = getLiturgyForDate(date);
-                if (!liturgyInfo) return null;
+                        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                            const data = App.services.getDailyOfficeData(new Date(d));
+                            if (data) {
+                                const formattedDate = new Date(d).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                                const entryEl = document.createElement('div');
+                                entryEl.className = 'lectionary-day-entry';
+                                entryEl.classList.add(data.color.scheme === 'light' ? 'light-scheme' : 'dark-scheme');
+                                entryEl.style.backgroundColor = data.color.hex;
+                                entryEl.innerHTML = `
+                                    <h3>${data.title}</h3>
+                                    <p class="date-label">${formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}</p>
+                                    <p class="liturgical-color-label">Color litúrgico: ${data.color.name}</p>
+                                    <h4>Colecta</h4><p>${data.collect}</p>
+                                    <h4>Lecciones</h4>
+                                    <div><h5>Oración Matutina</h5><ul><li>Salmos: ${data.readings.m.p}</li><li>1ª Lectura: ${data.readings.m.r1}</li><li>2ª Lectura: ${data.readings.m.r2}</li></ul></div>
+                                    <div><h5>Oración Vespertina</h5><ul><li>Salmos: ${data.readings.e.p}</li><li>1ª Lectura: ${data.readings.e.r1}</li><li>2ª Lectura: ${data.readings.e.r2}</li></ul></div>`;
+                                container.appendChild(entryEl);
+                            }
+                        }
+                        
+                        const existingBtn = container.parentElement.querySelector('.scroll-to-top-btn');
+                        if (existingBtn) existingBtn.remove();
 
-                let color, collect;
+                        const scrollTopBtn = document.createElement('button');
+                        scrollTopBtn.className = 'scroll-to-top-btn';
+                        scrollTopBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" /></svg><span>Volver al inicio del mes</span>`;
+                        scrollTopBtn.addEventListener('click', () => this.elements.lectionaryView.parentElement.scrollIntoView({ behavior: 'smooth' }));
+                        container.parentElement.appendChild(scrollTopBtn);
+                    },
+                    
+                    loadLogoFromStorage() {
+                        const savedLogo = localStorage.getItem('userLogo');
+                        if (savedLogo) this.elements.logoImage.src = savedLogo;
+                    },
 
-                switch(liturgyInfo.season) {
-                    case 'Advent':
-                        color = { name: 'Violeta', hex: '#7e22ce', scheme: 'dark' };
-                        collect = collectsData.advent;
-                        break;
-                    case 'Christmas':
-                    case 'Epiphany':
-                        color = { name: 'Blanco', hex: '#f8fafc', scheme: 'light' };
-                        collect = liturgyInfo.season === 'Epiphany' ? collectsData.epiphany : collectsData.christmas;
-                        break;
-                    case 'Lent':
-                        color = { name: 'Violeta', hex: '#7e22ce', scheme: 'dark' };
-                        collect = collectsData.lent;
-                        break;
-                    case 'Easter':
-                        color = { name: 'Blanco', hex: '#f8fafc', scheme: 'light' };
-                        collect = collectsData.easter;
-                        break;
-                    default: // Season after Epiphany, Season after Pentecost
-                        color = { name: 'Verde', hex: '#15803d', scheme: 'dark' };
-                        collect = collectsData.ordinary_time;
-                        break;
-                }
-                
-                // Override for special days
-                if (liturgyInfo.cycle === 'Día Santo') {
-                     color = { name: 'Blanco', hex: '#f8fafc', scheme: 'light' };
-                }
-                if (liturgyInfo.seasonColor === '#dc2626') { // Good Friday or other Red days
-                    color = { name: 'Rojo', hex: '#b91c1c', scheme: 'dark' };
-                }
-                if (dateString === '2025-03-30') { // Laetare Sunday
-                    color = { name: 'Rosado', hex: '#FBCFE8', scheme: 'light' };
-                }
-                if (dateString === '2025-06-08') { // Pentecost
-                    color = { name: 'Rojo', hex: '#b91c1c', scheme: 'dark' };
-                }
-                
-                return { title: liturgyInfo.title, color, collect, readings };
-            }
-            
-            function renderMonthSelector() {
-                if (!lectionaryMonthSelector) return;
-                lectionaryMonthSelector.innerHTML = '';
-                const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-                months.forEach((month, index) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'month-selector-btn';
-                    btn.textContent = month;
-                    btn.dataset.month = index;
-                    if (index === 0) { // Default to January
-                        btn.classList.add('active');
+                    openMobileMenu() {
+                        this.elements.mobileMenu.classList.remove('menu-hidden');
+                        document.body.style.overflow = 'hidden';
+                    },
+
+                    closeMobileMenu() {
+                        this.elements.mobileMenu.classList.add('menu-hidden');
+                        document.body.style.overflow = '';
                     }
-                    btn.addEventListener('click', () => {
-                        renderLectionaryList(index);
-                        document.querySelectorAll('.month-selector-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                    });
-                    lectionaryMonthSelector.appendChild(btn);
-                });
-            }
+                },
 
-            function renderLectionaryList(month) {
-                if (!lectionaryListContainer) return;
-                lectionaryListContainer.innerHTML = '';
-                const year = 2025;
-                const startDate = new Date(year, month, 1);
-                const endDate = new Date(year, month + 1, 0);
+                // -----------------------------------------------------------------
+                // SERVICES: Core application logic
+                // -----------------------------------------------------------------
+                services: {
+                    getLiturgyForDate(date) {
+                        if (date.getFullYear() !== 2025) return null;
+                        const toYYYYMMDD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                        const dateString = toYYYYMMDD(date);
+                        
+                        const firstSundayOfAdvent2024 = new Date(2024, 11, 1);
+                        const epiphanySunday = new Date(2025, 0, 5);
+                        const baptismOfTheLord = new Date(2025, 0, 12);
+                        const ashWednesday = new Date(2025, 2, 5);
+                        const easter = new Date(2025, 3, 20);
+                        const pentecost = new Date(2025, 5, 8);
+                        const trinitySunday = new Date(2025, 5, 15);
+                        const christTheKing = new Date(2025, 10, 23);
+                        const firstSundayOfAdvent2025 = new Date(2025, 10, 30);
 
-                for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                    const data = getDailyOfficeData(new Date(d));
-                    if (data) {
-                        const formattedDate = new Date(d).toLocaleDateString('es-ES', {
-                            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                        const countSundays = (start, end) => {
+                            let count = 0; let current = new Date(start);
+                            while (current <= end) { if (current.getDay() === 0) count++; current.setDate(current.getDate() + 1); }
+                            return count;
+                        };
+
+                        let season = '', seasonColor = '#16a34a', title = '', cycle = 'Ciclo C';
+
+                        if (date >= firstSundayOfAdvent2025) { season = 'Advent'; seasonColor = '#6d28d9'; } 
+                        else if (date >= pentecost) { season = 'Season after Pentecost'; seasonColor = '#16a34a'; }
+                        else if (date >= easter) { season = 'Easter'; seasonColor = '#f59e0b'; }
+                        else if (date >= ashWednesday) { season = 'Lent'; seasonColor = '#9333ea'; }
+                        else if (date > baptismOfTheLord) { season = 'Season after Epiphany'; seasonColor = '#16a34a'; }
+                        else if (date >= epiphanySunday) { season = 'Epiphany'; seasonColor = '#ca8a04'; }
+                        else if (date >= new Date(2024, 11, 25)) { season = 'Christmas'; seasonColor = '#ca8a04'; }
+                        else { season = 'Advent'; seasonColor = '#6d28d9'; }
+
+                        const solemnities = {'2025-01-01':{t:'La Circuncisión y Santo Nombre de Nuestro Señor Jesucristo',c:'#f1f5f9'},'2025-01-06':{t:'La Epifanía de Nuestro Señor Jesucristo',c:'#f1f5f9'},'2025-01-25':{t:'La Conversión de San Pablo Apóstol',c:'#f1f5f9'},'2025-02-02':{t:'La Presentación de Nuestro Señor Jesucristo en el Templo',c:'#f1f5f9'},'2025-03-05':{t:'Miércoles de Ceniza',c:'#9333ea'},'2025-03-25':{t:'La Anunciación de Nuestro Señor Jesucristo a la Santísima Virgen María',c:'#f1f5f9'},'2025-04-17':{t:'Jueves Santo',c:'#f1f5f9'},'2025-04-18':{t:'Viernes Santo',c:'#dc2626'},'2025-04-19':{t:'Sábado Santo',c:'#f1f5f9'},'2025-04-25':{t:'San Marcos Evangelista',c:'#dc2626'},'2025-05-01':{t:'San Felipe y San Santiago, Apóstoles',c:'#dc2626'},'2025-05-29':{t:'La Ascensión de Nuestro Señor Jesucristo',c:'#f1f5f9'},'2025-06-11':{t:'San Bernabé Apóstol',c:'#dc2626'},'2025-06-24':{t:'Natividad de San Juan Bautista',c:'#f1f5f9'},'2025-06-29':{t:'San Pedro y San Pablo, Apóstoles',c:'#dc2626'},'2025-07-22':{t:'Santa María Magdalena',c:'#f1f5f9'},'2025-07-25':{t:'Santiago Apóstol',c:'#dc2626'},'2025-08-06':{t:'La Transfiguración de Nuestro Señor Jesucristo',c:'#f1f5f9'},'2025-08-15':{t:'Santa María Virgen, Madre de Nuestro Señor Jesucristo',c:'#f1f5f9'},'2025-08-24':{t:'San Bartolomé Apóstol',c:'#dc2626'},'2025-09-14':{t:'Día de la Santa Cruz',c:'#dc2626'},'2025-09-21':{t:'San Mateo, Apóstol y Evangelista',c:'#dc2626'},'2025-09-29':{t:'San Miguel y todos los Ángeles',c:'#f1f5f9'},'2025-10-18':{t:'San Lucas Evangelista',c:'#dc2626'},'2025-10-23':{t:'San Santiago de Jerusalén, Hermano de Nuestro Señor, y Mártir',c:'#dc2626'},'2025-10-28':{t:'San Simón y San Judas, Apóstoles',c:'#dc2626'},'2025-11-01':{t:'Día de Todos los Santos',c:'#f1f5f9'},'2025-11-30':{t:'San Andrés Apóstol',c:'#dc2626'},'2025-12-25':{t:'El Día de Navidad',c:'#f59e0b'}};
+                        
+                        if (solemnities[dateString]) {
+                            title = solemnities[dateString].t;
+                            seasonColor = solemnities[dateString].c;
+                            cycle = 'Día Santo';
+                        }
+
+                        if (date.getDay() === 0 && !title) {
+                            const ordinals = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "Séptimo", "Octavo", "Noveno", "Décimo"];
+                            const addDays = (d, days) => { const res = new Date(d); res.setDate(d.getDate() + days); return res; };
+                            if (date >= firstSundayOfAdvent2025) title = `El ${ordinals[countSundays(firstSundayOfAdvent2025, date) - 1]} Domingo de Adviento`;
+                            else if (date.getTime() === christTheKing.getTime()) title = 'El Último Domingo después de Pentecostés: Cristo Rey';
+                            else if (date.getTime() === trinitySunday.getTime()) title = "El Domingo de la Santísima Trinidad";
+                            else if (date > trinitySunday) title = `El ${ordinals[countSundays(trinitySunday, date)] || (countSundays(trinitySunday, date) + 1) + 'º'} Domingo después de Pentecostés`;
+                            else if (date.getTime() === pentecost.getTime()) title = 'El Día de Pentecostés';
+                            else if (date.getTime() === easter.getTime()) title = 'Domingo de Pascua';
+                            else if (date > easter) title = `El ${ordinals[countSundays(easter, date) - 1]} Domingo de Pascua`;
+                            else if (date.getTime() === addDays(ashWednesday, 46).getTime()) { title = 'Domingo de Ramos: La Pasión del Señor'; seasonColor = '#dc2626'; }
+                            else if (date > ashWednesday) { const i = countSundays(addDays(ashWednesday, 4), date); title = i === 4 ? 'Domingo de Laetare ("Alegraos")' : `El ${ordinals[i - 1]} Domingo de Cuaresma`; }
+                            else if (date.getTime() === baptismOfTheLord.getTime()) title = 'El Bautismo de Nuestro Señor Jesucristo';
+                            else if (date > epiphanySunday) title = `El ${ordinals[countSundays(epiphanySunday, date) - 1]} Domingo después de la Epifanía`;
+                            else if (date > new Date(2024, 11, 25)) title = 'El Primer Domingo después de Navidad';
+                            else if (date >= firstSundayOfAdvent2024) title = `El ${ordinals[countSundays(firstSundayOfAdvent2024, date) - 1]} Domingo de Adviento`;
+                        }
+                        
+                        if (!title) {
+                            if (date.getDay() !== 0) { const dayOfWeek = date.toLocaleDateString('es-ES', { weekday: 'long' }); title = `El ${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} de la semana`; }
+                            else return null;
+                        }
+
+                        let liturgy = { title, cycle, omitGloria: (season === 'Advent' || season === 'Lent'), omitAlleluia: (season === 'Lent'), seasonColor, season, prayers: {}, readings: { firstReading: { ref: 'Lectura I', text: 'Texto de la primera lectura no disponible.' }, psalm: { ref: 'Salmo Responsorial', response: 'Respuesta del salmo.', stanzas: ['Estrofa del salmo no disponible.'] }, secondReading: { ref: 'Lectura II', text: 'Texto de la segunda lectura no disponible.' }, alleluiaVerse: 'Versículo del Aleluya no disponible.', gospel: { ref: 'Evangelio', text: 'Texto del Evangelio no disponible.' } } };
+                        
+                        // Specific data for the example date
+                        if (dateString === '2025-08-10') {
+                            const ref = (key, num) => `<span class="ref-link" data-term='${JSON.stringify(App.data.terms[key]).replace(/'/g, "&#39;")}'><sup>${num}</sup></span>`;
+                            liturgy.prayers = {collect: 'Dios todopoderoso y eterno, a quien podemos llamar Padre, aumenta en nuestros corações el espíritu de hijos adoptivos, para que merezcamos entrar un día en la herencia prometida. Por nuestro Señor Jesucristo.',offerings: 'Sé propicio, Señor, a tu pueblo y acepta con bondad estas ofrendas, para que, con la ayuda de tu piedad, a cada uno le aproveche para su salvación lo que ofrece en honor de tu nombre. Por Jesucristo, nuestro Señor.',postCommunion: 'Que la comunión en tus sacramentos nos salve, Señor, y nos afiance en la luz de tu verdad. Por Jesucristo, nuestro Señor.',preface: 'En verdad es justo y necesario, es nuestro deber y salvación darte gracias siempre y en todo lugar, Señor, Padre santo, Dios todopoderoso y eterno. Pues, aunque no necesitas nuestra alabanza, es don tuyo que seamos agradecidos; y aunque nuestras bendiciones no aumentan tu gloria, nos aprovechan para nuestra salvación. Por Cristo, Señor nuestro. Por eso, unidos a los ángeles, te aclamamos llenos de alegría:'};
+                            liturgy.readings = {firstReading: { ref: 'Sabiduría 18, 6-9', text: `La noche de la liberación fue anunciada de antemano a nuestros padres, para que tuvieran ánimo al conocer con certeza la promesa de la que se fiaban. Tu pueblo esperaba, a la vez, la salvación de los justos y la perdición de los enemigos. Porque con la misma acción que castigaste a los adversarios, nos glorificaste a nosotros, llamándonos a ti. Los santos hijos de los buenos ofrecían sacrificios a escondidas y establecieron de común acuerdo esta ley divina: que los santos compartirían por igual los mismos bienes y peligros; y entonaron los himnos de los padres.` },psalm: { ref: 'Salmo 32', response: 'Dichoso el pueblo que el Señor se escogió como heredad.', stanzas: [ `Aclamad, justos, al Señor,<br>que merece la alabanza de los buenos.<br>Dichosa la nación cuyo Dios es el Señor,<br>el pueblo que él se escogió como heredad.`, `El Señor mira desde el cielo,<br>se fija en todos los hombres.<br>Desde su morada observa<br>a todos los habitantes de la tierra.`, `Los ojos del Señor están puestos en quien lo teme,<br>en los que esperan en su misericordia,<br>para librar sus vidas de la muerte<br>y reanimarlos en tiempo de hambre.`, `Nosotros aguardamos al Señor:<br>él es nuestro auxilio y escudo;<br>que tu misericordia, Señor, venga sobre nosotros,<br>como lo esperamos de ti.` ] },secondReading: { ref: 'Hebreos 11, 1-2. 8-19', text: `Hermanos: La fe es garantía${ref('hypostasis', 1)} de lo que se espera, la prueba${ref('elenchos', 2)} de las realidades que no se ven. Por ella fueron alabados nuestros mayores. Por la fe, Abrahán, al ser llamado por Dios, obedeció y salió para el lugar que había de recibir en herencia, y salió sin saber a dónde iba. Por la fe, se estableció en la tierra prometida como en tierra extraña, viviendo en tiendas, y lo mismo Isaac y Jacob, herederos de la misma promesa${ref('epangelia', 3)}, pues esperaba la ciudad de sólidos cimientos, cuyo arquitecto y constructor es Dios. Por la fe, también Sara, siendo estéril, obtuvo vigor para concebir, a pesar de su edad avanzada, porque creyó que era fiel el que se lo prometía. Y así, de un solo hombre, y ya marcado por la muerte, nacieron hijos, numerosos como las estrellas del cielo e incontables como la arena de las playas. Con fe murieron todos estos, sin haber recibido las promesas; las vieron y las saludaron de lejos, confesando que eran extraños y peregrinos en la terra. Los que así hablan, dan a entender que buscan una patria; pues si hubieran pensado en la que habían abandonado, tenían ocasión de volver. Pero ellos ansiaban una patria mejor, la celestial. Por eso Dios no se avergenza de llamarse su Dios, pues les tenía preparada una ciudad. Por la fe, Abrahán, puesto a prueba, ofreció a Isaac; y el que había recibido las promesas, ofrecía a su unigénito, a quien se le había dicho: «La descendencia que lleve tu nombre será la de Isaac». Pero Abrahán pensaba que Dios tiene poder hasta para resucitar de entre los muertos, de donde en cierto sentido lo recobró.` },alleluiaVerse: 'Estad en vela y preparados, porque a la hora que menos penséis viene el Hijo del hombre. (cf. Mt 24, 42a. 44)',gospel: { ref: 'Lucas 12, 32-48', text: `En aquel tiempo, dijo Jesús a sus discípulos: «No temas, pequeño rebaño${ref('poimnion', 4)}, porque vuestro Padre ha tenido a bien daros el reino. Vended vuestros bienes y dad limosna. Haceos bolsas que no se estropeen, un tesoro inagotable en el cielo, adonde no se acercan los ladrones ni roe la polilla. Porque donde está vuestro tesoro, allí estará también vuestro corazón${ref('kardia', 5)}. Tened ceñida la cintura y encendidas las lámparas. Vosotros estad como los hombres que aguardan a que su señor vuelva de la boda, para abrirle apenas venga y llame. Bienaventurados aquellos criados a quienes el señor, al llegar, los encuentre en vela${ref('gregoreō', 6)}; en verdad os digo que se ceñirá, los hará sentar a la mesa y, acercándose, les irá sirviendo. Y, si llega a la segunda vigilia o a la tercera y los encuentra así, ¡bienaventurados ellos! Comprended que si supiera el dueño de casa a qué hora viene el ladrón, no le dejaría abrir un boquete en su casa. Lo mismo vosotros, estad preparados, porque a la hora que menos penséis viene el Hijo del hombre». Pedro le dijo: «Señor, ¿dices esta parábola por nosotros o por todos?». Y el Señor dijo: «¿Quién es el administrador fiel y prudente a quien el señor pondrá al frente de su servidumbre para que reparta la ración de alimento a sus horas? Bienaventurado aquel siervo${ref('doulos', 7)} a quien su señor, al llegar, lo encuentre portándose así. En verdad os digo que lo pondrá al frente de todos sus bienes. Pero si aquel siervo dijere para sus adentros: “Mi señor tarda en llegar”, y empieza a pegarles a los criados y a las criadas, a comer y beber y emborracharse, vendrá el señor de ese siervo el día que menos lo espera y a la hora que no sabe y lo castigará con rigor, y le asignará la suerte de los infieles. El siervo que, conociendo la voluntad de su señor, no se prepara ni obra de acuerdo con su voluntad, recibirá muchos azotes; pero el que, sin conocerla, ha hecho algo digno de azotes, recibirá menos. A quien mucho se le dio, mucho se le reclamará; a quien mucho se le confió, más aún se le pedirá».` }};
+                        }
+
+                        return liturgy;
+                    },
+
+                    getDailyOfficeData(date) {
+                        const toYYYYMMDD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                        const dateString = toYYYYMMDD(date);
+                        const readings = App.data.lectionaryData[dateString];
+                        if (!readings) return null;
+
+                        const liturgyInfo = this.getLiturgyForDate(date);
+                        if (!liturgyInfo) return null;
+
+                        let color, collect;
+                        const { collectsData } = App.data;
+                        switch(liturgyInfo.season) {
+                            case 'Advent': color = { name: 'Violeta', hex: '#7e22ce', scheme: 'dark' }; collect = collectsData.advent; break;
+                            case 'Christmas': case 'Epiphany': color = { name: 'Blanco', hex: '#f8fafc', scheme: 'light' }; collect = liturgyInfo.season === 'Epiphany' ? collectsData.epiphany : collectsData.christmas; break;
+                            case 'Lent': color = { name: 'Violeta', hex: '#7e22ce', scheme: 'dark' }; collect = collectsData.lent; break;
+                            case 'Easter': color = { name: 'Blanco', hex: '#f8fafc', scheme: 'light' }; collect = collectsData.easter; break;
+                            default: color = { name: 'Verde', hex: '#15803d', scheme: 'dark' }; collect = collectsData.ordinary_time; break;
+                        }
+                        
+                        if (liturgyInfo.cycle === 'Día Santo') color = { name: 'Blanco', hex: '#f8fafc', scheme: 'light' };
+                        if (liturgyInfo.seasonColor === '#dc2626') color = { name: 'Rojo', hex: '#b91c1c', scheme: 'dark' };
+                        if (dateString === '2025-03-30') color = { name: 'Rosado', hex: '#FBCFE8', scheme: 'light' };
+                        if (dateString === '2025-06-08') color = { name: 'Rojo', hex: '#b91c1c', scheme: 'dark' };
+                        
+                        return { title: liturgyInfo.title, color, collect, readings };
+                    },
+                    
+                    getLiturgyTemplates(liturgy, ref) {
+                        return {
+                            initialGreeting: `<h3>Saludo Inicial</h3><p class="liturgy-text">En el nombre del Padre, y del Hijo, y del Espíritu Santo.<br><strong>Amén.</strong><br>La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo esté con todos ustedes.<br><strong>Y con tu espíritu.</strong></p>`,
+                            penitentialAct: `<h3>Acto Penitencial (Libro de Oración Común ACNA)</h3><p class="liturgy-text">Amados en el Señor, acerquémonos con un corazón penitente y obediente a la Palabra de Dios, confesando nuestros pecados para que podamos recibir el perdón por su infinita bondad y misericordia.<br><em>Se guarda un momento de silencio.</em><br><strong>Misericordiosísimo Dios, confesamos que hemos pecado contra ti en pensamiento, palabra y obra, por lo que hemos hecho y por lo que hemos dejado de hacer. No te hemos amado con todo nuestro corazón; no hemos amado a nuestro prójimo como a nosotros mismos. Lo sentimos de veras y nos arrepentimos humildemente. Por tu Hijo Jesucristo, ten misericordia de nosotros y perdónanos, para que nos deleitemos en tu voluntad y andemos en tus caminos, para la gloria de tu Nombre. Amén.</strong><br>Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.<br><strong>Amén.</strong></p>`,
+                            gloria: `<h3>Gloria</h3><p class="liturgy-text"><strong>Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo. Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.</strong></p>`,
+                            alleluia: (verse) => `<h3>Aleluya</h3><p class="liturgy-text"><strong>Aleluya, aleluya.</strong><br>${verse}<br><strong>Aleluya.</strong></p>`,
+                            gospelAcclamation: (verse) => `<h3>Aclamación antes del Evangelio</h3><p class="liturgy-text">${verse}</p>`,
+                            gospel: (gospelData) => `<h3>Evangelio: ${gospelData.ref}</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Lectura del santo Evangelio según san ${gospelData.ref.split(' ')[0]}.<br><strong>Gloria a ti, Señor.</strong></p><p class="liturgy-text">${gospelData.text}</p><p class="liturgy-text">Palabra del Señor.<br><strong>Gloria a ti, Señor Jesús.</strong></p>`,
+                            credo: `<h3>Profesión de Fe - Credo Niceno</h3><p class="liturgy-text"><strong>Creo en un solo Dios, Padre todopoderoso, Creador del cielo y de la tierra, de todo lo visible y lo invisible. Creo en un solo Señor, Jesucristo, Hijo único de Dios, nacido del Padre antes de todos los siglos: Dios de Dios, Luz de Luz, Dios verdadero de Dios verdadero, engendrado, no creado, de la misma naturaleza del Padre, por quien todo fue hecho; que por nosotros, los hombres, y por nuestra salvation bajó del cielo, y por obra del Espíritu Santo se encarnó de María, la Virgen, y se hizo hombre; y por nuestra causa fue crucificado en tiempos de Poncio Pilato; padeció y fue sepultado, y resucitó al tercer día, según las Escrituras, y subió al cielo, y está sentado a la derecha del Padre; y de nuevo vendrá con gloria para juzgar a vivos y muertos, y su reino no tendrá fin. Creo en el Espíritu Santo, Señor y dador de vida, que procede del Padre y del Hijo, que con el Padre y del Hijo recibe una misma adoración y gloria, y que habló por los profetas. Creo en la Iglesia, que es una, santa, católica и apostólica. Confieso que hay un solo bautismo para el perdón de los pecados. Espero la resurrección de los muertos y la vida del mundo futuro. Amén.</strong></p>`,
+                            prayerOfTheFaithful: `<h3>Oración de los Fieles</h3><p class="liturgy-text">Hermanos, oremos a Dios Padre todopoderoso, que escucha siempre la oración de sus hijos. Digamos con fe:<br><strong>Te rogamos, óyenos.</strong><br><em>(Se presentan las intenciones)</em><br>Escucha, Padre, nuestra oración y concédenos aquellos dones que con fe te pedimos. Por Jesucristo, nuestro Señor.<br><strong>Amén.</strong></p>`,
+                            eucharisticPrayerII: (preface) => `<h3>Plegaria Eucarística II</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>Levantemos el corazón.<br><strong>Lo tenemos levantado hacia el Señor.</strong><br>Demos gracias al Señor, nuestro Dios.<br><strong>Es justo y necesario.</strong></p><p class="liturgy-text">${preface}</p><p class="liturgy-text"><strong>Santo, Santo, Santo es el Señor, Dios del Universo. Llenos están el cielo y la tierra de tu gloria. Hosanna en el cielo. Bendito el que viene en nombre del Señor. Hosanna en el cielo.</strong></p><p class="liturgy-text">Santo eres en verdad, Señor, fuente de toda santidad; por eso te pedimos que santifiques estos dones con la efusión de tu Espíritu, de manera que se conviertan para nosotros en el Cuerpo y la Sangre de Jesucristo, nuestro Señor. El cual, cuando iba a ser entregado a su Pasión, voluntariamente aceptada, tomó pan, dándote gracias, lo partió y lo dio a sus discípulos, diciendo: <strong>«TOMEN Y COMAN TODOS DE ÉL, PORQUE ESTO ES MI CUERPO, QUE SERÁ ENTREGADO POR USTEDES».</strong> Del mismo modo, acabada la cena, tomó el cáliz, y, dándote gracias de nuevo, lo pasó a sus discípulos, diciendo: <strong>«TOMEN Y BEBAN TODOS DE ÉL, PORQUE ESTE ES EL CÁLIZ DE MI SANGRE, SANGRE DE LA ALIANZA NUEVA Y ETERNA, QUE SERÁ DERRAMADA POR USTEDES Y POR MUCHOS PARA EL PERDÓN DE LOS PECADOS. HAGAN ESTO EN CONMEMORACIÓN MÍA».</strong> Este es el Misterio de la fe.<br><strong>Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!</strong></p><p class="liturgy-text">Así, pues, Padre, al celebrar ahora el memorial de la muerte y resurrección de tu Hijo, te ofrecemos el pan de vida y el cáliz de salvación, y te damos gracias porque nos haces dignos de servirte en tu presencia. Te pedimos humildemente que el Espíritu Santo congregue en la unidad a cuantos participamos del Cuerpo y la Sangre de Cristo. Por Cristo, con él y en él, a ti, Dios Padre omnipotente, en la unidad del Espíritu Santo, todo honor y toda gloria por los siglos de los siglos.<br><strong>Amén.</strong></p>`,
+                            communionRite: `<h3>Rito de la Comunión</h3><p class="liturgy-text">Fieles a la recomendación del Salvador y siguiendo su divina enseñanza, nos atrevemos a decir:<br><strong>Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal.</strong><br>Líbranos de todos los males, Señor, y concédenos la paz en nuestros días, para que, ayudados por tu misericordia, vivamos siempre libres de pecado y protegidos de toda perturbación, mientras esperamos la gloriosa venida de nuestro Salvador Jesucristo.<br><strong>Tuyo es el reino, tuyo el poder y la gloria, por siempre, Señor.</strong><br>Señor Jesucristo, que dijiste a tus apóstoles: «La paz les dejo, mi paz les doy», no tengas en cuenta nossos pecados, sino la fe de tu Iglesia y, conforme a tu palabra, concédele la paz y la unidad. Tú que vives y reinas por los siglos de los siglos.<br><strong>Amén.</strong><br>La paz del Señor esté siempre con ustedes.<br><strong>Y con tu espíritu.</strong></p><p class="liturgy-text"><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.</strong><br><strong>Cordero de Dios, que quitas el pecado del mundo, danos la paz.</strong></p><p class="liturgy-text">Este es el Cordero de Dios, que quita el pecado del mundo. Dichosos los invitados a la cena del Señor.<br><strong>Señor, no soy digno de que entres en mi casa, pero una palabra tuya bastará para sanarme.</strong></p>`,
+                            acnaPostCommunion: `<h3>Oración después de la Comunión (ACNA)</h3><p class="liturgy-text"><strong>Padre Celestial, te damos gracias por alimentarnos con el alimento espiritual del preciosísimo Cuerpo y Sangre de tu Hijo nuestro Salvador Jesucristo; y por asegurarnos en estos santos misterios que somos miembros vivos de tu Hijo y herederos de tu reino eterno. Y te suplicamos, oh Señor, que nos asistas con tu gracia, para que continuemos en esa santa confraternidad, y hagamos todas las buenas obras que has preparado para que andemos en ellas; por Jesucristo nuestro Señor, a quien, contigo y el Espíritu Santo, sea todo honor y gloria, por los siglos de los siglos. Amén.</strong></p>`,
+                            concludingRites: `<h3>Rito de Conclusión</h3><p class="liturgy-text">El Señor esté con ustedes.<br><strong>Y con tu espíritu.</strong><br>La bendición de Dios todopoderoso, Padre, Hijo, y Espíritu Santo, descienda sobre ustedes y permaneza para siempre.<br><strong>Amén.</strong><br>Pueden ir en paz.<br><strong>Demos gracias a Dios.</strong></p>`
+                        };
+                    }
+                },
+
+                // -----------------------------------------------------------------
+                // EVENTS: User interaction handlers
+                // -----------------------------------------------------------------
+                events: {
+                    setup() {
+                        const ui = App.ui;
+                        const els = ui.elements;
+
+                        // Main Navigation
+                        Object.keys(els.mainNavButtons).forEach(key => {
+                            if(els.mainNavButtons[key]) {
+                                els.mainNavButtons[key].addEventListener('click', () => ui.switchView(key));
+                            }
                         });
 
-                        const entryEl = document.createElement('div');
-                        entryEl.className = 'lectionary-day-entry';
-                        entryEl.classList.add(data.color.scheme === 'light' ? 'light-scheme' : 'dark-scheme');
-                        entryEl.style.backgroundColor = data.color.hex;
+                        // Full Liturgy View
+                        els.backToCalendarBtn.addEventListener('click', () => ui.hideFullLiturgy());
+                        els.printBtn.addEventListener('click', () => window.print());
+                        els.downloadDocxBtn.addEventListener('click', this.handleDocxDownload);
+                        els.cardsContainer.addEventListener('click', this.handleCardClick);
 
-                        entryEl.innerHTML = `
-                            <h3>${data.title}</h3>
-                            <p class="date-label">${formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}</p>
-                            <p class="liturgical-color-label">Color litúrgico: ${data.color.name}</p>
-                            <h4>Colecta</h4>
-                            <p>${data.collect}</p>
-                            <h4>Lecciones</h4>
-                            <div>
-                                <h5>Oración Matutina</h5>
-                                <ul>
-                                    <li>Salmos: ${data.readings.m.p}</li>
-                                    <li>1ª Lectura: ${data.readings.m.r1}</li>
-                                    <li>2ª Lectura: ${data.readings.m.r2}</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h5>Oración Vespertina</h5>
-                                <ul>
-                                    <li>Salmos: ${data.readings.e.p}</li>
-                                    <li>1ª Lectura: ${data.readings.e.r1}</li>
-                                    <li>2ª Lectura: ${data.readings.e.r2}</li>
-                                </ul>
-                            </div>
-                        `;
-                        lectionaryListContainer.appendChild(entryEl);
+                        // Theology Popup
+                        els.fullLiturgyView.addEventListener('click', this.handleTheologyLinkClick);
+                        els.theologyPopupClose.addEventListener('click', () => ui.closeTheologyPopup());
+                        els.theologyPopupOverlay.addEventListener('click', () => ui.closeTheologyPopup());
+
+                        // Logo Upload
+                        els.uploadLogoBtn.addEventListener('click', () => els.logoUploader.click());
+                        els.logoUploader.addEventListener('change', this.handleLogoUpload);
+
+                        // Mobile Menu
+                        els.hamburgerBtn.addEventListener('click', () => ui.openMobileMenu());
+                        els.closeMenuBtn.addEventListener('click', () => ui.closeMobileMenu());
+                        els.mobileNavLinks.addEventListener('click', this.handleMobileNavClick);
+
+                        // Header Scroll
+                        let lastScrollTop = 0;
+                        window.addEventListener("scroll", () => {
+                            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            if (scrollTop > lastScrollTop && scrollTop > els.mainHeader.offsetHeight) {
+                                els.mainHeader.classList.add('header-hidden');
+                            } else {
+                                els.mainHeader.classList.remove('header-hidden');
+                            }
+                            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+                        }, false);
+                    },
+
+                    handleCardClick(e) {
+                        const card = e.target.closest('.liturgical-card');
+                        if (card && card.dataset.date) {
+                            const [year, month, day] = card.dataset.date.split('-').map(Number);
+                            const selectedDate = new Date(year, month - 1, day);
+                            App.ui.showFullLiturgy(selectedDate);
+                        }
+                    },
+
+                    handleTheologyLinkClick(e) {
+                        const refLink = e.target.closest('.ref-link');
+                        if (refLink) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const data = JSON.parse(refLink.dataset.term);
+                            App.ui.showTheologyPopup(data);
+                        }
+                    },
+
+                    handleLogoUpload(event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const logoDataUrl = e.target.result;
+                                localStorage.setItem('userLogo', logoDataUrl);
+                                App.ui.elements.logoImage.src = logoDataUrl;
+                            }
+                            reader.readAsDataURL(file);
+                        }
+                    },
+
+                    handleMobileNavClick(e) {
+                        if (e.target.matches('a.mobile-nav-link')) {
+                            const view = e.target.dataset.view;
+                            if (view) App.ui.switchView(view);
+                            App.ui.closeMobileMenu();
+                        }
+                    },
+                    
+                    handleDocxDownload() {
+                        const { title, subtitle, content } = App.ui.elements.fullLiturgyUI;
+                        const contentElement = content.cloneNode(true);
+                        contentElement.querySelectorAll('.ref-link').forEach(el => {
+                            const sup = document.createElement('sup');
+                            sup.textContent = el.textContent;
+                            el.parentNode.replaceChild(sup, el);
+                        });
+
+                        const liturgyBody = contentElement.querySelector('.bg-white');
+                        if (!liturgyBody) { console.error("Liturgy content body not found for DOCX export."); return; }
+                        
+                        const headerHtml = `<div style="text-align: center; margin-bottom: 20px;"><h1>${title.textContent}</h1><p><em>${subtitle.textContent}</em></p></div>`;
+                        const styles = `<style>body{font-family:'Times New Roman',Times,serif;font-size:12pt;}h1{font-size:16pt;font-weight:bold;text-align:center;}p{font-size:12pt;text-align:justify;}h2{font-size:14pt;font-weight:bold;border-bottom:1px solid #000;padding-bottom:5px;margin-top:20px;}h3{font-size:12pt;font-weight:bold;margin-top:15px;}.liturgy-text{margin-top:10px;}strong{font-weight:bold;}em,i{font-style:italic;}</style>`;
+                        const fullHtmlForDocx = `<!DOCTYPE html><html><head><meta charset="UTF-8">${styles}</head><body>${headerHtml}${liturgyBody.innerHTML}</body></html>`;
+
+                        try {
+                            const converted = htmlDocx.asBlob(fullHtmlForDocx, { orientation: 'portrait', margins: { top: 720, right: 720, bottom: 720, left: 720 } });
+                            saveAs(converted, `${title.textContent}.docx`);
+                        } catch (error) {
+                            console.error("Error generating DOCX file:", error);
+                        }
                     }
-                }
-                
-                // Add the "scroll to top" button
-                const existingBtn = lectionaryListContainer.parentElement.querySelector('.scroll-to-top-btn');
-                if (existingBtn) {
-                    existingBtn.remove();
-                }
+                },
 
-                const scrollTopBtn = document.createElement('button');
-                scrollTopBtn.className = 'scroll-to-top-btn';
-                scrollTopBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                    </svg>
-                    <span>Volver al inicio del mes</span>
-                `;
-                scrollTopBtn.addEventListener('click', () => {
-                    const lectionaryView = document.getElementById('lectionary-view');
-                    if (lectionaryView) {
-                        lectionaryView.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-                lectionaryListContainer.parentElement.appendChild(scrollTopBtn);
-            }
+                // -----------------------------------------------------------------
+                // INITIALIZATION
+                // -----------------------------------------------------------------
+                init() {
+                    this.ui.selectElements();
+                    this.events.setup();
 
-
-            // --- EVENT LISTENERS ---
-            Object.keys(mainNavButtons).forEach(key => {
-                if(mainNavButtons[key]) {
-                    mainNavButtons[key].addEventListener('click', () => switchView(key));
-                }
-            });
-
-            backToCalendarBtn.addEventListener('click', hideFullLiturgy);
-            printBtn.addEventListener('click', () => window.print());
-            
-            downloadDocxBtn.addEventListener('click', () => {
-                const title = fullLiturgyUI.title.textContent;
-                const subtitle = fullLiturgyUI.subtitle.textContent;
-                const contentElement = document.getElementById('full-liturgy-content').cloneNode(true);
-
-                contentElement.querySelectorAll('.ref-link').forEach(el => {
-                    const sup = document.createElement('sup');
-                    sup.textContent = el.textContent;
-                    el.parentNode.replaceChild(sup, el);
-                });
-
-                const liturgyBody = contentElement.querySelector('.bg-white');
-                if (!liturgyBody) {
-                    console.error("Liturgy content body not found for DOCX export.");
-                    return;
-                }
-                
-                const headerHtml = `
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h1>${title}</h1>
-                        <p><em>${subtitle}</em></p>
-                    </div>
-                `;
-
-                const styles = `
-                    <style>
-                        body { font-family: 'Times New Roman', Times, serif; font-size: 10pt; }
-                        h1 { font-size: 16pt; font-weight: bold; }
-                        p { font-size: 12pt; }
-                        h2 { font-size: 14pt; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 5px; margin-top: 20px; }
-                        h3 { font-size: 11pt; font-weight: bold; margin-top: 15px; }
-                        .liturgy-text { margin-top: 10px; }
-                        strong { font-weight: bold; }
-                        em, i { font-style: italic; }
-                    </style>
-                `;
-
-                const twoColumnContent = `<div style="column-count: 2; column-gap: 40px;">${liturgyBody.innerHTML}</div>`;
-
-                const fullHtmlForDocx = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta charset="UTF-8">
-                        ${styles}
-                    </head>
-                    <body>
-                        ${headerHtml}
-                        ${twoColumnContent}
-                    </body>
-                    </html>
-                `;
-
-                try {
-                    const converted = htmlDocx.asBlob(fullHtmlForDocx, {
-                        orientation: 'landscape',
-                        margins: { top: 720, right: 720, bottom: 720, left: 720 }
-                    });
-                    saveAs(converted, `${title}.docx`);
-                } catch (error) {
-                    console.error("Error generating DOCX file:", error);
-                }
-            });
-            
-            cardsContainer.addEventListener('click', (e) => {
-                const card = e.target.closest('.liturgical-card');
-                if (card && card.dataset.date) {
-                    const [year, month, day] = card.dataset.date.split('-').map(Number);
-                    const selectedDate = new Date(year, month - 1, day);
-                    showFullLiturgy(selectedDate);
-                }
-            });
-
-            // --- THEOLOGY POPUP LISTENERS ---
-            fullLiturgyView.addEventListener('click', showTheologyPopup);
-            theologyPopupClose.addEventListener('click', closeTheologyPopup);
-            theologyPopupOverlay.addEventListener('click', closeTheologyPopup);
-
-            // --- LOGO UPLOAD LISTENERS ---
-            uploadLogoBtn.addEventListener('click', () => logoUploader.click());
-
-            logoUploader.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const logoDataUrl = e.target.result;
-                        localStorage.setItem('userLogo', logoDataUrl);
-                        logoImage.src = logoDataUrl;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // --- HEADER SCROLL LOGIC ---
-            let lastScrollTop = 0;
-            const mainHeader = document.getElementById('main-header');
-            window.addEventListener("scroll", function() {
-                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                if (scrollTop > lastScrollTop && scrollTop > mainHeader.offsetHeight) {
-                    mainHeader.classList.add('header-hidden');
-                } else {
-                    mainHeader.classList.remove('header-hidden');
-                }
-                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-            }, false);
-
-            // --- MOBILE MENU LOGIC ---
-            function openMobileMenu() {
-                mobileMenu.classList.remove('menu-hidden');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeMobileMenu() {
-                mobileMenu.classList.add('menu-hidden');
-                document.body.style.overflow = '';
-            }
-
-            hamburgerBtn.addEventListener('click', openMobileMenu);
-            closeMenuBtn.addEventListener('click', closeMobileMenu);
-            mobileNavLinks.addEventListener('click', (e) => {
-                if (e.target.matches('a.mobile-nav-link')) {
-                    const view = e.target.dataset.view;
-                    if (view) {
-                        switchView(view);
-                    }
-                    closeMobileMenu();
-                }
-            });
-
-            // --- INITIALIZATION ---
-            function initializeApp() {
-                setTimeout(() => {
-                    splashScreen.classList.add('fade-out');
-                    mainContent.classList.remove('opacity-0');
+                    // Initial UI State
                     setTimeout(() => {
-                        splashScreen.style.display = 'none';
-                    }, 1500);
-                }, 2000);
+                        this.ui.elements.splashScreen.classList.add('fade-out');
+                        this.ui.elements.mainContent.classList.remove('opacity-0');
+                        setTimeout(() => { this.ui.elements.splashScreen.style.display = 'none'; }, 1500);
+                    }, 2000);
 
-                loadLogoFromStorage();
-                switchView('home');
-                renderLiturgicalCards();
-            }
-            initializeApp();
+                    this.ui.loadLogoFromStorage();
+                    this.ui.switchView('home');
+                    this.ui.renderLiturgicalCards();
+                }
+            };
+
+            // Start the application
+            App.init();
         });
     </script>
 </body>
