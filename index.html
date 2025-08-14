@@ -211,7 +211,7 @@
         /* Lectionary List Styles */
         .lectionary-day-entry {
             padding: 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 0; /* Removed margin-bottom for accordion layout */
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
@@ -263,55 +263,6 @@
             margin-top: 1rem;
             margin-bottom: 0.5rem;
         }
-        #lectionary-month-selector .month-selector-btn {
-            flex-grow: 1;
-            text-align: center;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.8rem;
-            border: 1px solid #d1d5db;
-            background-color: #f3f4f6;
-            color: #4b5563;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        @media (min-width: 640px) {
-            #lectionary-month-selector .month-selector-btn {
-                font-size: 0.875rem;
-            }
-        }
-        #lectionary-month-selector .month-selector-btn:hover {
-            background-color: #e5e7eb;
-        }
-        #lectionary-month-selector .month-selector-btn.active {
-            background-color: #15803d; /* Green */
-            color: white;
-            font-weight: 600;
-            border-color: #15803d;
-        }
-        #lectionary-month-selector .month-selector-btn:first-child { border-top-left-radius: 0.375rem; border-bottom-left-radius: 0.375rem; }
-        #lectionary-month-selector .month-selector-btn:last-child { border-top-right-radius: 0.375rem; border-bottom-right-radius: 0.375rem; }
-        .scroll-to-top-btn {
-            display: block;
-            margin: 2rem auto 0;
-            padding: 0.75rem 1.5rem;
-            background-color: #0d9488; /* teal-600 */
-            color: white;
-            border: none;
-            border-radius: 9999px;
-            font-family: 'Roboto', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            width: fit-content;
-        }
-        .scroll-to-top-btn:hover {
-            background-color: #0f766e; /* teal-700 */
-            transform: translateY(-2px);
-        }
-
 
         /* Print Styles */
         .print-only-header { display: none; }
@@ -428,12 +379,9 @@
         <div id="lectionary-view" class="hidden">
             <main class="container mx-auto p-4 md:p-8">
                 <div class="bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
-                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Leccionario</h2>
-                    <div id="lectionary-month-selector" class="flex flex-wrap gap-1 mb-6">
-                        <!-- Month buttons will be generated here -->
-                    </div>
-                    <div id="lectionary-list-container">
-                        <!-- Daily lectionary entries will be inserted here -->
+                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Leccionario Diario del Oficio</h2>
+                    <div id="lectionary-accordion-container" class="space-y-2">
+                        <!-- Lectionary accordion will be generated here -->
                     </div>
                 </div>
             </main>
@@ -574,8 +522,7 @@
                         els.theologyPopupClose = document.getElementById('popup-close');
                         
                         els.liturgicalAccordionContainer = document.getElementById('liturgical-accordion-container');
-                        els.lectionaryListContainer = document.getElementById('lectionary-list-container');
-                        els.lectionaryMonthSelector = document.getElementById('lectionary-month-selector');
+                        els.lectionaryAccordionContainer = document.getElementById('lectionary-accordion-container');
                     },
 
                     switchView(viewName) {
@@ -590,8 +537,7 @@
                             this.elements.mainNavButtons[viewName].classList.add('active-nav');
                         }
                         if (viewName === 'lectionary') {
-                            this.renderMonthSelector();
-                            this.renderLectionaryList(new Date().getMonth());
+                            this.renderLectionaryAccordion();
                         }
                     },
 
@@ -717,53 +663,63 @@
                         document.body.style.overflow = ''; 
                     },
                     
-                    renderMonthSelector() {
-                        const selector = this.elements.lectionaryMonthSelector;
-                        if (!selector) return;
-                        selector.innerHTML = '';
-                        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-                        months.forEach((month, index) => {
-                            const btn = document.createElement('button');
-                            btn.className = 'month-selector-btn';
-                            btn.textContent = month;
-                            btn.dataset.month = index;
-                            if (index === new Date().getMonth()) { btn.classList.add('active'); }
-                            btn.addEventListener('click', () => {
-                                this.renderLectionaryList(index);
-                                document.querySelectorAll('.month-selector-btn').forEach(b => b.classList.remove('active'));
-                                btn.classList.add('active');
-                            });
-                            selector.appendChild(btn);
-                        });
-                    },
+                    renderLectionaryAccordion() {
+                        const accordionContainer = this.elements.lectionaryAccordionContainer;
+                        if (!accordionContainer) return;
+                        accordionContainer.innerHTML = '';
+                        const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-                    renderLectionaryList(month) {
-                        const container = this.elements.lectionaryListContainer;
-                        if (!container) return;
-                        container.innerHTML = '';
-                        const year = 2025;
-                        const startDate = new Date(year, month, 1);
-                        const endDate = new Date(year, month + 1, 0);
+                        months.forEach((monthName, monthIndex) => {
+                             if (monthIndex > 10) return; // Only show Jan to Nov
 
-                        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                            const data = App.services.getDailyOfficeData(new Date(d));
-                            if (data) {
-                                const formattedDate = new Date(d).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                                const entryEl = document.createElement('div');
-                                entryEl.className = 'lectionary-day-entry';
-                                entryEl.classList.add(data.color.scheme === 'light' ? 'light-scheme' : 'dark-scheme');
-                                entryEl.style.backgroundColor = data.color.hex;
-                                entryEl.innerHTML = `
-                                    <h3>${data.title}</h3>
-                                    <p class="date-label">${formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}</p>
-                                    <p class="liturgical-color-label">Color litúrgico: ${data.color.name}</p>
-                                    <h4>Colecta</h4><p>${data.collect}</p>
-                                    <h4>Lecciones</h4>
-                                    <div><h5>Oración Matutina</h5><ul><li>Salmos: ${data.readings.m.p}</li><li>1ª Lectura: ${data.readings.m.r1}</li><li>2ª Lectura: ${data.readings.m.r2}</li></ul></div>
-                                    <div><h5>Oración Vespertina</h5><ul><li>Salmos: ${data.readings.e.p}</li><li>1ª Lectura: ${data.readings.e.r1}</li><li>2ª Lectura: ${data.readings.e.r2}</li></ul></div>`;
-                                container.appendChild(entryEl);
+                            const accordionItem = document.createElement('div');
+                            accordionItem.className = 'overflow-hidden rounded-lg bg-white shadow-sm';
+
+                            const accordionHeader = document.createElement('button');
+                            accordionHeader.className = 'accordion-header flex justify-between items-center w-full p-4 text-left font-semibold text-gray-800 bg-gray-50 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500';
+                            accordionHeader.innerHTML = `
+                                <span class="text-lg">${monthName} 2025</span>
+                                <svg class="accordion-icon w-6 h-6 transform transition-transform duration-300 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            `;
+
+                            const accordionContent = document.createElement('div');
+                            accordionContent.className = 'accordion-content p-4 bg-white border-t border-gray-200 hidden';
+                            
+                            const contentWrapper = document.createElement('div');
+                            contentWrapper.className = 'space-y-6';
+
+                            const startDate = new Date(2025, monthIndex, 1);
+                            const endDate = new Date(2025, monthIndex + 1, 0);
+                            let hasContent = false;
+
+                            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                                const data = App.services.getDailyOfficeData(new Date(d));
+                                if (data) {
+                                    hasContent = true;
+                                    const formattedDate = new Date(d).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                                    const entryEl = document.createElement('div');
+                                    entryEl.className = 'lectionary-day-entry';
+                                    entryEl.classList.add(data.color.scheme === 'light' ? 'light-scheme' : 'dark-scheme');
+                                    entryEl.style.backgroundColor = data.color.hex;
+                                    entryEl.innerHTML = `
+                                        <h3>${data.title}</h3>
+                                        <p class="date-label">${formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}</p>
+                                        <p class="liturgical-color-label">Color litúrgico: ${data.color.name}</p>
+                                        <h4>Colecta</h4><p>${data.collect}</p>
+                                        <h4>Lecciones</h4>
+                                        <div><h5>Oración Matutina</h5><ul><li>Salmos: ${data.readings.m.p}</li><li>1ª Lectura: ${data.readings.m.r1}</li><li>2ª Lectura: ${data.readings.m.r2}</li></ul></div>
+                                        <div><h5>Oración Vespertina</h5><ul><li>Salmos: ${data.readings.e.p}</li><li>1ª Lectura: ${data.readings.e.r1}</li><li>2ª Lectura: ${data.readings.e.r2}</li></ul></div>`;
+                                    contentWrapper.appendChild(entryEl);
+                                }
                             }
-                        }
+                            
+                            if (hasContent) {
+                                accordionContent.appendChild(contentWrapper);
+                                accordionItem.appendChild(accordionHeader);
+                                accordionItem.appendChild(accordionContent);
+                                accordionContainer.appendChild(accordionItem);
+                            }
+                        });
                     },
                     
                     loadLogoFromStorage() {
@@ -938,11 +894,12 @@
                             }
                         });
 
-                        // Full Liturgy View & Accordion
+                        // Full Liturgy View & Accordions
                         els.backToCalendarBtn.addEventListener('click', () => ui.hideFullLiturgy());
                         els.printBtn.addEventListener('click', () => window.print());
                         els.downloadDocxBtn.addEventListener('click', this.handleDocxDownload);
                         els.liturgicalAccordionContainer.addEventListener('click', this.handleAccordionAndCardClick);
+                        els.lectionaryAccordionContainer.addEventListener('click', this.handleAccordionClick);
 
                         // Theology Popup
                         els.fullLiturgyView.addEventListener('click', this.handleTheologyLinkClick);
@@ -988,6 +945,16 @@
                             const [year, month, day] = card.dataset.date.split('-').map(Number);
                             const selectedDate = new Date(year, month - 1, day);
                             App.ui.showFullLiturgy(selectedDate);
+                        }
+                    },
+
+                    handleAccordionClick(e) {
+                        const header = e.target.closest('.accordion-header');
+                        if (header) {
+                            const content = header.nextElementSibling;
+                            const icon = header.querySelector('.accordion-icon');
+                            content.classList.toggle('hidden');
+                            icon.classList.toggle('rotate-180');
                         }
                     },
 
