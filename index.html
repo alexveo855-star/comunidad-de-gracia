@@ -305,6 +305,7 @@
             <a href="https://www.bibleserver.com/" target="_blank" rel="noopener noreferrer" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600">Biblia</a>
             <a data-view="glossary" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Libro de Oración Común</a>
             <a data-view="lectionary" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Leccionario</a>
+            <a data-view="study" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600 cursor-pointer">Material de Estudio</a>
             <a href="https://www.bibleserver.com/nicodemus-ai" target="_blank" rel="noopener noreferrer" class="mobile-nav-link text-2xl font-bold text-gray-700 hover:text-teal-600">Nicodemus IA</a>
         </nav>
     </div>
@@ -329,6 +330,7 @@
                     <a href="https://www.bibleserver.com/" target="_blank" rel="noopener noreferrer" class="main-nav-button">Biblia</a>
                     <a id="btn-glossary" class="main-nav-button cursor-pointer">Libro de Oración Común</a>
                     <a id="btn-lectionary" class="main-nav-button cursor-pointer">Leccionario</a>
+                    <a id="btn-study" class="main-nav-button cursor-pointer">Material de Estudio</a>
                     <a href="https://www.bibleserver.com/nicodemus-ai" target="_blank" rel="noopener noreferrer" class="main-nav-button">Nicodemus IA</a>
                     <a id="btn-upload-logo" class="main-nav-button cursor-pointer">
                         <svg class="w-6 h-6 text-gray-600 hover:text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -382,6 +384,43 @@
                     <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Leccionario Diario del Oficio</h2>
                     <div id="lectionary-accordion-container" class="space-y-2">
                         <!-- Lectionary accordion will be generated here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="study-material-view" class="hidden">
+            <main class="container mx-auto p-4 md:p-8">
+                <div class="bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl sm:text-3xl font-bold border-b-2 border-amber-400 pb-2 mb-6 text-gray-800">Material de Estudio</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                        <!-- Study Card 1: Liturgy -->
+                        <div class="bg-stone-100 p-6 rounded-lg shadow hover:shadow-xl transition-shadow">
+                            <h3 class="font-bold text-xl mb-2 text-teal-700">Liturgia</h3>
+                            <p class="text-gray-600 mb-4">Recursos litúrgicos adicionales, incluyendo guías y documentos para el servicio y la adoración.</p>
+                            <button id="btn-show-liturgy-docs" class="inline-block bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
+                                Entrar
+                            </button>
+                            <div id="liturgy-docs-list" class="hidden mt-4 pt-4 border-t border-gray-300">
+                                <p id="liturgy-docs-loader" class="text-gray-500">Cargando documentos...</p>
+                            </div>
+                        </div>
+                        <!-- Study Card 2 -->
+                        <div class="bg-stone-100 p-6 rounded-lg shadow hover:shadow-xl transition-shadow">
+                            <h3 class="font-bold text-xl mb-2 text-teal-700">Los 39 Artículos de la Religión</h3>
+                            <p class="text-gray-600 mb-4">Los artículos históricos que definen las creencias doctrinales de la Iglesia de Inglaterra y la Comunión Anglicana.</p>
+                             <a href="https://www.churchofengland.org/sites/default/files/2019-11/39-articles-of-religion-Spanish.pdf" target="_blank" rel="noopener noreferrer" class="inline-block bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
+                                Descargar PDF
+                            </a>
+                        </div>
+                        <!-- Study Card 3 -->
+                        <div class="bg-stone-100 p-6 rounded-lg shadow hover:shadow-xl transition-shadow">
+                            <h3 class="font-bold text-xl mb-2 text-teal-700">Introducción a la Liturgia</h3>
+                            <p class="text-gray-600 mb-4">Un documento que explora el significado, la historia y la práctica de la adoración litúrgica en la tradición anglicana.</p>
+                             <a href="https://www.academia.edu/12102037/Introducci%C3%B3n_a_la_Liturgia" target="_blank" rel="noopener noreferrer" class="inline-block bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
+                                Descargar PDF
+                            </a>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -498,13 +537,15 @@
                             home: document.getElementById('btn-home'),
                             liturgy: document.getElementById('btn-liturgy'), 
                             glossary: document.getElementById('btn-glossary'),
-                            lectionary: document.getElementById('btn-lectionary')
+                            lectionary: document.getElementById('btn-lectionary'),
+                            study: document.getElementById('btn-study')
                         };
                         els.views = { 
                             home: document.getElementById('home-view'),
                             liturgy: document.getElementById('liturgy-view'), 
                             glossary: document.getElementById('glossary-view'),
-                            lectionary: document.getElementById('lectionary-view')
+                            lectionary: document.getElementById('lectionary-view'),
+                            study: document.getElementById('study-material-view')
                         };
                         
                         els.fullLiturgyUI = { 
@@ -523,6 +564,11 @@
                         
                         els.liturgicalAccordionContainer = document.getElementById('liturgical-accordion-container');
                         els.lectionaryAccordionContainer = document.getElementById('lectionary-accordion-container');
+
+                        // Elements for the new functionality
+                        els.btnShowLiturgyDocs = document.getElementById('btn-show-liturgy-docs');
+                        els.liturgyDocsList = document.getElementById('liturgy-docs-list');
+                        els.liturgyDocsLoader = document.getElementById('liturgy-docs-loader');
                     },
 
                     switchView(viewName) {
@@ -914,6 +960,9 @@
                         els.hamburgerBtn.addEventListener('click', () => ui.openMobileMenu());
                         els.closeMenuBtn.addEventListener('click', () => ui.closeMobileMenu());
                         els.mobileNavLinks.addEventListener('click', this.handleMobileNavClick);
+                        
+                        // Study Material Documents
+                        els.btnShowLiturgyDocs.addEventListener('click', this.handleShowLiturgyDocs);
 
                         // Header Scroll
                         let lastScrollTop = 0;
@@ -987,6 +1036,54 @@
                             if (view) App.ui.switchView(view);
                             App.ui.closeMobileMenu();
                         }
+                    },
+
+                    handleShowLiturgyDocs() {
+                        const listDiv = App.ui.elements.liturgyDocsList;
+                        const loader = App.ui.elements.liturgyDocsLoader;
+
+                        if (listDiv.dataset.populated === 'true') {
+                            listDiv.classList.toggle('hidden');
+                            return;
+                        }
+
+                        listDiv.classList.remove('hidden');
+
+                        const apiUrl = 'https://api.github.com/repos/alexveo855-star/cominidad-de-gracia/contents/Material%20para%20descarga';
+
+                        fetch(apiUrl)
+                            .then(response => {
+                                if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+                                return response.json();
+                            })
+                            .then(data => {
+                                if(loader) loader.remove();
+                                const pdfFiles = data.filter(file => file.name.endsWith('.pdf'));
+                                
+                                if (pdfFiles.length === 0) {
+                                    listDiv.innerHTML = '<p class="text-gray-500">No se encontraron documentos PDF.</p>';
+                                } else {
+                                    const ul = document.createElement('ul');
+                                    ul.className = 'space-y-2';
+                                    pdfFiles.forEach(file => {
+                                        const li = document.createElement('li');
+                                        const a = document.createElement('a');
+                                        a.href = file.download_url;
+                                        a.textContent = file.name.replace('.pdf', '').replace(/_/g, ' ');
+                                        a.target = '_blank';
+                                        a.rel = 'noopener noreferrer';
+                                        a.className = 'text-teal-700 hover:underline';
+                                        li.appendChild(a);
+                                        ul.appendChild(li);
+                                    });
+                                    listDiv.appendChild(ul);
+                                }
+                                listDiv.dataset.populated = 'true';
+                            })
+                            .catch(error => {
+                                console.error('Error al cargar documentos de GitHub:', error);
+                                if(loader) loader.textContent = 'No se pudieron cargar los documentos.';
+                            });
                     },
                     
                     handleDocxDownload() {
