@@ -665,7 +665,7 @@
                             const templates = App.services.getLiturgyTemplates(liturgy, ref);
                             
                             const entranceProcession = `<h3>Procesión de Entrada</h3><p class="liturgy-text italic">(Se canta un himno o antífona de entrada apropiado)</p>`;
-                            const introductoryRites = entranceProcession + templates.initialGreeting + templates.penitentialAct + (liturgy.omitGloria ? '' : templates.gloria) + `<h3>Oración Colecta</h3><p class="liturgy-text">${liturgy.prayers.collect}</p>`;
+                            const introductoryRites = entranceProcession + templates.initialGreeting + templates.penitentialAct + templates.kyrie + (liturgy.omitGloria ? '' : templates.gloria) + `<h3>Oración Colecta</h3><p class="liturgy-text">${liturgy.prayers.collect}</p>`;
                             
                             let psalmContentHtml = `<strong>R. ${liturgy.readings.psalm.response}</strong><br><br>` + liturgy.readings.psalm.stanzas.join(`<br><br><strong>R. ${liturgy.readings.psalm.response}</strong><br><br>`);
                             const verseForAcclamation = liturgy.readings.alleluiaVerse || '';
@@ -964,6 +964,7 @@
                         return {
                             initialGreeting: `<h3>Saludo Inicial</h3><p class="liturgy-text">En el nombre del Padre, y del Hijo, y del Espíritu Santo.<br><strong>Amén.</strong><br>La gracia de nuestro Señor Jesucristo, el amor del Padre y la comunión del Espíritu Santo esté con todos ustedes.<br><strong>Y con tu espíritu.</strong></p>`,
                             penitentialAct: `<h3>Acto Penitencial (Libro de Oración Común ACNA)</h3><p class="liturgy-text">Amados en el Señor, acerquémonos con un corazón penitente y obediente a la Palabra de Dios, confesando nuestros pecados para que podamos recibir el perdón por su infinita bondad y misericordia.<br><em>Se guarda un momento de silencio.</em><br><strong>Misericordiosísimo Dios, confesamos que hemos pecado contra ti en pensamiento, palabra y obra, por lo que hemos hecho y por lo que hemos dejado de hacer. No te hemos amado con todo nuestro corazón; no hemos amado a nuestro prójimo como a nosotros mismos. Lo sentimos de veras y nos arrepentimos humildemente. Por tu Hijo Jesucristo, ten misericordia de nosotros y perdónanos, para que nos deleitemos en tu voluntad y andemos en tus caminos, para la gloria de tu Nombre. Amén.</strong><br>Dios todopoderoso tenga misericordia de nosotros, perdone nuestros pecados y nos lleve a la vida eterna.<br><strong>Amén.</strong></p>`,
+                            kyrie: `<h3>Kyrie Eleison</h3><p class="liturgy-text">Señor, ten piedad.<br><strong>Señor, ten piedad.</strong><br>Cristo, ten piedad.<br><strong>Cristo, ten piedad.</strong><br>Señor, ten piedad.<br><strong>Señor, ten piedad.</strong></p>`,
                             gloria: `<h3>Gloria</h3><p class="liturgy-text"><strong>Gloria a Dios en el cielo, y en la tierra paz a los hombres que ama el Señor. Por tu inmensa gloria te alabamos, te bendecimos, te adoramos, te glorificamos, te damos gracias, Señor Dios, Rey celestial, Dios Padre todopoderoso. Señor, Hijo único, Jesucristo. Señor Dios, Cordero de Dios, Hijo del Padre; tú que quitas el pecado del mundo, ten piedad de nosotros; tú que quitas el pecado del mundo, atiende nuestra súplica; tú que estás sentado a la derecha del Padre, ten piedad de nosotros. Porque sólo tú eres Santo, sólo tú Señor, sólo tú Altísimo, Jesucristo, con el Espíritu Santo en la gloria de Dios Padre. Amén.</strong></p>`,
                             alleluia: (verse) => `<h3>Aleluya</h3><p class="liturgy-text"><strong>Aleluya, aleluya.</strong><br>${verse}<br><strong>Aleluya.</strong></p>`,
                             gospelAcclamation: (verse) => `<h3>Aclamación antes del Evangelio</h3><p class="liturgy-text">${verse}</p>`,
@@ -1190,5 +1191,6 @@
     </script>
 </body>
 </html>
+
 
 
